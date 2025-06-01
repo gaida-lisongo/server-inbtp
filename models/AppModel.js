@@ -28,6 +28,36 @@ class AppModel extends Model {
         const result = await this.request(sql, [id]);
         return result || [];
     }
+
+    async getAnnees() {
+        const sql = `
+            SELECT *
+            FROM annee
+        `;
+        const result = await this.request(sql);
+        return result || [];
+    }
+
+    async getAnneeById(id) {
+        const sql = `
+            SELECT *
+            FROM annee
+            WHERE id = ?
+        `;
+        const result = await this.request(sql, [id]);
+        return result || [];
+    }
+
+    async getCurrentAnnee() {
+        const sql = `
+            SELECT *
+            FROM annee
+            ORDER BY annee DESC
+            LIMIT 1
+        `;
+        const result = await this.request(sql);
+        return result[0] || null; // Return the first result or null if not found
+    }
 }
 
 module.exports = AppModel;
