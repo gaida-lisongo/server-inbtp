@@ -56,7 +56,8 @@ class AppModel extends Model {
             LIMIT 1
         `;
         const result = await this.request(sql);
-        return result[0] || null; // Return the first result or null if not found
+        
+        return result || null; // Return the first result or null if not found
     }
 }
 
