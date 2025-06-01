@@ -1,8 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const db = require('./config/database');
-
+const { Model } = require('./models');
 const app = express();
 
 // Middleware
@@ -18,8 +17,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // Basic route
 app.get('/', async (req, res) => {
-    const allAgent = await db.query('SELECT * FROM agent');
-    res.json({ message: 'Welcome to INBTP API', agents: allAgent ? allAgent.length : 0 });
+    const request = await Model.findConnexion();
+
+    console.log('Request:', request);
+    const allConnexions = request ? request.length : 0;
+    res.json({ message: 'Welcome to INBTP API', connexions: allConnexions });
 });
 
 // Routes
