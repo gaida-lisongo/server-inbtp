@@ -17,7 +17,7 @@ class Model {
 
   async request(sql, params = []) {
     try {
-      const [rows] = await this.db.query(sql, params);
+      const rows = await this.db.query(sql, params);
       return {
         rows: rows,
         count: rows.length,
