@@ -18,14 +18,23 @@ class Database {
             database: process.env.DB_NAME || 'inbtp_db',
             waitForConnections: true,
             connectionLimit: 15, // Nombre maximum de connexions actives
-            queueLimit: 5 // Nombre maximum de connexions en file d'attente
+            queueLimit: 5, // Nombre maximum de connexions en file d'attente
+            enableKeepAlive: true,
+            keepAliveInitialDelay: 10000, // 10 secondes
+            connectTimeout: 30000, // 30 secondes
+            acquireTimeout: 30000, // 30 secondes
+            timeout: 60000, // 60 secondes
+            // Configuration SSL pour plus de sécurité en production
+            ssl: process.env.NODE_ENV === 'production' ? {
+                rejectUnauthorized: true
+            } : undefined
         });
 
         // Promisify pour utiliser async/await
         this.pool = this.pool.promise();
 
-        // Vérifier la connexion
-        this.testConnection();
+        // Vérifier la connexion avec retry
+        this.initConnection();
 
         Database.instance = this;
     }
@@ -42,34 +51,55 @@ class Database {
     }
 
     /**
-     * Tester la connexion à la base de données
+     * Initialise la connexion avec un système de retry
      * @private
      */
-    async testConnection() {
-        try {
-            const connection = await this.pool.getConnection();
-            console.log('Connexion à la base de données établie avec succès');
-            connection.release();
-        } catch (error) {
-            console.error('Erreur de connexion à la base de données:', error.message);
-            throw error;
+    async initConnection(retries = 5) {
+        for (let i = 0; i < retries; i++) {
+            try {
+                const connection = await this.pool.getConnection();
+                console.log('Connexion à la base de données établie avec succès');
+                connection.release();
+                return;
+            } catch (error) {
+                console.error(`Tentative ${i + 1}/${retries} - Erreur de connexion:`, error.message);
+                if (i === retries - 1) {
+                    throw error;
+                }
+                // Attendre avant de réessayer (temps d'attente exponentiel)
+                await new Promise(resolve => setTimeout(resolve, Math.min(1000 * Math.pow(2, i), 10000)));
+            }
         }
     }
 
     /**
-     * Exécuter une requête SQL
+     * Exécuter une requête SQL avec retry automatique
      * @param {string} sql - La requête SQL à exécuter
      * @param {Array} params - Les paramètres de la requête
      * @returns {Promise} Le résultat de la requête
      */
-    async query(sql, params) {
-        try {
-            const [results] = await this.pool.execute(sql, params);
-            return results;
-        } catch (error) {
-            console.error('Erreur lors de l\'exécution de la requête:', error.message);
-            throw error;
+    async query(sql, params, retries = 3) {
+        for (let i = 0; i < retries; i++) {
+            try {
+                const [results] = await this.pool.execute(sql, params);
+                return results;
+            } catch (error) {
+                console.error(`Tentative ${i + 1}/${retries} - Erreur de requête:`, error.message);
+                if (i === retries - 1 || !this.isRetryableError(error)) {
+                    throw error;
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
+            }
         }
+    }
+
+    /**
+     * Vérifie si l'erreur permet une nouvelle tentative
+     * @private
+     */
+    isRetryableError(error) {
+        const retryableErrors = ['ETIMEDOUT', 'ECONNRESET', 'PROTOCOL_CONNECTION_LOST'];
+        return retryableErrors.includes(error.code);
     }
 }
 
