@@ -16,6 +16,7 @@ class Database {
             user: process.env.DB_USER || 'root',
             password: process.env.DB_PASSWORD || '',
             database: process.env.DB_NAME || 'inbtp_db',
+            port: process.env.DB_PORT || 3306,
             waitForConnections: true,
             connectionLimit: 15, // Nombre maximum de connexions actives
             queueLimit: 5, // Nombre maximum de connexions en file d'attente
@@ -24,10 +25,10 @@ class Database {
             connectTimeout: 30000, // 30 secondes
             acquireTimeout: 30000, // 30 secondes
             timeout: 60000, // 60 secondes
-            // Configuration SSL pour plus de sécurité en production
-            ssl: process.env.NODE_ENV === 'production' ? {
-                rejectUnauthorized: true
-            } : undefined
+            // Forcer l'utilisation d'IPv4
+            family: 4,
+            // Désactiver SSL pour le moment pour tester la connexion
+            ssl: false
         });
 
         // Promisify pour utiliser async/await
@@ -59,15 +60,26 @@ class Database {
             try {
                 const connection = await this.pool.getConnection();
                 console.log('Connexion à la base de données établie avec succès');
+                // Test de la connexion avec une requête simple
+                await connection.query('SELECT 1');
+                console.log('Test de connexion réussi');
                 connection.release();
                 return;
             } catch (error) {
+                const retryIn = Math.min(1000 * Math.pow(2, i), 10000);
                 console.error(`Tentative ${i + 1}/${retries} - Erreur de connexion:`, error.message);
+                console.error('Configuration utilisée:', {
+                    host: process.env.DB_HOST,
+                    user: process.env.DB_USER,
+                    database: process.env.DB_NAME,
+                    port: process.env.DB_PORT || 3306
+                });
+                
                 if (i === retries - 1) {
                     throw error;
                 }
-                // Attendre avant de réessayer (temps d'attente exponentiel)
-                await new Promise(resolve => setTimeout(resolve, Math.min(1000 * Math.pow(2, i), 10000)));
+                console.log(`Nouvelle tentative dans ${retryIn/1000} secondes...`);
+                await new Promise(resolve => setTimeout(resolve, retryIn));
             }
         }
     }
