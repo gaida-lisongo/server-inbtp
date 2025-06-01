@@ -52,7 +52,7 @@ class AppModel extends Model {
         const sql = `
             SELECT *
             FROM annee
-            ORDER BY annee DESC
+            ORDER BY annee.id DESC
             LIMIT 1
         `;
         const result = await this.request(sql);
