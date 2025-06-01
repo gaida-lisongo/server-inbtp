@@ -19,6 +19,22 @@ class AppController extends Controller {
             return this.result('Failed to retrieve programmes', null, 500);
         }
     }
+
+    async programme(id) {
+        try {
+            const programme = await this.model.getProgrammeById(id);
+            if (!programme) {
+                return this.result('Programme not found', null, 404);
+            }
+            return this.result(
+                'Programme retrieved successfully', 
+                programme
+            );
+        } catch (error) {
+            console.error('Error retrieving programme:', error);
+            return this.result('Failed to retrieve programme', null, 500);
+        }
+    }
 }
 
 module.exports = AppController;
