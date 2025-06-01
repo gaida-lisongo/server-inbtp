@@ -25,4 +25,33 @@ router.get('/section/:id', async (req, res) => {
     }
 
 })
+
+router.get('/annees', async (req, res) => {
+    try {
+        const data = await App.annees();
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching annees', error });
+    }
+})
+
+router.get('/annee/:id', async (req, res) => {
+    const anneeId = req.params.id;
+    try {
+        const data = await App.annee(anneeId);
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching annee', error });
+    }
+})
+
+router.get('/current-annee', async (req, res) => {
+    try {
+        const data = await App.currentAnnee();
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching current annee', error });
+    }
+})  
+
 module.exports = router;
