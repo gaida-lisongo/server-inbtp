@@ -81,6 +81,35 @@ class AppController extends Controller {
         }
     }
 
+    async promotions() {
+        try {
+            const promotions = await this.model.getPromotions();
+            return this.result(
+                'Promotions retrieved successfully', 
+                promotions
+            );
+        } catch (error) {
+            console.error('Error retrieving promotions:', error);
+            return this.result('Failed to retrieve promotions', null, 500);
+        }
+    }
+
+    async promotionsBySection(id) {
+        try {
+            const promotions = await this.model.getPromotionsByProgramme(id);
+            if (!promotions) {
+                return this.result('Promotions not found for section', null, 404);
+            }
+            return this.result(
+                'Promotions retrieved successfully for section', 
+                promotions
+            );
+        } catch (error) {
+            console.error('Error retrieving promotions by section:', error);
+            return this.result('Failed to retrieve promotions by section', null, 500);
+        }
+    }
+
 }
 
 module.exports = AppController;

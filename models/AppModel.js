@@ -59,6 +59,27 @@ class AppModel extends Model {
         
         return result || null; // Return the first result or null if not found
     }
+
+    async getPromotions() {
+        const sql = `SELECT p.*, s.designation AS 'section', n.intitule AS 'niveau', n.systeme
+            FROM promotion p
+            INNER JOIN section s ON p.id_section = s.id
+            INNER JOIN niveau n ON n.id = p.id_niveau
+        `;
+        const result = await this.request(sql);
+        return result || [];
+    }
+
+    async getPromotionsByProgramme(idProgramme) {
+        const sql = `SELECT p.*, s.designation AS 'section', n.intitule AS 'niveau', n.systeme
+            FROM promotion p
+            INNER JOIN section s ON p.id_section = s.id
+            INNER JOIN niveau n ON n.id = p.id_niveau
+            WHERE p.id_section = ?
+        `;
+        const result = await this.request(sql, [idProgramme]);
+        return result || [];
+    }
 }
 
 module.exports = AppModel;
