@@ -112,7 +112,7 @@ class AppController extends Controller {
 
     async promotion(promotionId){
         try {
-            const promotion = await this.model.getPromotionsById(promotionId);
+            const promotion = await this.model.getPromotionById(promotionId);
             if (!promotion) {
                 return this.result('Promotion not found', null, 404);
             }
@@ -184,6 +184,112 @@ class AppController extends Controller {
         } catch (error) {
             console.error('Error adding message:', error);
             return this.result('Failed to add message', null, 500);
+        }
+    }
+
+    async getNotesEtudiant({anneeId, matricule, promotionId, type}) {
+        
+        matricule = matricule.toUpperCase();
+        try {
+            const anneeData = await this.model.getAnneeById(anneeId);
+            if (!anneeData) {
+                return this.result('Annee not found', null, 404);
+            }
+
+            let matieres = [];
+            const matieresData = await this.model.getMatieresByPromotion(promotionId);
+            switch (type) {
+                case 'S1':
+                    matieres = matieresData.rows.filter(matiere => matiere.semestre == 'Premier');
+                    break;
+                
+                case 'S2':
+                    matieres = matieresData.rows.filter(matiere => matiere.semestre == 'Second');
+                    break;
+            
+                default:
+                    matieres = matieresData.rows;
+                    break;
+            }
+
+            if (!matieres || matieres.length === 0) {
+                return this.result('No matieres found for the given promotion', null, 404);
+            }
+
+            const etudiantData = await this.model.getEtudiantByMatricule(matricule);
+
+            if (!etudiantData) {
+                return this.result('Etudiant not found', null, 404);
+            }
+
+            const promotionData = await this.model.getPromotionById(promotionId);
+
+            if (!promotionData) {
+                return this.result('Promotion not found', null, 404);
+            }
+
+            const checkCmd = await this.model.getCommandeEtudiant({
+                etudiantId: etudiantData.rows[0].id,
+                anneeId: anneeId,
+                promotionId: promotionId
+            })
+
+            if (!checkCmd || checkCmd.rows.length === 0) {
+                return this.result('No command found for the student in the given year and promotion', null, 404);
+            }
+            // Process queries sequentially instead of using Promise.all
+            const notes = [];
+            for (const matiere of matieres) {
+                const cotes = await this.model.getCotesEtudiant({
+                    etudiantId: etudiantData.rows[0].id,
+                    matiereId: matiere.id,
+                    anneeId: anneeId
+                });
+
+                notes.push({
+                    ...matiere,
+                    cotes: cotes.rows || []
+                });
+            }
+            
+            let unites = [];
+            notes.forEach(matiere => {
+                if (!unites.some(u => u.id === matiere.id_unite)) {
+                    unites.push({
+                        id: matiere.id_unite,
+                        code: matiere['unite-code'],
+                        designation: matiere['unite-titre'],
+                        semestre: matiere.semestre,
+                        notes: []
+                    });
+                }
+            });
+
+            notes.forEach(matiere => {
+                const unite = unites.find(u => u.id === matiere.id_unite);
+                if (unite) {
+                    unite.notes.push({
+                        id: matiere.id,
+                        titre: matiere.designation,
+                        credit: matiere.credit,
+                        cote: matiere.cotes.length > 0 ? matiere.cotes[0] : null
+                    });
+                }
+            });
+
+            return this.result(
+                'Notes retrieved successfully', 
+                {
+                    etudiant: etudiantData.rows[0],
+                    promotion: promotionData.rows[0],
+                    matieres: unites,
+                    annee: anneeData.rows[0],
+                    commande: checkCmd.rows[0]
+                }
+            );
+        } catch (error) {
+            console.error('Error retrieving notes:', error);
+            return this.result('Failed to retrieve notes', null, 500);
         }
     }
 

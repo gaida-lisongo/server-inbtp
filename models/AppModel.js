@@ -81,7 +81,7 @@ class AppModel extends Model {
         return result || [];
     }
 
-    async getPromotionsById(idPromotion) {
+    async getPromotionById(idPromotion) {
         const sql = `SELECT p.*, s.designation AS 'section', n.intitule AS 'niveau', n.systeme
             FROM promotion p
             INNER JOIN section s ON p.id_section = s.id
@@ -101,6 +101,51 @@ class AppModel extends Model {
         const result = await this.request(sql, [promotionId]);
         return result || [];
         
+    }
+
+    async getEtudiants(){
+        const sql = `SELECT *
+            FROM etudiant
+        `;
+        const result = await this.request(sql);
+        return result || [];
+    }
+
+    async getEtudiantById(etudiantId) {
+        const sql = `SELECT *
+            FROM etudiant
+            WHERE id = ?
+        `;
+        const result = await this.request(sql, [etudiantId]);
+        return result || null;
+    }
+
+    async getEtudiantByMatricule(matricule) {
+        const sql = `SELECT *
+            FROM etudiant
+            WHERE matricule = ?
+        `;
+        const result = await this.request(sql, [matricule]);
+        return result || null;
+    }
+
+    async getCotesEtudiant({etudiantId, matiereId, anneeId}) {
+        const sql = `SELECT *
+            FROM fiche_cotation
+            WHERE id_etudiant = ? AND id_matiere = ? AND id_annee = ?
+        `;
+        const result = await this.request(sql, [etudiantId, matiereId, anneeId]);
+        return result || null;
+    }
+
+    async getCommandeEtudiant({etudiantId, anneeId, promotionId}) {
+        const sql = `SELECT er.*, cmde.id_enrollement, cmde.id_etudiant, cmde.montant, cmde.statut, cmde.reference AS 'payment_enrol', cmde.orderNumber AS 'payment_carnet', cmde.montant AS 'payment_frais', cmde.date_created AS 'date_payment'
+                    FROM enrollements er
+                    INNER JOIN commande_enrollement cmde ON cmde.id_enrollement = er.id
+                    WHERE er.id_promotion = ? AND er.id_annee = ? AND cmde.id_etudiant = ?
+                `;
+        const result = await this.request(sql, [promotionId, anneeId, etudiantId]);
+        return result || null;
     }
 
     async createMessageSection({ nom, email, objet, contenu, sectionId }) {
