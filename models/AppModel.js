@@ -80,6 +80,15 @@ class AppModel extends Model {
         const result = await this.request(sql, [idProgramme]);
         return result || [];
     }
+
+    async createMessageSection({ nom, email, objet, contenu, sectionId }) {
+        const sql = `
+            INSERT INTO contacts_sections (auteur_nom, auteur_email, message_objet, message_contenu, sectionId)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        const result = await this.request(sql, [nom, email, objet, contenu, sectionId]);
+        return result || null;
+    }
 }
 
 module.exports = AppModel;

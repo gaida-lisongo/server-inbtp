@@ -110,6 +110,22 @@ class AppController extends Controller {
         }
     }
 
+    async addMessageSection(data) {
+        try {
+            const result = await this.model.createMessageSection(data);
+            if (!result) {
+                return this.result('Failed to add message', null, 400);
+            }
+            return this.result(
+                'Message added successfully', 
+                result
+            );
+        } catch (error) {
+            console.error('Error adding message:', error);
+            return this.result('Failed to add message', null, 500);
+        }
+    }
+
 }
 
 module.exports = AppController;

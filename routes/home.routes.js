@@ -73,4 +73,14 @@ router.get('/promotions-section/:id', async (req, res) => {
     }
 })
 
+router.post('/message-section', async (req, res) => {
+    const { nom, email, objet, contenu, sectionId } = req.body;
+    try {
+        const data = await App.addMessageSection({ nom, email, objet, contenu, sectionId });
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'Error adding message to section', error });
+    }
+})
+
 module.exports = router;
