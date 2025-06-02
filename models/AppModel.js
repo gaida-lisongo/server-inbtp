@@ -81,6 +81,28 @@ class AppModel extends Model {
         return result || [];
     }
 
+    async getPromotionsById(idPromotion) {
+        const sql = `SELECT p.*, s.designation AS 'section', n.intitule AS 'niveau', n.systeme
+            FROM promotion p
+            INNER JOIN section s ON p.id_section = s.id
+            INNER JOIN niveau n ON n.id = p.id_niveau
+            WHERE p.id = ?
+        `;
+        const result = await this.request(sql, [idPromotion]);
+        return result || [];
+    }
+
+    async getMatieresByPromotion(promotionId) {
+        const sql = `SELECT mt.*, ut.designation AS 'unite-titre', ut.code AS 'unite-code'
+            FROM matiere mt
+            INNER JOIN unite ut ON ut.id = mt.id_unite
+            WHERE ut.id_promotion = ?
+        `;
+        const result = await this.request(sql, [promotionId]);
+        return result || [];
+        
+    }
+
     async createMessageSection({ nom, email, objet, contenu, sectionId }) {
         const sql = `
             INSERT INTO contacts_sections (auteur_nom, auteur_email, message_objet, message_contenu, sectionId)

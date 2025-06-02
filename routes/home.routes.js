@@ -73,6 +73,17 @@ router.get('/promotions-section/:id', async (req, res) => {
     }
 })
 
+router.get('/promotion/:id', async (req, res) => {
+    const promotionId = req.params.id;
+    try {
+        const data = await App.promotion(promotionId);
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching promotion', error });
+    }
+})
+
+
 router.post('/message-section', async (req, res) => {
     const { nom, email, objet, contenu, sectionId } = req.body;
     try {

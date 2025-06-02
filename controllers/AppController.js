@@ -110,6 +110,67 @@ class AppController extends Controller {
         }
     }
 
+    async promotion(promotionId){
+        try {
+            const promotion = await this.model.getPromotionsById(promotionId);
+            if (!promotion) {
+                return this.result('Promotion not found', null, 404);
+            }
+            const matieresData = await this.model.getMatieresByPromotion(promotionId);
+            if (!matieresData) {
+                return this.result('Matieres not found for promotion', null, 404);
+            }
+            let semestre1 = [];
+            let semestre2 = [];
+
+            matieresData.rows.map(matiere => {
+                if (!matiere) {
+                    return null; // Skip if matiere is not found
+                }
+
+                if (matiere.semestre == 'Premier') {
+                    semestre1.push({
+                        id: matiere.id,
+                        titre: matiere.designation,
+                        credit: matiere.credit,
+                        unite: {
+                            id: matiere.id_unite,
+                            code: matiere['unite-code'],
+                            designation: matiere['unite-titre']
+                        }
+                    });
+
+                } else {
+                    semestre2.push({
+                        id: matiere.id,
+                        titre: matiere.designation,
+                        credit: matiere.credit,
+                        unite: {
+                            id: matiere.id_unite,
+                            code: matiere['unite-code'],
+                            designation: matiere['unite-titre']
+                        }
+                    });
+                }
+            });
+            return this.result(
+                'Promotion retrieved successfully',
+                {
+                    promotion : promotion.rows[0],
+                    matieres : {
+                        semestre1,
+                        semestre2
+                    }
+                } 
+            );
+
+        } catch (error) {
+            console.error('Error retrieving matieres by promotion:', error);
+            return this.result('Failed to retrieve matieres by promotion', null, 500);
+            
+        }
+    }
+
     async addMessageSection(data) {
         try {
             const result = await this.model.createMessageSection(data);
