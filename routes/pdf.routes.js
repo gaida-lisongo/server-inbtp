@@ -207,9 +207,7 @@ const generatePdfEntete = async () => {
     return pdfDoc;
 }
 
-const generateSimpleTable = async () => {
-    
-
+const generateSimpleTable = async () => {    
     const docDefinition = {
         content: [
             {
@@ -310,7 +308,6 @@ const generateSimpleTable = async () => {
     const pdfDoc = printer.createPdfKitDocument(docDefinition);
     return pdfDoc;
 }
-
 
 // Fonction pour générer le PDF avec pdfmake
 function generatePdf(docDefinition) {
@@ -442,7 +439,10 @@ router.get('/cover/:name', async (req, res) => {
     const coverName = req.params.name;
     
     /**
-     * Avec pdf-lib ouvrir le PDF de couverture et placer le nom
+     * Avec pdf-lib ouvrir le PDF de couverture et placer le nom dans la premiere page
+     * Avec pdfmake créer un PDF suivant la docDefinition
+     * Fusionner les deux PDF pour créer un PDF final
+     * Envoyer le PDF final en réponse
      */
 
     try {
@@ -471,5 +471,24 @@ router.get('/cover/:name', async (req, res) => {
         console.error('Error generating cover PDF:', error);
         res.status(500).send('Error generating cover PDF');
     }
+});
+
+router.post('/checkResultat', async (req, res) => {
+    const { annee, matricule, promotionId, type } = req.body;
+
+    try {
+        const payload = {
+            anneeId: annee,
+            matricule,
+            promotionId,
+            type
+        }
+        const data = await App.getNotesEtudiant(payload);
+        console.log('Data:', data);
+        // res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'Error checking result', error });
+    }
+
 })
 module.exports = router;
