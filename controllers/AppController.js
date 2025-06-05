@@ -186,7 +186,7 @@ class AppController extends Controller {
             return this.result('Failed to add message', null, 500);
         }
     }
-
+    
     async getNotesEtudiant({anneeId, matricule, promotionId, type}) {
         
         matricule = matricule.toUpperCase();

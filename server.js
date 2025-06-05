@@ -71,7 +71,30 @@ app.use((err, req, res, next) => {
 
 // Set port and start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
+
+// Gérer les erreurs non capturées
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    // Ne pas quitter le processus, laisser Koyeb le gérer
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Ne pas quitter le processus, laisser Koyeb le gérer
+});
+
+// Gérer l'arrêt gracieux
+process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received. Closing HTTP server...');
+    // Fermer proprement le serveur
+    server.close(() => {
+        console.log('HTTP server closed');
+        process.exit(0);
+    });
+});
+
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}.`);
     console.log(`Server is running on http://0.0.0.0:${PORT}.`);
+    console.log('Environment:', process.env.NODE_ENV || 'development');
 });

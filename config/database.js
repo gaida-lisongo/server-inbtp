@@ -9,26 +9,27 @@ class Database {
     constructor() {
         if (Database.instance) {
             return Database.instance;
-        }
-
-        this.pool = mysql.createPool({
+        }        this.pool = mysql.createPool({
             host: process.env.DB_HOST || 'localhost',
             user: process.env.DB_USER || 'root',
             password: process.env.DB_PASSWORD || '',
             database: process.env.DB_NAME || 'inbtp_db',
             port: process.env.DB_PORT || 3306,
             waitForConnections: true,
-            connectionLimit: 15, // Nombre maximum de connexions actives
-            queueLimit: 5, // Nombre maximum de connexions en file d'attente
+            connectionLimit: 10, // Réduire le nombre de connexions pour Koyeb
+            queueLimit: 0, // Pas de limite de file d'attente
             enableKeepAlive: true,
-            keepAliveInitialDelay: 10000, // 10 secondes
-            connectTimeout: 30000, // 30 secondes
-            acquireTimeout: 30000, // 30 secondes
-            timeout: 60000, // 60 secondes
-            // Forcer l'utilisation d'IPv4
-            family: 4,
-            // Désactiver SSL pour le moment pour tester la connexion
-            ssl: false
+            keepAliveInitialDelay: 10000,
+            connectTimeout: 60000, // Augmenter le timeout
+            acquireTimeout: 60000,
+            timeout: 120000,
+            ssl: {
+                // Activer SSL mais permettre les certificats auto-signés
+                rejectUnauthorized: false
+            },
+            // Configuration spécifique pour gérer les déconnexions
+            multipleStatements: true,
+            timezone: 'Z'
         });
 
         // Promisify pour utiliser async/await
