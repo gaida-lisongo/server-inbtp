@@ -324,8 +324,7 @@ router.post('/checkResultat', async (req, res) => {
                 }
             }
         };
-
-        console.log("Document description : ", ...docDefinition.content[0]);        
+     
         console.log('Début de la génération du bulletin...');
         const pdfBulletin = await generatePdf(docDefinition);
         
