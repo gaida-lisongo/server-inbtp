@@ -214,6 +214,8 @@ router.post('/checkResultat', async (req, res) => {
 
         const { commande, annee, etudiant, matieres, promotion } = data;
         const ecues =  matieres.map(matiere =>{
+            const cotes = matiere.notes.map(note => note.cote);
+            console.log(`Cote of matiere ${matiere.designation}`, cotes)
             return matiere.notes
         })
         console.log('Detail notes to show :', ecues)
@@ -316,6 +318,7 @@ router.post('/checkResultat', async (req, res) => {
                 },
                 {
                     table : {
+                        widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
                         body: [
                             [
                                 {text: 'Code', style: 'tableHeader'}, 
