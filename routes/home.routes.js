@@ -16,15 +16,32 @@ const printer = new PdfPrinter(fonts);
 async function generatePdf(docDefinition) {
   return new Promise((resolve, reject) => {
     try {
+      console.log('Début de la génération du PDF...');
       const pdfDoc = printer.createPdfKitDocument(docDefinition);
       const chunks = [];
 
-      pdfDoc.on('data', chunk => chunks.push(chunk));
-      pdfDoc.on('error', error => reject(error));
-      pdfDoc.on('end', () => resolve(Buffer.concat(chunks)));
+      pdfDoc.on('data', chunk => {
+        console.log(`Chunk reçu, taille: ${chunk.length} octets`);
+        chunks.push(chunk);
+      });
+
+      pdfDoc.on('error', error => {
+        console.error('Erreur pendant la génération du PDF:', error);
+        reject(error);
+      });
+
+      pdfDoc.on('end', () => {
+        console.log('Génération du PDF terminée');
+        const result = Buffer.concat(chunks);
+        console.log(`Taille totale du PDF: ${result.length} octets`);
+        resolve(result);
+      });
+
+      console.log('Début du streaming du document...');
       pdfDoc.end();
     } catch (error) {
       console.error('Erreur lors de la génération du PDF:', error);
+      console.error('Stack trace:', error.stack);
       reject(error);
     }
   });
@@ -191,12 +208,7 @@ router.post('/checkResultat', async (req, res) => {
             throw new Error('Données incomplètes pour générer le bulletin');
         }
 
-        // Utiliser un objet vide si commande n'existe pas
-        const { commande = { 
-            id_etudiant: data.etudiant.id, 
-            id_promotion: data.promotion.id,
-            id: new Date().getTime()
-        }, annee, etudiant, matieres, promotion } = data;
+        const { commande, annee, etudiant, matieres, promotion } = data;
         
         const docDefinition = {
             defaultStyle: {
@@ -313,16 +325,38 @@ router.post('/checkResultat', async (req, res) => {
             }
         };
 
-        console.log("Document description : ", ...docDefinition.content[0]);
-
-
+        console.log("Document description : ", ...docDefinition.content[0]);        
+        console.log('Début de la génération du bulletin...');
         const pdfBulletin = await generatePdf(docDefinition);
-        console.log('Pdf Generate :', pdfBulletin);
-        const bulletin = await addCoverToPdf(pdfBulletin, `${etudiant.nom} ${etudiant.post_nom} ${etudiant.prenom ? etudiant.prenom : ''}`);
+        
+        if (!pdfBulletin || pdfBulletin.length === 0) {
+            throw new Error('Le PDF généré est vide');
+        }
+        
+        console.log('PDF bulletin généré avec succès, taille:', pdfBulletin.length);
+        
+        const nomComplet = `${etudiant.nom} ${etudiant.post_nom} ${etudiant.prenom ? etudiant.prenom : ''}`;
+        console.log('Ajout de la page de couverture pour:', nomComplet);
+        
+        const bulletin = await addCoverToPdf(pdfBulletin, nomComplet);
+        
+        if (!bulletin || bulletin.length === 0) {
+            throw new Error('Le PDF final est vide après ajout de la couverture');
+        }
+        
+        console.log('PDF final généré avec succès, taille:', bulletin.length);
 
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename=${matricule}.pdf`);
-        res.send(Buffer.from(bulletin));
+        res.setHeader('Content-Length', bulletin.length);
+        
+        try {
+            res.send(Buffer.from(bulletin));
+            console.log('PDF envoyé avec succès');
+        } catch (sendError) {
+            console.error('Erreur lors de l\'envoi du PDF:', sendError);
+            throw sendError;
+        }
     } catch (error) {
         res.status(500).json({ message: 'Error checking result', error });
     }
