@@ -413,10 +413,19 @@ router.post('/checkResultat', async (req, res) => {
                             width: '40%',
                             table : {
                                 body: [
+                                    [{text: "Resumé des Notes", bold: true, colSpan: 2}, ""],
+                                    ["Maximum", {text: `${maximum}`, bold: true}],
+                                    ["Total Obtenu", {text: `${totalObenue.toFixed(2)}`, bold: true}],
+                                    ["Pourcentage", {text: `${pourcentage}%`, bold: true}],
+                                    ["NCV", {text: `${ncv}`, bold: true}],
+                                    ["NCNV", {text: `${ncnv}`, bold: true}],
                                     ["Decison", {text: `${decision.decison}`, bold: true}],
                                     ["Appréciation", {text: `${decision.appraciation}`, bold: true}],
                                     ["Capitalisation", {text: `${decision.capitalisation}`, bold: true}],
-                                ]
+                                ],
+                                widths: ['*', 'auto'],
+                                alignment: 'left',
+                                margin: [0, 10, 0, 0]
                             }
                         },
                         {
@@ -510,23 +519,18 @@ router.post('/checkResultat', async (req, res) => {
                         {
                             width: '50%',
                             stack: [
-                                { text: `Maximum Possible: ${maximum}`, style: 'subheader', alignment: 'left', margin: [0, 20, 0, 0] },
-                                { text: `Total Obtenu: ${!manqueCote ? totalObenue.toFixed(2) : 'N/A'}`, style: 'subheader', alignment: 'left' },
-                                { text: `Pourcentage: ${!manqueCote ? pourcentage + '%' : 'N/A'}`, style: 'subheader', alignment: 'left' },
-                                { text: `Nombre de crédits validés (NCV): ${ncv}`, style: 'subheader', alignment: 'left' },
-                                { text: `Nombre de crédits non validés (NCNV): ${ncnv}`, style: 'subheader', alignment: 'left' },
+                                {
+                                    qr: `https://ista-gm.net/check-result/${commande.id}`,
+                                    fit: 180,
+                                    alignment: 'left',
+                                    margin: [0, 10, 0, 10]
+                                }
                             ]
                         },
                         {
                             width: '*',
                             stack: [
-                                {text: 'Fait à Mbanza-Ngungu, le ' + new Date().toLocaleDateString('fr-FR'), style: 'subheader', alignment: 'right', margin: [0, 20, 0, 0]},
-                                {
-                                    qr: `https://ista-gm.net/check-result/${commande.id}`,
-                                    fit: 100,
-                                    alignment: 'right',
-                                    margin: [0, 10, 0, 10]
-                                }
+                                {text: 'Fait à Mbanza-Ngungu, le ' + new Date().toLocaleDateString('fr-FR'), style: 'subheader', alignment: 'right', margin: [0, 10, 0, 0]},
                             ]
 
                         },
