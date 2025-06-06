@@ -70,14 +70,15 @@ async function addCoverToPdf(pdfBuffer, coverName=""){
         //Merge this PDF with the Pdf generate by pdfmake (pdfBuffer)
         const existingPdf = await PDFDocument.load(pdfBuffer);
         const mergedPdf = await PDFDocument.create();
-        const [coverPage] = await mergedPdf.copyPages(pdfBytes, [0]);
+        const [coverPage] = await mergedPdf.copyPages(coverPdf, [0]);
         const [existingPage] = await mergedPdf.copyPages(existingPdf, [0]);
         mergedPdf.addPage(coverPage);
         mergedPdf.addPage(existingPage);
 
         const mergedPdfBytes = await mergedPdf.save();
 
-        return mergedPdfBytes;    } catch (error) {
+        return mergedPdfBytes;
+    } catch (error) {
         console.error('Error generating cover PDF:', error);
         throw new Error('Erreur lors de la génération de la page de couverture : ' + error.message);
     }
