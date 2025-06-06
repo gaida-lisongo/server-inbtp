@@ -186,7 +186,7 @@ class AppController extends Controller {
             return this.result('Failed to add message', null, 500);
         }
     }
-    
+
     async getNotesEtudiant({anneeId, matricule, promotionId, type}) {
         
         matricule = matricule.toUpperCase();
@@ -195,7 +195,7 @@ class AppController extends Controller {
             if (!anneeData) {
                 return this.result('Annee not found', null, 404);
             }
-
+            console.log('Annee Data:', anneeData.rows[0]);
             let matieres = [];
             const matieresData = await this.model.getMatieresByPromotion(promotionId);
             switch (type) {
@@ -215,19 +215,19 @@ class AppController extends Controller {
             if (!matieres || matieres.length === 0) {
                 return this.result('No matieres found for the given promotion', null, 404);
             }
-
+            console.log('Matieres Data:', matieres);
             const etudiantData = await this.model.getEtudiantByMatricule(matricule);
 
             if (!etudiantData) {
                 return this.result('Etudiant not found', null, 404);
             }
-
+            console.log('Etudiant Data:', etudiantData.rows[0]);
             const promotionData = await this.model.getPromotionById(promotionId);
 
             if (!promotionData) {
                 return this.result('Promotion not found', null, 404);
             }
-
+            console.log('Promotion Data:', promotionData.rows[0]);
             const checkCmd = await this.model.getCommandeEtudiant({
                 etudiantId: etudiantData.rows[0].id,
                 anneeId: anneeId,
@@ -237,6 +237,8 @@ class AppController extends Controller {
             if (!checkCmd || checkCmd.rows.length === 0) {
                 return this.result('No command found for the student in the given year and promotion', null, 404);
             }
+
+            console.log('Commande Data:', checkCmd.rows[0]);
             // Process queries sequentially instead of using Promise.all
             const notes = [];
             for (const matiere of matieres) {
@@ -252,7 +254,8 @@ class AppController extends Controller {
                 });
             }
             
-            let unites = [];
+            console.log('Notes Data:', notes);
+            let unites = [];    
             notes.forEach(matiere => {
                 if (!unites.some(u => u.id === matiere.id_unite)) {
                     unites.push({
@@ -276,6 +279,8 @@ class AppController extends Controller {
                     });
                 }
             });
+
+            console.log('Unites Data:', unites);
 
             return this.result(
                 'Notes retrieved successfully', 
