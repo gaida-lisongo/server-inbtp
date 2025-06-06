@@ -475,7 +475,7 @@ router.get('/cover/:name', async (req, res) => {
 
 router.post('/checkResultat', async (req, res) => {
     const { annee, matricule, promotionId, type } = req.body;
-
+    console.log("Request data : " + JSON.stringify(req.body));
     try {
         const payload = {
             anneeId: annee,
