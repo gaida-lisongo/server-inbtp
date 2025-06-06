@@ -168,6 +168,12 @@ router.get('/promotion/:id', async (req, res) => {
 
 router.post('/checkResultat', async (req, res) => {
     const { annee, matricule, promotionId, type } = req.body;
+    const payload = {
+        anneeId: annee,
+        matricule,
+        promotionId,
+        type
+    }   
     
     const title = type => {
         switch (type) {
@@ -186,13 +192,7 @@ router.post('/checkResultat', async (req, res) => {
         }
     }
     console.log('Title of document : ', title(type))
-    try {
-        const payload = {
-            anneeId: annee,
-            matricule,
-            promotionId,
-            type
-        }        
+    try {     
         
         const infoNotes = await App.getNotesEtudiant(payload);
 
