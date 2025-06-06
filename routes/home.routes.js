@@ -411,9 +411,13 @@ router.post('/checkResultat', async (req, res) => {
                     columns: [
                         {
                             width: '40%',
-                            stack: [
-                                ""
-                            ]
+                            table : {
+                                body: [
+                                    ["Decison", {text: `${decision.decison}`, bold: true}],
+                                    ["Appréciation", {text: `${decision.appraciation}`, bold: true}],
+                                    ["Capitalisation", {text: `${decision.capitalisation}`, bold: true}],
+                                ]
+                            }
                         },
                         {
                             width: '*',
@@ -506,27 +510,27 @@ router.post('/checkResultat', async (req, res) => {
                         {
                             width: '50%',
                             stack: [
-                                { text: `Maximum Possible: ${maximum}`, style: 'subheader', alignment: 'left' },
+                                { text: `Maximum Possible: ${maximum}`, style: 'subheader', alignment: 'left', margin: [0, 20, 0, 0] },
                                 { text: `Total Obtenu: ${!manqueCote ? totalObenue.toFixed(2) : 'N/A'}`, style: 'subheader', alignment: 'left' },
                                 { text: `Pourcentage: ${!manqueCote ? pourcentage + '%' : 'N/A'}`, style: 'subheader', alignment: 'left' },
                                 { text: `Nombre de crédits validés (NCV): ${ncv}`, style: 'subheader', alignment: 'left' },
                                 { text: `Nombre de crédits non validés (NCNV): ${ncnv}`, style: 'subheader', alignment: 'left' },
-                                { text: `Décision : ${decision.decison}`, style: 'subheader', alignment: 'right' },
-                                { text: `Appréciation : ${decision.appraciation}`, style: 'subheader', alignment: 'right' },
-                                { text: `Capitalisation : ${decision.capitalisation}`, style: 'subheader', alignment: 'right' }
                             ]
                         },
                         {
                             width: '*',
                             stack: [
-                                {text: 'Fait à Mbanza-Ngungu, le ' + new Date().toLocaleDateString('fr-FR'), style: 'subheader', alignment: 'right'},
+                                {text: 'Fait à Mbanza-Ngungu, le ' + new Date().toLocaleDateString('fr-FR'), style: 'subheader', alignment: 'right', margin: [0, 20, 0, 0]},
                                 {
                                     qr: `https://ista-gm.net/check-result/${commande.id}`,
-                                    fit: 100
+                                    fit: 100,
+                                    alignment: 'right',
+                                    margin: [0, 10, 0, 10]
                                 }
                             ]
 
-                        }
+                        },
+                        
                     ]
                 }
             ],
@@ -578,7 +582,7 @@ router.post('/checkResultat', async (req, res) => {
         console.log('PDF final généré avec succès, taille:', bulletin.length);
 
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename=${matricule}.pdf`);
+        res.setHeader('Content-Disposition', `inline; filename=bulletin_${etudiant.nom}_${new Date().getTime()}.pdf`);
         res.setHeader('Content-Length', bulletin.length);
         
         try {
