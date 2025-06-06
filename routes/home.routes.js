@@ -53,7 +53,7 @@ async function addCoverToPdf(pdfBuffer, coverName=""){
         //Merge this PDF with the Pdf generate by pdfmake (pdfBuffer)
         const existingPdf = await PDFDocument.load(pdfBuffer);
         const mergedPdf = await PDFDocument.create();
-        const [coverPage] = await mergedPdf.copyPages(coverPdf, [0]);
+        const [coverPage] = await mergedPdf.copyPages(pdfBytes, [0]);
         const [existingPage] = await mergedPdf.copyPages(existingPdf, [0]);
         mergedPdf.addPage(coverPage);
         mergedPdf.addPage(existingPage);
@@ -178,6 +178,8 @@ router.post('/checkResultat', async (req, res) => {
         }        
         
         const infoNotes = await App.getNotesEtudiant(payload);
+
+        console.log("Data of Notes : ", infoNotes);
 
         if (!infoNotes || !infoNotes.data) {
             throw new Error('Aucune donnée trouvée pour cet étudiant');
