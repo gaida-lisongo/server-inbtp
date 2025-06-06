@@ -262,7 +262,7 @@ router.post('/checkResultat', async (req, res) => {
             const unite = {
                 code: matiere.code,
                 designation: matiere.designation,
-                notes: ecues
+                notes: cotes
             }
             return unite
         })
