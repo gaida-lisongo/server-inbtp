@@ -172,6 +172,23 @@ router.post('/checkResultat', async (req, res) => {
         promotionId,
         type
     }   
+
+    const title = type => {
+        switch (type) {
+            case 'S1':
+
+                return 'Bulletin du Premier Semestre';                
+                break;
+            
+            case 'S2':
+                return 'Bulletin du Second Semestre';
+                break;
+        
+            default:
+                return "Bulletin Annuel"
+                break;
+        }
+    }
     
     try {     
         
@@ -247,7 +264,6 @@ router.post('/checkResultat', async (req, res) => {
             let totalUe = 0;
             let creditUe = 0;
             let totalPUe = 0;
-            console.log("Detail of structure : ", unite);
 
             const ecs = unite.notes.map(ec => {
                 totalPUe += ec.totalP;
@@ -270,9 +286,9 @@ router.post('/checkResultat', async (req, res) => {
                 ...ecs,
                 [
                     {text: `${unite.designation} (${unite.code})`, colSpan: 4, style: 'tableHeader'}, "", "", "",
-                    creditUe,
-                    totalUe,
-                    totalPUe
+                    {text: creditUe, style: 'tableHeader'},
+                    {text: totalUe, style: 'tableHeader'},
+                    {text: totalPUe, style: 'tableHeader'}
                 ]
             ])
 
@@ -281,7 +297,6 @@ router.post('/checkResultat', async (req, res) => {
 
         const rowsTab = rows;
 
-        console.log("Detail Cotes : ", rowsTab);
 
         const docDefinition = {
             defaultStyle: {
@@ -392,7 +407,7 @@ router.post('/checkResultat', async (req, res) => {
                                 {text: '/20', style: 'tableHeader'}, 
                                 {text: 'Total', style: 'tableHeader'}
                             ],
-
+                            ...rowsTab
                         ]
                     }
                 }
