@@ -224,13 +224,17 @@ router.post('/checkResultat', async (req, res) => {
                     const cote = note.cote;
 
                     cmi = (cote.tp ? parseFloat(cote.tp) : 0.0 ) + ( cote.td ? parseFloat(cote.td) : 0.0);
-                    manque = !cote.examen ? true : (!cote.rattrapage ? true : false);
+                    
+                    const examen = cote?.examen ? parseFloat(cote.examen) : null;
+                    const rattrapage = cote?.rattrapage ? parseFloat(cote.rattrapage) : null;
 
-                    if(!manque) {
+                    manque = examen || rattrapage ? false : true;
+
+                    if (!manque) {
                         total = parseFloat(cmi + cote.examen) > parseFloat(cote.rattrapage ? cote.rattrapage : '0') ? parseFloat(cmi + cote.examen) : parseFloat(cote.rattrapage ? cote.rattrapage : '0');
                         totalP = parseFloat(note.credit) * total;
-                    }
 
+                    }
                     return {
                         cours: note.titre,
                         cmi,
@@ -255,7 +259,12 @@ router.post('/checkResultat', async (req, res) => {
             });
 
             console.log(`Cote of matiere ${matiere.designation}`, cotes)
-            return matiere.notes
+            const unite = {
+                code: matiere.code,
+                designation: matiere.designation,
+                notes: ecues
+            }
+            return unite
         })
         console.log('Detail notes to show :', ecues)
 
