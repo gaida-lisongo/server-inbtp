@@ -251,10 +251,13 @@ router.post('/checkResultat', async (req, res) => {
                 {
                     columns: [
                         {
-                            width: '50%',
+                            width: '40%',
+                            stack: [
+                                ""
+                            ]
                         },
                         {
-                            width: '50%',
+                            width: '*',
                             stack: [
                                 { 
                                     text: `${etudiant.nom} ${etudiant.post_nom} ${etudiant.prenom ? etudiant.prenom : ''}`, 
