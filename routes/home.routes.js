@@ -257,7 +257,7 @@ router.post('/checkResultat', async (req, res) => {
             }
             return unite
         })
-          let tableRows = [];
+        let tableRows = [];
 
         ecues.forEach(unite => {
             let totalUe = 0;
@@ -293,9 +293,7 @@ router.post('/checkResultat', async (req, res) => {
             ]);
         })
 
-        const rowsTab = rows;
 
-        console.log("Rows : ", ...[...rowsTab.map(row => row)])
         const docDefinition = {
             defaultStyle: {
                 font: 'Roboto'
