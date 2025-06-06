@@ -231,7 +231,7 @@ router.post('/checkResultat', async (req, res) => {
                     manque = examen || rattrapage ? false : true;
 
                     if (!manque) {
-                        total = parseFloat(cmi + cote.examen) > parseFloat(cote.rattrapage ? cote.rattrapage : '0') ? parseFloat(cmi + cote.examen) : parseFloat(cote.rattrapage ? cote.rattrapage : '0');
+                        total = parseFloat(cmi + cote.examen) > parseFloat(cote.rattrapage ? cote.rattrapage : '0') ? parseFloat(cmi) + parseFloat(cote.examen) : parseFloat(cote.rattrapage ? cote.rattrapage : '0');
                         totalP = parseFloat(note.credit) * total;
 
                     }
