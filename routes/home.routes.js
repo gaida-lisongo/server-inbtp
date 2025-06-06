@@ -258,6 +258,67 @@ router.post('/checkResultat', async (req, res) => {
             return unite
         })
         let tableRows = [];
+        let maximum = 0;
+        let totalObenue = 0;
+        let pourcentage = 0;
+        let manqueCote = [];
+        let ncv = 0;
+        let ncnv = 0;
+        let decision = null;
+
+        const appreciation = (ncv, ncnv, pourcentage) => {
+            let validation = (ncv + ncnv) > 0 ? ncv * 100 / (ncv + ncnv) : 0;
+
+            if (validation >= 75) {
+                if (pourcentage >= 18*100/20) {
+                    return {
+                        decison: 'Admis',
+                        appraciation: 'Excellent',
+                        capitalisation: ncnv ? "Oui" : "Non"
+                    };
+                } else if (pourcentage >= 16*100/20) {
+                    return {
+                        decison: 'Admis',
+                        appraciation: 'Très Bien',
+                        capitalisation: ncnv ? "Oui" : "Non"
+                    };
+                    
+                } else if (pourcentage >= 14*100/20) {
+                    return {
+                        decison: 'Admis',
+                        appraciation: 'Bien',
+                        capitalisation: ncnv ? "Oui" : "Non"
+                    };
+                    
+                } else if (pourcentage >= 12*100/20) {
+                    return {
+                        decison: 'Admis',
+                        appraciation: 'Assez Bien',
+                        capitalisation: ncnv ? "Oui" : "Non"
+                    };
+                    
+                } else if (pourcentage >= 10*100/20) {
+                    return {
+                        decison: 'Admis',
+                        appraciation: 'Passable',
+                        capitalisation: ncnv ? "Oui" : "Non"
+                    };
+                } else {
+                    return {
+                        decison: 'Admis',
+                        appraciation: 'Insuffisant',
+                        capitalisation: ncnv ? "Oui" : "Non"
+                    };
+                    
+                }
+            } else {
+                return {
+                    decison: 'Double',
+                    appraciation: 'Instatisfaisant',
+                    capitalisation: 'Non'                    
+                };
+            }
+        }
 
         ecues.forEach(unite => {
             let totalUe = 0;
@@ -268,7 +329,11 @@ router.post('/checkResultat', async (req, res) => {
             unite.notes.forEach(ec => {
                 totalPUe += ec.totalP || 0;
                 creditUe += ec.credit || 0;
-                
+
+                if (ec.cmi === null || ec.examen === null) {
+                    manqueCote.push(true);
+                }
+
                 tableRows.push([
                     { text: ec.cours || '', alignment: 'left' },
                     { text: ec.cmi || '-', alignment: 'center' },
@@ -283,6 +348,12 @@ router.post('/checkResultat', async (req, res) => {
             // Calculer la moyenne de l'UE
             totalUe = creditUe ? (totalPUe / creditUe).toFixed(2) : '0.00';
 
+            maximum += 20 * creditUe;
+            totalObenue += totalPUe;
+
+            ncv += totalUe >= 10 ? creditUe : 0;
+            ncnv += totalUe < 10 ? creditUe : 0;
+
             // Ajouter la ligne de résumé de l'UE
             tableRows.push([
                 { text: `${unite.designation} (${unite.code})`, colSpan: 4, style: 'tableHeader', alignment: 'left' },
@@ -293,6 +364,10 @@ router.post('/checkResultat', async (req, res) => {
             ]);
         })
 
+        // Calculer le pourcentage global
+        pourcentage = maximum > 0 ? (totalObenue * 100 / maximum).toFixed(2) : '0.00';
+        manqueCote = manqueCote.length > 0;
+        decision = appreciation(ncv, ncnv, pourcentage);
 
         const docDefinition = {
             defaultStyle: {
@@ -389,7 +464,8 @@ router.post('/checkResultat', async (req, res) => {
                     text: `${title(type)}`,
                     style: 'title',
                     alignment: 'center',
-                },                {
+                },                
+                {
                     table: {
                         headerRows: 1,
                         widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
@@ -424,6 +500,34 @@ router.post('/checkResultat', async (req, res) => {
                             paddingBottom: function(i, node) { return 2; }
                         }
                     }
+                },
+                {
+                    columns: [
+                        {
+                            width: '50%',
+                            stack: [
+                                { text: `Maximum Possible: ${maximum}`, style: 'subheader', alignment: 'left' },
+                                { text: `Total Obtenu: ${!manqueCote ? totalObenue.toFixed(2) : 'N/A'}`, style: 'subheader', alignment: 'left' },
+                                { text: `Pourcentage: ${!manqueCote ? pourcentage + '%' : 'N/A'}`, style: 'subheader', alignment: 'left' },
+                                { text: `Nombre de crédits validés (NCV): ${ncv}`, style: 'subheader', alignment: 'left' },
+                                { text: `Nombre de crédits non validés (NCNV): ${ncnv}`, style: 'subheader', alignment: 'left' },
+                                { text: `Décision : ${decision.decison}`, style: 'subheader', alignment: 'right' },
+                                { text: `Appréciation : ${decision.appraciation}`, style: 'subheader', alignment: 'right' },
+                                { text: `Capitalisation : ${decision.capitalisation}`, style: 'subheader', alignment: 'right' }
+                            ]
+                        },
+                        {
+                            width: '*',
+                            stack: [
+                                {text: 'Fait à Mbanza-Ngungu, le ' + new Date().toLocaleDateString('fr-FR'), style: 'subheader', alignment: 'right'},
+                                {
+                                    qr: `https://ista-gm.net/check-result/${commande.id}`,
+                                    fit: 100
+                                }
+                            ]
+
+                        }
+                    ]
                 }
             ],
             styles: {
