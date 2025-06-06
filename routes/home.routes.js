@@ -213,8 +213,35 @@ router.post('/checkResultat', async (req, res) => {
         }
 
         const { commande, annee, etudiant, matieres, promotion } = data;
-        const ecues =  matieres.map(matiere =>{
-            const cotes = matiere.notes.map(note => note.cote);
+        const ecues =  matieres.map(matiere => {
+            const cotes = matiere.notes.map(note => {
+                let manque = false;
+                let total = null;
+                let totalP = null;
+
+                if(note.cote) {
+                    const cote = note.cote;
+
+                    const cmi = (cote.tp ? parseFloat(cote.tp) : 0.0 ) + ( cote.td ? parseFloat(cote.td) : 0.0);
+                    manque = !cote.examen ? true : (!cote.rattrapage ? true : false);
+
+                    if(!manque) {
+                        total = parseFloat(cmi + cote.examen) > parseFloat(cote.rattrapage ? cote.rattrapage : '0') ? parseFloat(cmi + cote.examen) : parseFloat(cote.rattrapage ? cote.rattrapage : '0');
+                        totalP = parseFloat(note.credit) * total;
+                    }
+                }
+
+                return {
+                    cours: note.titre,
+                    cmi,
+                    examen : cote.examen,
+                    rattrapage: cote.rattrapage,
+                    total,
+                    credit: note.credit,
+                    totalP
+                }
+            });
+            
             console.log(`Cote of matiere ${matiere.designation}`, cotes)
             return matiere.notes
         })
