@@ -352,15 +352,38 @@ router.post('/checkResultat', async (req, res) => {
             totalObenue += totalPUe;
 
             ncv += totalUe >= 10 ? creditUe : 0;
-            ncnv += totalUe < 10 ? creditUe : 0;
-
-            // Ajouter la ligne de résumé de l'UE
+            ncnv += totalUe < 10 ? creditUe : 0;            // Déterminer si l'UE est validée (moyenne >= 10)
+            const isValidated = parseFloat(totalUe) >= 10;
+            
+            // Ajouter la ligne de résumé de l'UE avec le style approprié
             tableRows.push([
-                { text: `${unite.designation} (${unite.code})`, colSpan: 4, style: 'tableHeader', alignment: 'left' },
+                { 
+                    text: `${unite.designation} (${unite.code})`, 
+                    colSpan: 4, 
+                    fillColor: '#2B579A',
+                    color: '#FFFFFF',
+                    bold: true,
+                    alignment: 'left' 
+                },
                 '', '', '',
-                { text: creditUe.toString(), style: 'tableHeader', alignment: 'center' },
-                { text: totalUe.toString(), style: 'tableHeader', alignment: 'center' },
-                { text: totalPUe.toFixed(2), style: 'tableHeader', alignment: 'center' }
+                { 
+                    text: creditUe.toString(), 
+                    style: isValidated ? 'validCredit' : 'invalidCredit',
+                    fillColor: '#2B579A',
+                    color: '#FFFFFF',
+                },
+                { 
+                    text: totalUe.toString(), 
+                    style: isValidated ? 'validCredit' : 'invalidCredit',
+                    fillColor: '#2B579A',
+                    color: '#FFFFFF',
+                },
+                { 
+                    text: totalPUe.toFixed(2), 
+                    style: isValidated ? 'validCredit' : 'invalidCredit',
+                    fillColor: '#2B579A',
+                    color: '#FFFFFF',
+                }
             ]);
         })
 
@@ -469,15 +492,63 @@ router.post('/checkResultat', async (req, res) => {
                     table: {
                         headerRows: 1,
                         widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                        body: [
-                            [
-                                {text: 'Elément Constitutif', style: 'tableHeader', alignment: 'left'}, 
-                                {text: 'CMI', style: 'tableHeader', alignment: 'center'}, 
-                                {text: 'EXM', style: 'tableHeader', alignment: 'center'}, 
-                                {text: 'RTP', style: 'tableHeader', alignment: 'center'}, 
-                                {text: 'CRD', style: 'tableHeader', alignment: 'center'}, 
-                                {text: '/20', style: 'tableHeader', alignment: 'center'}, 
-                                {text: 'Total', style: 'tableHeader', alignment: 'center'}
+                        body: [                            [
+                                {
+                                    text: 'Elément Constitutif',
+                                    fillColor: '#1B4F72',
+                                    color: '#FFFFFF',
+                                    bold: true,
+                                    alignment: 'left',
+                                    margin: [0, 5, 0, 5]
+                                }, 
+                                {
+                                    text: 'CMI',
+                                    fillColor: '#1B4F72',
+                                    color: '#FFFFFF',
+                                    bold: true,
+                                    alignment: 'center',
+                                    margin: [0, 5, 0, 5]
+                                }, 
+                                {
+                                    text: 'EXM',
+                                    fillColor: '#1B4F72',
+                                    color: '#FFFFFF',
+                                    bold: true,
+                                    alignment: 'center',
+                                    margin: [0, 5, 0, 5]
+                                }, 
+                                {
+                                    text: 'RTP',
+                                    fillColor: '#1B4F72',
+                                    color: '#FFFFFF',
+                                    bold: true,
+                                    alignment: 'center',
+                                    margin: [0, 5, 0, 5]
+                                }, 
+                                {
+                                    text: 'CRD',
+                                    fillColor: '#1B4F72',
+                                    color: '#FFFFFF',
+                                    bold: true,
+                                    alignment: 'center',
+                                    margin: [0, 5, 0, 5]
+                                }, 
+                                {
+                                    text: '/20',
+                                    fillColor: '#1B4F72',
+                                    color: '#FFFFFF',
+                                    bold: true,
+                                    alignment: 'center',
+                                    margin: [0, 5, 0, 5]
+                                }, 
+                                {
+                                    text: 'Total',
+                                    fillColor: '#1B4F72',
+                                    color: '#FFFFFF',
+                                    bold: true,
+                                    alignment: 'center',
+                                    margin: [0, 5, 0, 5]
+                                }
                             ],
                             ...tableRows
                         ],
@@ -543,7 +614,7 @@ router.post('/checkResultat', async (req, res) => {
                         
                     ]
                 }
-            ],
+            ],            
             styles: {
                 header: {
                     fontSize: 13,
@@ -564,8 +635,18 @@ router.post('/checkResultat', async (req, res) => {
                 },
                 tableHeader: {
                     bold: true,
-                    fillColor: '#eeeeee',
-                    color: '#0000',
+                    fillColor: '#2B579A',
+                    color: '#FFFFFF',
+                    alignment: 'center'
+                },
+                validCredit: {
+                    color: '#27AE60',
+                    bold: true,
+                    alignment: 'center'
+                },
+                invalidCredit: {
+                    color: '#E74C3C',
+                    bold: true,
                     alignment: 'center'
                 }
             }
@@ -577,7 +658,6 @@ router.post('/checkResultat', async (req, res) => {
         }
         
         const nomComplet = `${etudiant.nom} ${etudiant.post_nom} ${etudiant.prenom ? etudiant.prenom : ''}`;
-        console.log('Ajout de la page de couverture pour:', nomComplet);
         
         const bulletin = await addCoverToPdf(pdfBulletin, nomComplet);
         
@@ -591,7 +671,6 @@ router.post('/checkResultat', async (req, res) => {
         
         try {
             res.send(Buffer.from(bulletin));
-            console.log('PDF envoyé avec succès');
         } catch (sendError) {
             console.error('Erreur lors de l\'envoi du PDF:', sendError);
             throw sendError;
