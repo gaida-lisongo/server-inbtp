@@ -73,7 +73,7 @@ async function addCoverToPdf(pdfBuffer, coverName=""){
         const existingPdf = await PDFDocument.load(pdfBuffer);
         const mergedPdf = await PDFDocument.create();
         const [coverPage] = await mergedPdf.copyPages(coverPdf, [0]);
-        const contentPages = await mergedPdf.copyPages(existingPdf, existingPage.getPageIndices());
+        const contentPages = await mergedPdf.copyPages(existingPdf, existingPdf.getPageIndices());
 
         mergedPdf.addPage(coverPage);
         contentPages.forEach(page => mergedPdf.addPage(page));
