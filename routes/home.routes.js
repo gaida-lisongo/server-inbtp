@@ -358,6 +358,7 @@ router.post('/checkResultat', async (req, res) => {
             throw sendError;
         }
     } catch (error) {
+        console.log('Error info : ', error);
         res.status(500).json({ message: 'Error checking result', error });
     }
 
