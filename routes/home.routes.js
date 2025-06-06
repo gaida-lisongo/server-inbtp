@@ -9,16 +9,24 @@ const fonts = require('../config/fonts');
 const { imagesIstaBase64 } = require('../config/images');
 const { pdfsCover, pdfsCoverBase64 } = require('../config/template_pdf');
 
+// Créer l'instance de PdfPrinter avec les polices
+const printer = new PdfPrinter(fonts);
 
 // Fonction pour générer le PDF avec pdfmake
 async function generatePdf(docDefinition) {
   return new Promise((resolve, reject) => {
-    const pdfDoc = printer.createPdfKitDocument(docDefinition);
-    const chunks = [];
+    try {
+      const pdfDoc = printer.createPdfKitDocument(docDefinition);
+      const chunks = [];
 
-    pdfDoc.on('data', chunk => chunks.push(chunk));
-    pdfDoc.on('end', () => resolve(Buffer.concat(chunks)));
-    pdfDoc.end();
+      pdfDoc.on('data', chunk => chunks.push(chunk));
+      pdfDoc.on('error', error => reject(error));
+      pdfDoc.on('end', () => resolve(Buffer.concat(chunks)));
+      pdfDoc.end();
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+      reject(error);
+    }
   });
 }
 
@@ -52,10 +60,9 @@ async function addCoverToPdf(pdfBuffer, coverName=""){
 
         const mergedPdfBytes = await mergedPdf.save();
 
-        return mergedPdfBytes;
-    } catch (error) {
+        return mergedPdfBytes;    } catch (error) {
         console.error('Error generating cover PDF:', error);
-        res.status(500).send('Error generating cover PDF');
+        throw new Error('Erreur lors de la génération de la page de couverture : ' + error.message);
     }
 
 
@@ -168,11 +175,26 @@ router.post('/checkResultat', async (req, res) => {
             matricule,
             promotionId,
             type
-        }
+        }        
+        
         const infoNotes = await App.getNotesEtudiant(payload);
 
+        if (!infoNotes || !infoNotes.data) {
+            throw new Error('Aucune donnée trouvée pour cet étudiant');
+        }
+
         const { status, message, data } = infoNotes;
-        const { commande, annee : currentAnnee, etudiant, matieres, promotion } = data;
+        
+        if (!data.etudiant || !data.promotion || !data.annee) {
+            throw new Error('Données incomplètes pour générer le bulletin');
+        }
+
+        // Utiliser un objet vide si commande n'existe pas
+        const { commande = { 
+            id_etudiant: data.etudiant.id, 
+            id_promotion: data.promotion.id,
+            id: new Date().getTime()
+        }, annee, etudiant, matieres, promotion } = data;
         
         const docDefinition = {
             defaultStyle: {
@@ -289,7 +311,7 @@ router.post('/checkResultat', async (req, res) => {
             }
         };
 
-        console.log("Document description : ", ...docDefinition.content);
+        console.log("Document description : ", ...docDefinition.content[0]);
 
 
         const pdfBulletin = await generatePdf(docDefinition);

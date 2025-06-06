@@ -195,7 +195,6 @@ class AppController extends Controller {
             if (!anneeData) {
                 return this.result('Annee not found', null, 404);
             }
-            console.log('Annee Data:', anneeData.rows[0]);
             let matieres = [];
             const matieresData = await this.model.getMatieresByPromotion(promotionId);
             switch (type) {
