@@ -289,6 +289,9 @@ router.post('/checkResultat', async (req, res) => {
             }
         };
 
+        console.log("Document description : ", docDefinition);
+
+        
         const pdfBulletin = await generatePdf(docDefinition);
 
         const bulletin = await addCoverToPdf(pdfBulletin, `${etudiant.nom} ${etudiant.post_nom} ${etudiant.prenom ? etudiant.prenom : ''}`);
