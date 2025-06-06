@@ -230,17 +230,28 @@ router.post('/checkResultat', async (req, res) => {
                         total = parseFloat(cmi + cote.examen) > parseFloat(cote.rattrapage ? cote.rattrapage : '0') ? parseFloat(cmi + cote.examen) : parseFloat(cote.rattrapage ? cote.rattrapage : '0');
                         totalP = parseFloat(note.credit) * total;
                     }
+
+                    return {
+                        cours: note.titre,
+                        cmi,
+                        examen : cote.examen,
+                        rattrapage: cote.rattrapage,
+                        total,
+                        credit: note.credit,
+                        totalP
+                    }
+                } else {
+                    return {
+                        cours: note.titre,
+                        cmi,
+                        examen :null,
+                        rattrapage: null,
+                        total,
+                        credit: note.credit,
+                        totalP
+                    }
                 }
 
-                return {
-                    cours: note.titre,
-                    cmi,
-                    examen : cote.examen,
-                    rattrapage: cote.rattrapage,
-                    total,
-                    credit: note.credit,
-                    totalP
-                }
             });
 
             console.log(`Cote of matiere ${matiere.designation}`, cotes)
