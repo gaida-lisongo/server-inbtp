@@ -257,42 +257,40 @@ router.post('/checkResultat', async (req, res) => {
             }
             return unite
         })
-        
-        let rows = [];
+          let tableRows = [];
 
         ecues.forEach(unite => {
             let totalUe = 0;
             let creditUe = 0;
             let totalPUe = 0;
 
-            const ecs = unite.notes.map(ec => {
-                totalPUe += ec.totalP;
-                creditUe += ec.credit;
+            // Ajouter d'abord les lignes de notes individuelles
+            unite.notes.forEach(ec => {
+                totalPUe += ec.totalP || 0;
+                creditUe += ec.credit || 0;
                 
-                return [
-                    ec.cours,
-                    ec.cmi,
-                    ec.examen,
-                    ec.rattrapage,
-                    ec.credit,
-                    ec.total,
-                    ec.totalP
-                ]
-            })
+                tableRows.push([
+                    { text: ec.cours || '', alignment: 'left' },
+                    { text: ec.cmi || '-', alignment: 'center' },
+                    { text: ec.examen || '-', alignment: 'center' },
+                    { text: ec.rattrapage || '-', alignment: 'center' },
+                    { text: ec.credit || '0', alignment: 'center' },
+                    { text: ec.total || '-', alignment: 'center' },
+                    { text: ec.totalP || '-', alignment: 'center' }
+                ]);
+            });
 
-            totalUe = creditUe ? (totalPUe / creditUe).toFixed(2) : 0.0;
+            // Calculer la moyenne de l'UE
+            totalUe = creditUe ? (totalPUe / creditUe).toFixed(2) : '0.00';
 
-            rows.push([
-                ...ecs,
-                [
-                    {text: `${unite.designation} (${unite.code})`, colSpan: 4, style: 'tableHeader'}, "", "", "",
-                    {text: creditUe, style: 'tableHeader'},
-                    {text: totalUe, style: 'tableHeader'},
-                    {text: totalPUe, style: 'tableHeader'}
-                ]
-            ])
-
-            return rows
+            // Ajouter la ligne de résumé de l'UE
+            tableRows.push([
+                { text: `${unite.designation} (${unite.code})`, colSpan: 4, style: 'tableHeader', alignment: 'left' },
+                '', '', '',
+                { text: creditUe.toString(), style: 'tableHeader', alignment: 'center' },
+                { text: totalUe.toString(), style: 'tableHeader', alignment: 'center' },
+                { text: totalPUe.toFixed(2), style: 'tableHeader', alignment: 'center' }
+            ]);
         })
 
         const rowsTab = rows;
@@ -393,22 +391,40 @@ router.post('/checkResultat', async (req, res) => {
                     text: `${title(type)}`,
                     style: 'title',
                     alignment: 'center',
-                },
-                {
-                    table : {
+                },                {
+                    table: {
+                        headerRows: 1,
                         widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
                         body: [
-                            [ 
-                                {text: 'Elément Constitutif', style: 'tableHeader'}, 
-                                {text: 'CMI', style: 'tableHeader'}, 
-                                {text: 'EXM', style: 'tableHeader'}, 
-                                {text: 'RTP', style: 'tableHeader'}, 
-                                {text: 'CRD', style: 'tableHeader'}, 
-                                {text: '/20', style: 'tableHeader'}, 
-                                {text: 'Total', style: 'tableHeader'}
+                            [
+                                {text: 'Elément Constitutif', style: 'tableHeader', alignment: 'left'}, 
+                                {text: 'CMI', style: 'tableHeader', alignment: 'center'}, 
+                                {text: 'EXM', style: 'tableHeader', alignment: 'center'}, 
+                                {text: 'RTP', style: 'tableHeader', alignment: 'center'}, 
+                                {text: 'CRD', style: 'tableHeader', alignment: 'center'}, 
+                                {text: '/20', style: 'tableHeader', alignment: 'center'}, 
+                                {text: 'Total', style: 'tableHeader', alignment: 'center'}
                             ],
-                            ...[...rowsTab.map(row => row)]
-                        ]
+                            ...tableRows
+                        ],
+                        layout: {
+                            hLineWidth: function(i, node) {
+                                return 0.5;
+                            },
+                            vLineWidth: function(i, node) {
+                                return 0.5;
+                            },
+                            hLineColor: function(i, node) {
+                                return '#aaa';
+                            },
+                            vLineColor: function(i, node) {
+                                return '#aaa';
+                            },
+                            paddingLeft: function(i, node) { return 4; },
+                            paddingRight: function(i, node) { return 4; },
+                            paddingTop: function(i, node) { return 2; },
+                            paddingBottom: function(i, node) { return 2; }
+                        }
                     }
                 }
             ],
