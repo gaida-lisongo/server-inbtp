@@ -189,7 +189,7 @@ router.post('/checkResultat', async (req, res) => {
                 break;
         }
     }
-    
+
     try {     
         
         const infoNotes = await App.getNotesEtudiant(payload);
@@ -297,7 +297,7 @@ router.post('/checkResultat', async (req, res) => {
 
         const rowsTab = rows;
 
-
+        console.log("Rows : ", ...rowsTab.map(row => row))
         const docDefinition = {
             defaultStyle: {
                 font: 'Roboto'
@@ -407,7 +407,7 @@ router.post('/checkResultat', async (req, res) => {
                                 {text: '/20', style: 'tableHeader'}, 
                                 {text: 'Total', style: 'tableHeader'}
                             ],
-                            ...rowsTab
+                            ...rowsTab.map(row => row)
                         ]
                     }
                 }
