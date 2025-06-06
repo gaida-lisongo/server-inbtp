@@ -168,7 +168,7 @@ router.post('/checkResultat', async (req, res) => {
                 break;
         }
     }
-
+    console.log('Title of document : ', title(type))
     try {
         const payload = {
             anneeId: annee,
