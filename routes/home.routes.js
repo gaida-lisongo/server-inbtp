@@ -94,8 +94,7 @@ router.post('/checkResultat', async (req, res) => {
             type
         }
         const data = await App.getNotesEtudiant(payload);
-        console.log('Data:', data);
-        // res.status(200).json(data);
+        res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ message: 'Error checking result', error });
     }
