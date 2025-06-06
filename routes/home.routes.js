@@ -241,13 +241,15 @@ router.post('/checkResultat', async (req, res) => {
             return unite
         })
         
-        const rowsTab = ecues.forEach(unite => {
-            let rows = [];
+        let rows = [];
+
+        ecues.forEach(unite => {
             let totalUe = 0;
             let creditUe = 0;
             let totalPUe = 0;
+            console.log("Detail of structure : ", unite);
 
-            const ecs = unite.map(ec => {
+            const ecs = unite.notes.map(ec => {
                 totalPUe += ec.totalP;
                 creditUe += ec.credit;
                 
@@ -276,6 +278,8 @@ router.post('/checkResultat', async (req, res) => {
 
             return rows
         })
+
+        const rowsTab = rows;
 
         console.log("Detail Cotes : ", rowsTab);
 
