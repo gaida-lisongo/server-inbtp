@@ -18,28 +18,22 @@ const printer = new PdfPrinter(fonts);
 async function generatePdf(docDefinition) {
   return new Promise((resolve, reject) => {
     try {
-      console.log('Début de la génération du PDF...');
       const pdfDoc = printer.createPdfKitDocument(docDefinition);
       const chunks = [];
 
       pdfDoc.on('data', chunk => {
-        console.log(`Chunk reçu, taille: ${chunk.length} octets`);
         chunks.push(chunk);
       });
 
       pdfDoc.on('error', error => {
-        console.error('Erreur pendant la génération du PDF:', error);
         reject(error);
       });
 
       pdfDoc.on('end', () => {
-        console.log('Génération du PDF terminée');
         const result = Buffer.concat(chunks);
-        console.log(`Taille totale du PDF: ${result.length} octets`);
         resolve(result);
       });
 
-      console.log('Début du streaming du document...');
       pdfDoc.end();
     } catch (error) {
       console.error('Erreur lors de la génération du PDF:', error);
@@ -179,28 +173,9 @@ router.post('/checkResultat', async (req, res) => {
         type
     }   
     
-    const title = type => {
-        switch (type) {
-            case 'S1':
-
-                return 'Bulletin du Premier Semestre';                
-                break;
-            
-            case 'S2':
-                return 'Bulletin du Second Semestre';
-                break;
-        
-            default:
-                return "Bulletin Annuel"
-                break;
-        }
-    }
-    console.log('Title of document : ', title(type))
     try {     
         
         const infoNotes = await App.getNotesEtudiant(payload);
-
-        console.log("Data of Notes : ", infoNotes);
 
         if (!infoNotes || !infoNotes.data) {
             throw new Error('Aucune donnée trouvée pour cet étudiant');
@@ -258,7 +233,6 @@ router.post('/checkResultat', async (req, res) => {
 
             });
 
-            console.log(`Cote of matiere ${matiere.designation}`, cotes)
             const unite = {
                 code: matiere.code,
                 designation: matiere.designation,
@@ -266,7 +240,44 @@ router.post('/checkResultat', async (req, res) => {
             }
             return unite
         })
-        console.log('Detail notes to show :', ecues)
+        
+        const rowsTab = ecues.forEach(unite => {
+            let rows = [];
+            let totalUe = 0;
+            let creditUe = 0;
+            let totalPUe = 0;
+
+            const ecs = unite.map(ec => {
+                totalPUe += ec.totalP;
+                creditUe += ec.credit;
+                
+                return [
+                    ec.cours,
+                    ec.cmi,
+                    ec.examen,
+                    ec.rattrapage,
+                    ec.credit,
+                    ec.total,
+                    ec.totalP
+                ]
+            })
+
+            totalUe = creditUe ? (totalPUe / creditUe).toFixed(2) : 0.0;
+
+            rows.push([
+                ...ecs,
+                [
+                    {text: `${unite.designation} (${unite.code})`, colSpan: 4, style: 'tableHeader'}, "", "", "",
+                    creditUe,
+                    totalUe,
+                    totalPUe
+                ]
+            ])
+
+            return rows
+        })
+
+        console.log("Detail Cotes : ", rowsTab);
 
         const docDefinition = {
             defaultStyle: {
@@ -376,7 +387,7 @@ router.post('/checkResultat', async (req, res) => {
                                 {text: 'CRD', style: 'tableHeader'}, 
                                 {text: '/20', style: 'tableHeader'}, 
                                 {text: 'Total', style: 'tableHeader'}
-                            ]
+                            ],
 
                         ]
                     }
