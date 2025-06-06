@@ -83,6 +83,25 @@ router.get('/promotion/:id', async (req, res) => {
     }
 })
 
+router.post('/checkResultat', async (req, res) => {
+    const { annee, matricule, promotionId, type } = req.body;
+    console.log("Request data : " + JSON.stringify(req.body));
+    try {
+        const payload = {
+            anneeId: annee,
+            matricule,
+            promotionId,
+            type
+        }
+        const data = await App.getNotesEtudiant(payload);
+        console.log('Data:', data);
+        // res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'Error checking result', error });
+    }
+
+})
+
 
 router.post('/message-section', async (req, res) => {
     const { nom, email, objet, contenu, sectionId } = req.body;
