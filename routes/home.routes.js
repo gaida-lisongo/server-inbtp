@@ -411,22 +411,9 @@ router.post('/checkResultat', async (req, res) => {
                     columns: [
                         {
                             width: '40%',
-                            table : {
-                                body: [
-                                    [{text: "Resumé des Notes", bold: true, colSpan: 2}, ""],
-                                    ["Maximum", {text: `${maximum}`, bold: true}],
-                                    ["Total Obtenu", {text: `${totalObenue.toFixed(2)}`, bold: true}],
-                                    ["Pourcentage", {text: `${pourcentage}%`, bold: true}],
-                                    ["NCV", {text: `${ncv}`, bold: true}],
-                                    ["NCNV", {text: `${ncnv}`, bold: true}],
-                                    ["Decison", {text: `${decision.decison}`, bold: true}],
-                                    ["Appréciation", {text: `${decision.appraciation}`, bold: true}],
-                                    ["Capitalisation", {text: `${decision.capitalisation}`, bold: true}],
-                                ],
-                                widths: ['*', 'auto'],
-                                alignment: 'left',
-                                margin: [0, 10, 0, 0]
-                            }
+                            stack: [
+                                ""
+                            ]
                         },
                         {
                             width: '*',
@@ -520,17 +507,36 @@ router.post('/checkResultat', async (req, res) => {
                             width: '50%',
                             stack: [
                                 {
-                                    qr: `https://ista-gm.net/check-result/${commande.id}`,
-                                    fit: 180,
-                                    alignment: 'left',
-                                    margin: [0, 10, 0, 10]
+                                    table: {
+                                        body: [
+                                            [{text: "Resumé des Notes", style: 'tableHeader', alignment: 'center', colSpan: 2}, ""],
+                                            ["Maximum", {text: `${maximum}`, bold: true}],
+                                            ["Total Obtenu", {text: `${totalObenue.toFixed(2)}`, bold: true}],
+                                            ["Pourcentage", {text: `${pourcentage}%`, bold: true}],
+                                            ["NCV", {text: `${ncv}`, bold: true}],
+                                            ["NCNV", {text: `${ncnv}`, bold: true}],
+                                            ["Decison", {text: `${decision.decison}`, bold: true}],
+                                            ["Appréciation", {text: `${decision.appraciation}`, bold: true}],
+                                            ["Capitalisation", {text: `${decision.capitalisation}`, bold: true}],
+                                        ],
+                                        widths: ['*', 'auto'],
+                                        alignment: 'left',
+                                        margin: [0, 15, 0, 0]
+                                    }
                                 }
                             ]
                         },
                         {
                             width: '*',
                             stack: [
-                                {text: 'Fait à Mbanza-Ngungu, le ' + new Date().toLocaleDateString('fr-FR'), style: 'subheader', alignment: 'right', margin: [0, 10, 0, 0]},
+                                {text: 'Fait à Mbanza-Ngungu, le ' + new Date().toLocaleDateString('fr-FR'), style: 'subheader', alignment: 'right', margin: [0, 15, 0, 0]},
+                                "",
+                                {
+                                    qr: `https://ista-gm.net/check-result/${commande.id}`,
+                                    fit: 120,
+                                    alignment: 'left',
+                                    margin: [0, 20, 0, 10]
+                                },
                             ]
 
                         },
