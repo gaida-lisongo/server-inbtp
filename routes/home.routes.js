@@ -8,6 +8,8 @@ const { PDFDocument } = require('pdf-lib');
 const fonts = require('../config/fonts');
 const { imagesIstaBase64 } = require('../config/images');
 const { pdfsCover, pdfsCoverBase64 } = require('../config/template_pdf');
+const { table } = require('console');
+const { text } = require('stream/consumers');
 
 // Créer l'instance de PdfPrinter avec les polices
 const printer = new PdfPrinter(fonts);
@@ -71,9 +73,10 @@ async function addCoverToPdf(pdfBuffer, coverName=""){
         const existingPdf = await PDFDocument.load(pdfBuffer);
         const mergedPdf = await PDFDocument.create();
         const [coverPage] = await mergedPdf.copyPages(coverPdf, [0]);
-        const [existingPage] = await mergedPdf.copyPages(existingPdf, [0]);
+        const contentPages = await mergedPdf.copyPages(existingPdf, existingPage.getPageIndices());
+
         mergedPdf.addPage(coverPage);
-        mergedPdf.addPage(existingPage);
+        contentPages.forEach(page => mergedPdf.addPage(page));
 
         const mergedPdfBytes = await mergedPdf.save();
 
@@ -210,7 +213,11 @@ router.post('/checkResultat', async (req, res) => {
         }
 
         const { commande, annee, etudiant, matieres, promotion } = data;
-        
+        const ecues =  matieres.map(matiere =>{
+            return matiere.notes
+        })
+        console.log('Detail notes to show :', ecues)
+
         const docDefinition = {
             defaultStyle: {
                 font: 'Roboto'
@@ -232,7 +239,7 @@ router.post('/checkResultat', async (req, res) => {
                                 },
                                 { text: 'Institut Supérieur des Techniques Appliquées', style: { fontSize: 10, italics: true, alignment: 'center' } },
                                 { text: 'ISTA/GM à Mbanza-Ngungu', style: { fontSize: 10, italics: true, alignment: 'center' } },
-                                { text: 'Secrétariat Général Académique', style: { fontSize: 12, bold: true, alignment: 'center' } },
+                                { text:  `JURY ${promotion.section}`, style: { fontSize: 12, bold: true, alignment: 'center' } },
                             ]
 
                         },                    
@@ -306,6 +313,23 @@ router.post('/checkResultat', async (req, res) => {
                     text: `${title(type)}`,
                     style: 'title',
                     alignment: 'center',
+                },
+                {
+                    table : {
+                        body: [
+                            [
+                                {text: 'Code', style: 'tableHeader'}, 
+                                {text: 'Elément Constitutif', style: 'tableHeader'}, 
+                                {text: 'CMI', style: 'tableHeader'}, 
+                                {text: 'EXM', style: 'tableHeader'}, 
+                                {text: 'RTP', style: 'tableHeader'}, 
+                                {text: 'CRD', style: 'tableHeader'}, 
+                                {text: '/20', style: 'tableHeader'}, 
+                                {text: 'Total', style: 'tableHeader'}
+                            ]
+
+                        ]
+                    }
                 }
             ],
             styles: {
@@ -318,13 +342,18 @@ router.post('/checkResultat', async (req, res) => {
                 subheader: {
                     fontSize: 12,
                     italics: true,
-                    margin: [0, 5, 0, 5]
+                    margin: [0, 5, 0, 1]
                 },            
                 title: {
                     fontSize: 12,
                     bold: true,
-                    margin: [0, 10, 0, 20],
+                    margin: [0, 10, 0, 1],
                     color: '#000000'
+                },
+                tableHeader: {
+                    bold: true,
+                    fillColor: '#eeeeee',
+                    color: '#0000'
                 }
             }
         };
