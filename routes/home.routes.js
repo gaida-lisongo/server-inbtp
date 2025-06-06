@@ -297,7 +297,7 @@ router.post('/checkResultat', async (req, res) => {
 
         const rowsTab = rows;
 
-        console.log("Rows : ", ...rowsTab.map(row => row))
+        console.log("Rows : ", ...[...rowsTab.map(row => row)])
         const docDefinition = {
             defaultStyle: {
                 font: 'Roboto'
@@ -407,7 +407,7 @@ router.post('/checkResultat', async (req, res) => {
                                 {text: '/20', style: 'tableHeader'}, 
                                 {text: 'Total', style: 'tableHeader'}
                             ],
-                            ...rowsTab.map(row => row)
+                            ...[...rowsTab.map(row => row)]
                         ]
                     }
                 }
