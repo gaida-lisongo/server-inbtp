@@ -218,11 +218,12 @@ router.post('/checkResultat', async (req, res) => {
                 let manque = false;
                 let total = null;
                 let totalP = null;
+                let cmi = null;
 
                 if(note.cote) {
                     const cote = note.cote;
 
-                    const cmi = (cote.tp ? parseFloat(cote.tp) : 0.0 ) + ( cote.td ? parseFloat(cote.td) : 0.0);
+                    cmi = (cote.tp ? parseFloat(cote.tp) : 0.0 ) + ( cote.td ? parseFloat(cote.td) : 0.0);
                     manque = !cote.examen ? true : (!cote.rattrapage ? true : false);
 
                     if(!manque) {
@@ -241,7 +242,7 @@ router.post('/checkResultat', async (req, res) => {
                     totalP
                 }
             });
-            
+
             console.log(`Cote of matiere ${matiere.designation}`, cotes)
             return matiere.notes
         })
@@ -345,10 +346,9 @@ router.post('/checkResultat', async (req, res) => {
                 },
                 {
                     table : {
-                        widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                        widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
                         body: [
-                            [
-                                {text: 'Code', style: 'tableHeader'}, 
+                            [ 
                                 {text: 'Elément Constitutif', style: 'tableHeader'}, 
                                 {text: 'CMI', style: 'tableHeader'}, 
                                 {text: 'EXM', style: 'tableHeader'}, 
@@ -383,7 +383,8 @@ router.post('/checkResultat', async (req, res) => {
                 tableHeader: {
                     bold: true,
                     fillColor: '#eeeeee',
-                    color: '#0000'
+                    color: '#0000',
+                    alignment: 'center'
                 }
             }
         };
