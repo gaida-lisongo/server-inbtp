@@ -506,6 +506,7 @@ router.post('/checkResultat', async (req, res) => {
                         {
                             width: '50%',
                             stack: [
+                                { text: "", margin: [0, 15, 0, 0] },
                                 {
                                     table: {
                                         body: [
@@ -521,7 +522,6 @@ router.post('/checkResultat', async (req, res) => {
                                         ],
                                         widths: ['*', 'auto'],
                                         alignment: 'left',
-                                        margin: [0, 15, 0, 0]
                                     }
                                 }
                             ]
@@ -534,7 +534,7 @@ router.post('/checkResultat', async (req, res) => {
                                 {
                                     qr: `https://ista-gm.net/check-result/${commande.id}`,
                                     fit: 120,
-                                    alignment: 'left',
+                                    alignment: 'right',
                                     margin: [0, 20, 0, 10]
                                 },
                             ]
@@ -570,15 +570,11 @@ router.post('/checkResultat', async (req, res) => {
                 }
             }
         };
-     
-        console.log('Début de la génération du bulletin...');
         const pdfBulletin = await generatePdf(docDefinition);
         
         if (!pdfBulletin || pdfBulletin.length === 0) {
             throw new Error('Le PDF généré est vide');
         }
-        
-        console.log('PDF bulletin généré avec succès, taille:', pdfBulletin.length);
         
         const nomComplet = `${etudiant.nom} ${etudiant.post_nom} ${etudiant.prenom ? etudiant.prenom : ''}`;
         console.log('Ajout de la page de couverture pour:', nomComplet);
@@ -588,8 +584,6 @@ router.post('/checkResultat', async (req, res) => {
         if (!bulletin || bulletin.length === 0) {
             throw new Error('Le PDF final est vide après ajout de la couverture');
         }
-        
-        console.log('PDF final généré avec succès, taille:', bulletin.length);
 
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename=bulletin_${etudiant.nom}_${new Date().getTime()}.pdf`);
