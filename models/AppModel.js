@@ -111,6 +111,14 @@ class AppModel extends Model {
         return result || [];
     }
 
+    async getNiveaux(){
+        const sql = `SELECT *
+            FROM niveau
+        `;
+        const result = await this.request(sql);
+        return result || [];
+    }
+
     async getEtudiantById(etudiantId) {
         const sql = `SELECT *
             FROM etudiant
