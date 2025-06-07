@@ -114,6 +114,7 @@ class AppModel extends Model {
     async getNiveaux(){
         const sql = `SELECT *
             FROM niveau
+            ORDER BY intitule
         `;
         const result = await this.request(sql);
         return result || [];
