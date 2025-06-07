@@ -7,6 +7,19 @@ class AppController extends Controller {
         this.model = AppModel;
     }
 
+    async niveaux() {
+        try {
+            const niveaux = await this.model.getNiveaux();
+            return this.result(
+                'Niveaux retrieved successfully', 
+                niveaux
+            );
+        } catch (error) {
+            console.error('Error retrieving niveaux:', error);
+            return this.result('Failed to retrieve niveaux', null, 500);
+        }
+    }
+
     async programmes(){
         try {
             const programmes = await this.model.getProgrammes();

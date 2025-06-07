@@ -107,6 +107,17 @@ router.get('/section/:id', async (req, res) => {
 
 })
 
+router.get('/niveaux', async (req, res) => {
+    try {
+        const niveaux = await App.niveaux();
+        res.status(200).json(niveaux);   
+        
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching niveaux', error });
+        
+    }
+})
+
 router.get('/annees', async (req, res) => {
     try {
         const data = await App.annees();
