@@ -8,8 +8,7 @@ const { PDFDocument } = require('pdf-lib');
 const fonts = require('../config/fonts');
 const { imagesIstaBase64 } = require('../config/images');
 const { pdfsCover, pdfsCoverBase64 } = require('../config/template_pdf');
-const { table } = require('console');
-const { text } = require('stream/consumers');
+const saveImage = require('../utils/saveImage');
 
 // Créer l'instance de PdfPrinter avec les polices
 const printer = new PdfPrinter(fonts);
@@ -701,6 +700,137 @@ router.post('/message-section', async (req, res) => {
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ message: 'Error adding message to section', error });
+    }
+})
+
+router.post('/subscrib', async (req, res) => {
+    const { etudiantData, identitesData, scolariteData, promotionData} = req.body;
+    try {
+        const { nom, postNom, preNom, numRef, email, telephone, photo: photoBase64 } = etudiantData;
+
+        const avatar = photoBase64 ? await saveImage(photoBase64) : null;
+        
+        const { sexe, dateNaissance, lieuNaissance, pays, province } = identitesData;
+        const { anneeDiplome, sectionDiplome, optionDiplome, pourcentageDiplome } = scolariteData;
+        const { filiere, classe } = promotionData;
+
+        const getMatricule = () => {
+            const timestamp = new Date().getTime();
+            return `${classe}.${filiere}.${new Date().getFullYear()}.${timestamp}`;
+        }
+
+        const matricule = getMatricule();
+
+        const getSection = async (filiere) => {
+            let currentSection = '';
+            switch (filiere) {
+                case 'prep':
+                    currentSection = 'PREPARATOIRE';
+                case 'meca':
+                    currentSection = 'MECANIQUE';
+                case 'elec':
+                    currentSection = 'ELECTRICITE';
+                case 'electron':
+                    currentSection = 'ELECTRONIQUE';
+                case 'telecom':
+                    currentSection = 'TELECOMMUNICATION';
+                case 'info':
+                    currentSection = 'INFORMATIQUE';
+                case 'const':
+                    currentSection = 'CONSTRUCTION';
+                case 'maint':
+                    currentSection = 'MAINTENANCE';
+                default:
+                    currentSection = 'PETROLE ET GAZ';
+            }
+
+            const data = await App.getSectionByName(currentSection);
+            if (!data || !data.id) {
+                throw new Error(`Section ${currentSection} non trouvée`);
+            }
+
+            return data.id;
+
+        }
+
+        const sectionId = await getSection(filiere);
+
+        const getNiveau = async (niveau) => {
+            const data = await App.getNiveauByName({ name: niveau });
+            if (!data || !data.id) {
+                throw new Error(`Niveau ${niveau} non trouvé`);
+            }
+            return data.id;
+        }
+
+        const niveauId = await getNiveau(promotionData.niveau);
+
+        const reqEtudiant = await App.createEtudiant({
+            nom,
+            postNom,
+            preNom,
+            matricule,
+            sexe,
+            dateNaissance,
+            telephone,
+            email,
+            photo: avatar,
+        });
+
+        if (!reqEtudiant || !reqEtudiant.insertId) {
+            throw new Error('Erreur lors de la création de l\'étudiant');
+        }
+
+        const id_etudiant = reqEtudiant.insertId;
+
+        const reqAdmin = await App.createAdminEtudiant({
+            id_etudiant,
+            section: sectionDiplome,
+            option: optionDiplome,
+            annee: anneeDiplome,
+            pourcentage_exetat: pourcentageDiplome
+        });
+
+        if (!reqAdmin || !reqAdmin.insertId) {
+            throw new Error('Erreur lors de la création des informations administratives de l\'étudiant');
+        }
+
+        const reqOrigine = await App.createOrigineEtudiant({
+            id_etudiant,
+            pays,
+            province,
+            lieu_naissance: lieuNaissance,
+        });
+
+        if (!reqOrigine || !reqOrigine.insertId) {
+            throw new Error('Erreur lors de la création des informations d\'origine de l\'étudiant');
+        }
+
+        const reqInscription = await App.createInscriptionEtudiant({
+            id_etudiant,
+            id_section: sectionId,
+            id_niveau: niveauId,
+            nref: numRef
+        });
+
+        if (!reqInscription || !reqInscription.insertId) {
+            throw new Error('Erreur lors de l\'inscription de l\'étudiant');
+        }
+
+        res.status(201).json({
+            message: 'Étudiant inscrit avec succès',
+            data: {
+                id_etudiant,
+                matricule,
+                sectionId,
+                niveauId,
+                nref: numRef,
+                inscriptionId: reqInscription.insertId
+            }
+        });
+    } catch (error) {
+        console.error('Error subscribing student:', error);
+        res.status(500).json({ message: 'Error subscribing student', error });
     }
 })
 

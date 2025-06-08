@@ -29,6 +29,27 @@ class AppModel extends Model {
         return result || [];
     }
 
+    async getProgrammeByName(name) {
+        const sql = `SELECT s.*, m.designation AS 'mention', CONCAT(chef_section.grade, '. ', chef_section.nom, ' ', chef_section.post_nom) AS 'chef_section', chef_section.telephone AS 'chef-phone', chef_section.avatar AS 'chef-photo', CONCAT(sec_section.grade, '. ', sec_section.nom, ' ', sec_section.post_nom) AS 'sec_section', sec_section.telephone AS 'sec-phone', sec_section.avatar AS 'sec-photo', chef_section.e_mail
+            FROM section s
+            INNER JOIN mention m ON m.id = s.id_mention
+            INNER JOIN agent chef_section ON chef_section.id = m.id_agent
+            INNER JOIN agent sec_section ON sec_section.id = s.id_sec
+            WHERE s.designation = ?
+        `;
+        const result = await this.request(sql, [name]);
+        return result || [];
+    }
+
+    async getNiveauByName({name}) {
+        const sql = `SELECT *
+            FROM niveau
+            WHERE intitule = ?
+        `;
+        const result = await this.request(sql, [name]);
+        return result || null;
+    }
+
     async getAnnees() {
         const sql = `
             SELECT *
@@ -163,6 +184,60 @@ class AppModel extends Model {
             VALUES (?, ?, ?, ?, ?)
         `;
         const result = await this.request(sql, [nom, email, objet, contenu, sectionId]);
+        return result || null;
+    }
+
+    async createEtudiant(data) {
+        const { nom, postNom, preNom, matricule, sexe, dateNaissance, telephone, email, avatar } = data;
+
+        const sql = `
+            INSERT INTO etudiant (nom, post_nom, prenom, matricule, sexe, date_naiss, telephone, e_mail, avatar)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        const result = await this.request(sql, [nom, postNom, preNom, matricule, sexe, dateNaissance, telephone, email, avatar]);
+        return result || null;
+    }
+
+    async createAdminEtudiant(data) {
+        /**
+         * INSERT INTO `administratif_etudiant`( `id_etudiant`, `section`, `option`, `annee`, `pourcentage_exetat`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]')
+         */
+        const { id_etudiant, section, option, annee, pourcentage_exetat } = data;
+        const sql = `
+            INSERT INTO \`administratif_etudiant\`( \`id_etudiant\`, \`section\`, \`option\`, \`annee\`, \`pourcentage_exetat\`) VALUES (?, ?, ?, ?, ?)
+        `;
+        const result = await this.request(sql, [id_etudiant, section, option, annee, pourcentage_exetat]);
+        return result || null;
+    }
+
+    async createOriginEtudiant(data) {
+        /**
+         * INSERT INTO `origine_etudiant`(`id_etudiant`, `id_ville`, `nomPays`, `nomProvince`, `nomVille`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]')
+         */
+        const { id_etudiant, nomPays, nomProvince, nomVille } = data;
+        const sql = `
+            INSERT INTO \`origine_etudiant\`(\`id_etudiant\`, \`id_ville\`, \`nomPays\`, \`nomProvince\`, \`nomVille\`) VALUES (?, ?, ?, ?, ?)
+        `;
+        const result = await this.request(sql, [id_etudiant, 3, nomVille, nomProvince, nomPays]);
+        return result || null;
+    }
+
+    async createInscriptionEtudiant(data) {
+        /**
+         * INSERT INTO `req_inscription`(`id_section`, `id_niveau`, `id_etudiant`, `date_creation`, `statut`, `nref`) VALUES
+         */
+        const { id_section, id_niveau, id_etudiant, nref } = data;
+        const sql = `
+            INSERT INTO req_inscription(
+                id_section, 
+                id_niveau, 
+                id_etudiant, 
+                date_creation, 
+                statut, 
+                nref
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        `;
+        const result = await this.request(sql, [id_section, id_niveau, id_etudiant, NOW(), 'PENDING', nref]);
         return result || null;
     }
 }
