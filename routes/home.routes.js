@@ -207,7 +207,26 @@ router.get('/promotion/:id', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error fetching promotion', error });
     }
-})
+});
+
+router.get('/calenrier', async (req, res) => {
+    try {
+        const reqCalender = await appModel.getActivites();
+        const { rows, count } = reqCalender;
+        if (count === 0) {
+            return res.status(404).json({ message: 'Aucune activité trouvée' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Activités récupérées avec succès',
+            data: rows
+        });
+    } catch (error) {
+        console.error('Error fetching calendar:', error);
+        res.status(500).json({ message: 'Error fetching calendar', error });
+    } 
+});
 
 router.post('/checkResultat', async (req, res) => {
     const { annee, matricule, promotionId, type } = req.body;

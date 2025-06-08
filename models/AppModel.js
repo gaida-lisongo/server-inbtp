@@ -196,6 +196,15 @@ class AppModel extends Model {
         return result || [];
     }
 
+    async getActivites(){
+        const sql = `SELECT cal.*, act.date, act.description
+            FROM calendrier_acad cal
+            INNER JOIN activites_acad act ON act.id_calendrier = cal.id
+            ORDER BY act.id DESC`;
+        const result = await this.request(sql);
+        return result || [];
+    }
+
     async createMessageSection({ nom, email, objet, contenu, sectionId }) {
         const sql = `
             INSERT INTO contacts_sections (auteur_nom, auteur_email, message_objet, message_contenu, sectionId)
