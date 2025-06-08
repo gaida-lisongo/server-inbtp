@@ -9,7 +9,7 @@ const fonts = require('../config/fonts');
 const { imagesIstaBase64 } = require('../config/images');
 const { pdfsCover, pdfsCoverBase64 } = require('../config/template_pdf');
 const saveImage = require('../utils/saveImage');
-
+const multer = require('multer');
 // Créer l'instance de PdfPrinter avec les polices
 const printer = new PdfPrinter(fonts);
 
@@ -704,134 +704,103 @@ router.post('/message-section', async (req, res) => {
 })
 
 router.post('/subscrib', async (req, res) => {
-    const { etudiantData, identitesData, scolariteData, promotionData} = req.body;
-    console.log('Data received for subscription:', req.body);
+    console.log('Données reçues:', req.body);
+    
     try {
-        const { nom, postNom, preNom, numRef, email, telephone, photo: photoBase64 } = etudiantData;
+        const { etudiantData, identitesData, scolariteData, promotionData } = req.body;
 
-        const avatar = photoBase64 ? await saveImage(photoBase64) : null;
+        // Validation des données requises
+        if (!etudiantData || !identitesData || !scolariteData || !promotionData) {
+            throw new Error('Données incomplètes');
+        }
+
+        const { nom, postNom, preNom, numRef, email, telephone, photo } = etudiantData;
         
-        const { sexe, dateNaissance, lieuNaissance, pays, province } = identitesData;
-        const { anneeDiplome, sectionDiplome, optionDiplome, pourcentageDiplome } = scolariteData;
-        const { filiere, classe } = promotionData;
-
-        const getMatricule = () => {
-            const timestamp = new Date().getTime();
-            return `${classe}.${filiere}.${new Date().getFullYear()}.${timestamp}`;
+        // Sauvegarde de la photo si présente
+        const avatar = photo ? await saveImage(photo) : null;
+        
+        // Validation des données critiques
+        if (!nom || !postNom || !promotionData.filiere) {
+            throw new Error('Champs obligatoires manquants');
         }
 
-        const matricule = getMatricule();
+        const matricule = `${promotionData.niveau}.${promotionData.filiere}.${new Date().getFullYear()}.${Date.now()}`;
 
-        const getSection = async (filiere) => {
-            let currentSection = '';
-            switch (filiere) {
-                case 'prep':
-                    currentSection = 'PREPARATOIRE';
-                case 'meca':
-                    currentSection = 'MECANIQUE';
-                case 'elec':
-                    currentSection = 'ELECTRICITE';
-                case 'electron':
-                    currentSection = 'ELECTRONIQUE';
-                case 'telecom':
-                    currentSection = 'TELECOMMUNICATION';
-                case 'info':
-                    currentSection = 'INFORMATIQUE';
-                case 'const':
-                    currentSection = 'CONSTRUCTION';
-                case 'maint':
-                    currentSection = 'MAINTENANCE';
-                default:
-                    currentSection = 'PETROLE ET GAZ';
-            }
-
-            const data = await App.getSectionByName(currentSection);
-            if (!data || !data.id) {
-                throw new Error(`Section ${currentSection} non trouvée`);
-            }
-
-            return data.id;
-
+        // Récupération de l'ID de la section
+        const section = await App.getSectionByName(promotionData.section);
+        if (!section?.id) {
+            throw new Error(`Section ${promotionData.section} non trouvée`);
         }
 
-        const sectionId = await getSection(filiere);
-
-        const getNiveau = async (niveau) => {
-            const data = await App.getNiveauByName({ name: niveau });
-            if (!data || !data.id) {
-                throw new Error(`Niveau ${niveau} non trouvé`);
-            }
-            return data.id;
+        // Récupération de l'ID du niveau
+        const niveau = await App.getNiveauByName({ name: promotionData.niveau });
+        if (!niveau?.id) {
+            throw new Error(`Niveau ${promotionData.niveau} non trouvé`);
         }
 
-        const niveauId = await getNiveau(promotionData.niveau);
-
+        // Création de l'étudiant
         const reqEtudiant = await App.createEtudiant({
             nom,
             postNom,
             preNom,
             matricule,
-            sexe,
-            dateNaissance,
+            sexe: identitesData.sexe,
+            dateNaissance: identitesData.dateNaissance,
             telephone,
             email,
-            photo: avatar,
+            photo: avatar
         });
 
-        if (!reqEtudiant || !reqEtudiant.insertId) {
+        if (!reqEtudiant?.insertId) {
             throw new Error('Erreur lors de la création de l\'étudiant');
         }
 
         const id_etudiant = reqEtudiant.insertId;
 
-        const reqAdmin = await App.createAdminEtudiant({
+        // Création des informations administratives
+        await App.createAdminEtudiant({
             id_etudiant,
-            section: sectionDiplome,
-            option: optionDiplome,
-            annee: anneeDiplome,
-            pourcentage_exetat: pourcentageDiplome
+            section: scolariteData.sectionDiplome,
+            option: scolariteData.optionDiplome,
+            annee: scolariteData.anneeDiplome,
+            pourcentage_exetat: scolariteData.pourcentageDiplome
         });
 
-        if (!reqAdmin || !reqAdmin.insertId) {
-            throw new Error('Erreur lors de la création des informations administratives de l\'étudiant');
-        }
-
-        const reqOrigine = await App.createOrigineEtudiant({
+        // Création des informations d'origine
+        await App.createOrigineEtudiant({
             id_etudiant,
-            pays,
-            province,
-            lieu_naissance: lieuNaissance,
+            pays: identitesData.pays,
+            province: identitesData.province,
+            lieu_naissance: identitesData.lieuNaissance
         });
 
-        if (!reqOrigine || !reqOrigine.insertId) {
-            throw new Error('Erreur lors de la création des informations d\'origine de l\'étudiant');
-        }
-
+        // Création de l'inscription
         const reqInscription = await App.createInscriptionEtudiant({
             id_etudiant,
-            id_section: sectionId,
-            id_niveau: niveauId,
+            id_section: section.id,
+            id_niveau: niveau.id,
             nref: numRef
         });
 
-        if (!reqInscription || !reqInscription.insertId) {
-            throw new Error('Erreur lors de l\'inscription de l\'étudiant');
-        }
-
         res.status(201).json({
+            success: true,
             message: 'Étudiant inscrit avec succès',
             data: {
                 id_etudiant,
                 matricule,
-                sectionId,
-                niveauId,
-                nref: numRef,
+                section: section.id,
+                niveau: niveau.id,
                 inscriptionId: reqInscription.insertId
             }
         });
+
     } catch (error) {
-        console.error('Error subscribing student:', error);
-        res.status(500).json({ message: 'Error subscribing student', error });
+        console.error('Erreur d\'inscription:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Erreur lors de l\'inscription',
+            error: process.env.NODE_ENV === 'development' ? error : undefined
+        });
     }
 })
 
