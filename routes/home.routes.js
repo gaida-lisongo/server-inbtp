@@ -718,6 +718,53 @@ router.post('/subscrib', async (req, res) => {
 
         const { nom, postNom, preNom, numRef, email, telephone, photo } = etudiantData;
         
+        const getMatricule = () => {
+            const timestamp = new Date().getTime();
+            return `${classe}.${filiere}.${new Date().getFullYear()}.${timestamp}`;
+        }
+
+        const getSection = async (filiere) => {
+            let currentSection = '';
+            switch (filiere) {
+                case 'prep':
+                    currentSection = 'PREPARATOIRE';
+                case 'meca':
+                    currentSection = 'MECANIQUE';
+                case 'elec':
+                    currentSection = 'ELECTRICITE';
+                case 'electron':
+                    currentSection = 'ELECTRONIQUE';
+                case 'telecom':
+                    currentSection = 'TELECOMMUNICATION';
+                case 'info':
+                    currentSection = 'INFORMATIQUE';
+                case 'const':
+                    currentSection = 'CONSTRUCTION';
+                case 'maint':
+                    currentSection = 'MAINTENANCE';
+                default:
+                    currentSection = 'PETROLE ET GAZ';
+            }
+
+            const data = await appModel.getSectionByName(currentSection);
+            if (!data || !data.id) {
+                throw new Error(`Section ${currentSection} non trouvée`);
+            }
+
+            return data;
+
+        }
+        
+        const getNiveau = async (niveau) => {
+            const data = await appModel.getNiveauByName({ name: niveau });
+            if (!data || !data.id) {
+                throw new Error(`Niveau ${niveau} non trouvé`);
+            }
+            return data;
+        }
+
+        const niveau = await getNiveau(promotionData.niveau);
+
         // Sauvegarde de la photo si présente
         const avatar = photo ? await saveImage(photo) : null;
         
@@ -726,16 +773,16 @@ router.post('/subscrib', async (req, res) => {
             throw new Error('Champs obligatoires manquants');
         }
 
-        const matricule = `${promotionData.niveau}.${promotionData.filiere}.${new Date().getFullYear()}.${Date.now()}`;
+        const matricule = `${promotionData.niveau}.${(promotionData.filiere).toString().toUpperCase()}.${new Date().getFullYear()}.${Date.now()}`;
+
+
+        const section = await getSection(promotionData.filiere);
 
         // Récupération de l'ID de la section
-        const section = await appModel.getProgrammeByName(promotionData.section);
         if (!section?.id) {
             throw new Error(`Section ${promotionData.section} non trouvée`);
         }
-
-        // Récupération de l'ID du niveau
-        const niveau = await appModelApp.getNiveauByName({ name: promotionData.niveau });
+        
         if (!niveau?.id) {
             throw new Error(`Niveau ${promotionData.niveau} non trouvé`);
         }
