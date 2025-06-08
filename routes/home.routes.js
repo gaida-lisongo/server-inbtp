@@ -705,6 +705,7 @@ router.post('/message-section', async (req, res) => {
 
 router.post('/subscrib', async (req, res) => {
     const { etudiantData, identitesData, scolariteData, promotionData} = req.body;
+    console.log('Data received for subscription:', req.body);
     try {
         const { nom, postNom, preNom, numRef, email, telephone, photo: photoBase64 } = etudiantData;
 
