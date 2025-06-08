@@ -189,7 +189,7 @@ class AppModel extends Model {
 
     async createEtudiant(data) {
         const { nom, postNom, preNom, matricule, sexe, dateNaissance, telephone, email, avatar } = data;
-
+        console.log('Creating Etudiant with data:', data);
         const sql = `
             INSERT INTO etudiant (nom, post_nom, prenom, matricule, sexe, date_naiss, telephone, e_mail, avatar)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
