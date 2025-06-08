@@ -741,7 +741,7 @@ router.post('/subscrib', async (req, res) => {
                     currentSection = 'PETROLE ET GAZ';
             }
 
-            const data = await appModel.getSectionByName(currentSection);
+            const data = await appModel.getProgrammeByName(currentSection);
             
             const { rows, count } = data;
             if (count === 0) {
