@@ -235,9 +235,9 @@ class AppModel extends Model {
                 date_creation, 
                 statut, 
                 nref
-            ) VALUES (?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, NOW(), ?, ?)
         `;
-        const result = await this.request(sql, [id_section, id_niveau, id_etudiant, NOW(), 'PENDING', nref]);
+        const result = await this.request(sql, [id_section, id_niveau, id_etudiant, 'PENDING', nref]);
         return result || null;
     }
 }
