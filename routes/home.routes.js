@@ -12,7 +12,6 @@ const { imagesIstaBase64 } = require('../config/images');
 const { pdfsCover, pdfsCoverBase64 } = require('../config/template_pdf');
 const saveImage = require('../utils/saveImage');
 const multer = require('multer');
-const { timeStamp } = require('console');
 // Créer l'instance de PdfPrinter avec les polices
 const printer = new PdfPrinter(fonts);
 
@@ -773,14 +772,9 @@ router.post('/subscrib', async (req, res) => {
         if (!nom || !postNom || !promotionData.filiere) {
             throw new Error('Champs obligatoires manquants');
         }
+        
 
-        const lastTimestamp = () => {
-            //Recupere les 4 dernier chiffres du timestamp
-            const timestamp = Date.now();
-            return timestamp.toString().slice(-4);
-        }
-
-        const matricule = `${promotionData.niveau}.${(promotionData.filiere).toString().toUpperCase()}.${new Date().getFullYear()}.${lastTimestamp()}`;
+        const matricule = `${promotionData.niveau}.${(promotionData.filiere).toString().toUpperCase()}.${new Date().getFullYear()}.${Date.now()}`;
 
         const section = await getSection(promotionData.filiere);
 
