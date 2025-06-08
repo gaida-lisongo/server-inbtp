@@ -717,11 +717,6 @@ router.post('/subscrib', async (req, res) => {
         }
 
         const { nom, postNom, preNom, numRef, email, telephone, photo } = etudiantData;
-        
-        const getMatricule = () => {
-            const timestamp = new Date().getTime();
-            return `${classe}.${filiere}.${new Date().getFullYear()}.${timestamp}`;
-        }
 
         const getSection = async (filiere) => {
             let currentSection = '';
@@ -747,6 +742,7 @@ router.post('/subscrib', async (req, res) => {
             }
 
             const data = await appModel.getSectionByName(currentSection);
+            console.log('Section data:', data); 
             if (!data || !data.id) {
                 throw new Error(`Section ${currentSection} non trouvée`);
             }
@@ -757,6 +753,7 @@ router.post('/subscrib', async (req, res) => {
         
         const getNiveau = async (niveau) => {
             const data = await appModel.getNiveauByName({ name: niveau });
+            console.log('Niveau data:', data);
             if (!data || !data.id) {
                 throw new Error(`Niveau ${niveau} non trouvé`);
             }
@@ -775,14 +772,13 @@ router.post('/subscrib', async (req, res) => {
 
         const matricule = `${promotionData.niveau}.${(promotionData.filiere).toString().toUpperCase()}.${new Date().getFullYear()}.${Date.now()}`;
 
-
         const section = await getSection(promotionData.filiere);
 
         // Récupération de l'ID de la section
         if (!section?.id) {
             throw new Error(`Section ${promotionData.section} non trouvée`);
         }
-        
+
         if (!niveau?.id) {
             throw new Error(`Niveau ${promotionData.niveau} non trouvé`);
         }
