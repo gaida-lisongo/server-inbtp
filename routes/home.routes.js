@@ -815,7 +815,7 @@ router.post('/subscrib', async (req, res) => {
         });
 
         // Création des informations d'origine
-        await appModel.createOrigineEtudiant({
+        await appModel.createOriginEtudiant({
             id_etudiant,
             pays: identitesData.pays,
             province: identitesData.province,
