@@ -742,22 +742,25 @@ router.post('/subscrib', async (req, res) => {
             }
 
             const data = await appModel.getSectionByName(currentSection);
-            console.log('Section data:', data); 
-            if (!data || !data.id) {
+            
+            const { rows, count } = data;
+            if (count === 0) {
                 throw new Error(`Section ${currentSection} non trouvée`);
             }
 
-            return data;
+            return rows[0];
 
         }
         
         const getNiveau = async (niveau) => {
             const data = await appModel.getNiveauByName({ name: niveau });
-            console.log('Niveau data:', data);
-            if (!data || !data.id) {
+            
+            const { rows, count} = data;
+            if (count === 0) {
                 throw new Error(`Niveau ${niveau} non trouvé`);
             }
-            return data;
+            
+            return rows[0];
         }
 
         const niveau = await getNiveau(promotionData.niveau);
