@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { App } = require('../controllers')
+const { App } = require('../controllers');
+const AppModel = require('../models/AppModel');
+const appModel = new AppModel();
 const fs = require('fs');
 const path = require('path');
 const PdfPrinter = require('pdfmake');
@@ -727,19 +729,19 @@ router.post('/subscrib', async (req, res) => {
         const matricule = `${promotionData.niveau}.${promotionData.filiere}.${new Date().getFullYear()}.${Date.now()}`;
 
         // Récupération de l'ID de la section
-        const section = await App.getProgrammeByName(promotionData.section);
+        const section = await appModel.getProgrammeByName(promotionData.section);
         if (!section?.id) {
             throw new Error(`Section ${promotionData.section} non trouvée`);
         }
 
         // Récupération de l'ID du niveau
-        const niveau = await App.getNiveauByName({ name: promotionData.niveau });
+        const niveau = await appModelApp.getNiveauByName({ name: promotionData.niveau });
         if (!niveau?.id) {
             throw new Error(`Niveau ${promotionData.niveau} non trouvé`);
         }
 
         // Création de l'étudiant
-        const reqEtudiant = await App.createEtudiant({
+        const reqEtudiant = await appModel.createEtudiant({
             nom,
             postNom,
             preNom,
@@ -758,7 +760,7 @@ router.post('/subscrib', async (req, res) => {
         const id_etudiant = reqEtudiant.insertId;
 
         // Création des informations administratives
-        await App.createAdminEtudiant({
+        await appModel.createAdminEtudiant({
             id_etudiant,
             section: scolariteData.sectionDiplome,
             option: scolariteData.optionDiplome,
@@ -767,7 +769,7 @@ router.post('/subscrib', async (req, res) => {
         });
 
         // Création des informations d'origine
-        await App.createOrigineEtudiant({
+        await appModel.createOrigineEtudiant({
             id_etudiant,
             pays: identitesData.pays,
             province: identitesData.province,
@@ -775,7 +777,7 @@ router.post('/subscrib', async (req, res) => {
         });
 
         // Création de l'inscription
-        const reqInscription = await App.createInscriptionEtudiant({
+        const reqInscription = await appModel.createInscriptionEtudiant({
             id_etudiant,
             id_section: section.id,
             id_niveau: niveau.id,
