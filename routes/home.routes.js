@@ -727,7 +727,7 @@ router.post('/subscrib', async (req, res) => {
         const matricule = `${promotionData.niveau}.${promotionData.filiere}.${new Date().getFullYear()}.${Date.now()}`;
 
         // Récupération de l'ID de la section
-        const section = await App.getSectionByName(promotionData.section);
+        const section = await App.getProgrammeByName(promotionData.section);
         if (!section?.id) {
             throw new Error(`Section ${promotionData.section} non trouvée`);
         }
