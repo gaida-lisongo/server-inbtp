@@ -798,12 +798,12 @@ router.post('/subscrib', async (req, res) => {
             email,
             photo: avatar
         });
-
-        if (!reqEtudiant?.insertId) {
+        const { rows, count } = reqEtudiant;
+        if (!rows || rows.length === 0) {
             throw new Error('Erreur lors de la création de l\'étudiant');
         }
 
-        const id_etudiant = reqEtudiant.insertId;
+        const id_etudiant = rows[0].id;
 
         // Création des informations administratives
         await appModel.createAdminEtudiant({
