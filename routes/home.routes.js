@@ -774,7 +774,7 @@ router.post('/subscrib', async (req, res) => {
         }
         
 
-        const matricule = `${promotionData.niveau}.${(promotionData.filiere).toString().toUpperCase()}.${new Date().getFullYear()}.${Date.now()}`;
+        const matricule = `${promotionData.niveau}.${(promotionData.filiere).toString().toUpperCase()}.${new Date().getFullYear()}.${Date.now().toString().slice(-4)}`;
 
         const section = await getSection(promotionData.filiere);
 
