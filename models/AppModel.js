@@ -5,6 +5,15 @@ class AppModel extends Model {
         super();
     }
 
+    async getAllMentions() {
+        const sql = `
+            SELECT *
+            FROM mention
+        `;
+        const result = await this.request(sql);
+        return result || [];
+    }
+
     async getProgrammes() {
         const sql = `
             SELECT s.*, m.designation AS 'mention', CONCAT(chef_mention.nom, ' ', chef_mention.post_nom, ' ', chef_mention.prenom) AS 'chef_section'
@@ -176,6 +185,15 @@ class AppModel extends Model {
                 `;
         const result = await this.request(sql, [promotionId, anneeId, etudiantId]);
         return result || null;
+    }
+
+    async getAgents() {
+        const sql = `SELECT *
+            FROM agent
+            ORDER BY nom, post_nom, prenom
+        `;
+        const result = await this.request(sql);
+        return result || [];
     }
 
     async createMessageSection({ nom, email, objet, contenu, sectionId }) {

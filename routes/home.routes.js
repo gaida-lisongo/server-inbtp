@@ -119,6 +119,39 @@ router.get('/niveaux', async (req, res) => {
     }
 })
 
+router.get('/metrics', async (req, res) => {
+    try {
+        const mentions = await appModel.getAllMentions();
+        const filieres = await appModel.getProgrammes();
+        const etudiants = await appModel.getEtudiants();
+        const agents = await appModel.getAgents();
+
+        const { count : countSections } = mentions;
+        const { count: countFilieres} = filieres;
+        const { count: countEtudiants } = etudiants;
+        const { count: countAgents } = agents;
+
+        let metriques = {
+            sections: countSections,
+            filieres: countFilieres,
+            etudiants: countEtudiants,
+            agents: countAgents,
+        }
+
+
+        res.status(201).json({
+            success: true,
+            message: 'Metriques récupérées avec succès',
+            data: metriques
+        });
+    } catch (error) {
+        console.error('Error fetching metrics:', error);
+        res.status(500).json({ message: 'Error fetching metrics', error });
+        return;
+        
+    }
+})
+
 router.get('/annees', async (req, res) => {
     try {
         const data = await App.annees();
