@@ -206,6 +206,15 @@ class AppModel extends Model {
         return result || [];
     }
 
+    async createMessage({ nom, email, objet, contenu }) {
+        const sql = `
+            INSERT INTO contacts_institut (auteur_nom, auteur_email, message_objet, message_contenu)
+            VALUES (?, ?, ?, ?)
+        `;
+        const result = await this.request(sql, [nom, email, objet, contenu]);
+        return result || null;
+    }
+
     async createMessageSection({ nom, email, objet, contenu, sectionId }) {
         const sql = `
             INSERT INTO contacts_sections (auteur_nom, auteur_email, message_objet, message_contenu, sectionId)

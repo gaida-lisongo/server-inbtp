@@ -209,7 +209,7 @@ router.get('/promotion/:id', async (req, res) => {
     }
 });
 
-router.get('/calenrier', async (req, res) => {
+router.get('/calendrier', async (req, res) => {
     try {
         const reqCalender = await appModel.getActivites();
         const { rows, count } = reqCalender;
@@ -744,7 +744,7 @@ router.post('/checkResultat', async (req, res) => {
         res.status(500).json({ message: 'Error checking result', error });
     }
 
-})
+});
 
 
 router.post('/message-section', async (req, res) => {
@@ -755,7 +755,7 @@ router.post('/message-section', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error adding message to section', error });
     }
-})
+});
 
 router.post('/subscrib', async (req, res) => {
     console.log('Données reçues:', req.body);
@@ -903,6 +903,41 @@ router.post('/subscrib', async (req, res) => {
             error: process.env.NODE_ENV === 'development' ? error : undefined
         });
     }
-})
+});
+
+router.post('/contact', async (req, res) => {
+    try {
+        const { nom, email, objet, contenu } = req.body;
+
+        // Validation des données
+        if (!nom || !email || !objet || !contenu) {
+            return res.status(400).json({
+                success: false,
+                message: 'Tous les champs sont obligatoires'
+            });
+        }
+
+        // Création du message
+        const message = await appModel.createMessage({
+            nom,
+            email,
+            objet,
+            contenu
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Message envoyé avec succès',
+            data: message
+        });
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du message:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Erreur lors de l\'envoi du message',
+            error: process.env.NODE_ENV === 'development' ? error : undefined
+        });
+    }
+});
 
 module.exports = router;
