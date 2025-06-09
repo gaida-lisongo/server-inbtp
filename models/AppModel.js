@@ -197,8 +197,9 @@ class AppModel extends Model {
     }
 
     async getActivites(){
-        const sql = `SELECT cal.*, act.date, act.description
+        const sql = `SELECT cal.*, act.date, act.description, an.fin, an.debut
             FROM calendrier_acad cal
+            INNER JOIN annee an ON an.id = cal.id_annee
             INNER JOIN activites_acad act ON act.id_calendrier = cal.id
             ORDER BY act.id DESC`;
         const result = await this.request(sql);
