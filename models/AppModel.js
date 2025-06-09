@@ -206,6 +206,23 @@ class AppModel extends Model {
         return result || [];
     }
 
+    async getCommuniques() {
+        const sql = `SELECT cmq.*, CONCAT(agt.grade, ' ', agt.nom, ' ', agt.post_nom) AS 'auteur'
+                FROM communique cmq
+                INNER JOIN agent agt ON agt.id = cmq.id_auteur`;
+        const result = await this.request(sql);
+        return result || [];
+    }
+
+    async getCommuniqueById(id) {
+        const sql = `SELECT cmq.*, CONCAT(agt.grade, ' ', agt.nom, ' ', agt.post_nom) AS 'auteur'
+                FROM communique cmq
+                INNER JOIN agent agt ON agt.id = cmq.id_auteur
+                WHERE cmq.id = ?`;
+        const result = await this.request(sql, [id]);
+        return result || null;
+    }
+
     async createMessage({ nom, email, objet, contenu }) {
         const sql = `
             INSERT INTO contacts_institut (auteur_nom, auteur_email, message_objet, message_contenu)
