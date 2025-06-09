@@ -228,6 +228,40 @@ router.get('/calendrier', async (req, res) => {
     } 
 });
 
+router.get('/communiques', async (req, res) => {
+    try {
+        const communiques = await appModel.getCommuniques();
+        const { rows, count } = communiques;
+        if (count === 0) {
+            return res.status(404).json({ message: 'Aucun communiqué trouvé' });
+        }
+        res.status(200).json({
+            success: true,
+            message: 'Communiqués récupérés avec succès',
+            data: rows
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching communiques', error });
+    }
+});
+
+router.get('/communique/:id', async (req, res) => {
+    const communiqueId = req.params.id;
+    try {
+        const data = await appModel.getCommuniqueById(communiqueId);
+        if (!data || data.count === 0) {
+            return res.status(404).json({ message: 'Communiqué non trouvé' });
+        }
+        res.status(200).json({
+            success: true,
+            message: 'Communiqué récupéré avec succès',
+            data: data.rows[0]
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching communique', error });
+    }
+});
+
 router.post('/checkResultat', async (req, res) => {
     const { annee, matricule, promotionId, type } = req.body;
     const payload = {
@@ -939,5 +973,6 @@ router.post('/contact', async (req, res) => {
         });
     }
 });
+
 
 module.exports = router;
