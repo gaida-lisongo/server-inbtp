@@ -133,6 +133,59 @@ class AppModel extends Model {
         
     }
 
+    async getMatiereById(matiereId) {
+        const sql = `SELECT matiere.*, unite.designation AS 'unite', unite.id_promotion, unite.code AS code_ue, unite.competences, unite.objectifs, p.id_section, p.id_niveau, p.orientation, p.vision, s.designation AS 'mention', mt.designation AS 'filiere', n.intitule AS 'niveau', n.systeme
+            FROM matiere 
+            INNER JOIN unite ON unite.id = matiere.id_unite
+            INNER JOIN promotion p ON p.id = unite.id_promotion
+            INNER JOIN section s ON s.id = p.id_section
+            INNER JOIN mention mt ON mt.id = s.id_mention
+            INNER JOIN niveau n ON n.id = p.id_niveau
+            WHERE matiere.id = ?`;
+        const result = await this.request(sql, [matiereId]);
+        return result || null;
+    }
+
+    async getChargeByMatiere({matiereId, anneeId}){
+        const sql = `SELECT ch.*, tit.nom, tit.post_nom, tit.prenom, tit.avatar, tit.statut, tit.telephone, tit.e_mail, tit.grade
+                FROM charge_horaire ch
+                INNER JOIN agent tit ON tit.id = ch.id_titulaire
+                WHERE ch.id_matiere = ? AND ch.id_annee = ?`;
+        
+        const result = await this.request(sql, [matiereId, anneeId]);
+
+        return result || null;
+    }
+
+    async getMatieresByUE(uniteId){
+        const sql = `SELECT *
+            FROM matiere
+            WHERE matiere.id_unite = ?`;
+
+        const result = await this.request(sql, [uniteId]);
+
+        return result || null;
+    }
+
+    async getLeconsByCharge(chargeId){
+        const sql = `SELECT *
+            FROM lecons
+            WHERE id_charge = ?`;
+        const result = await this.request(sql, [chargeId]);
+        return result || [];
+    }
+
+    async getTravauxByCharge(chargeId){
+        const sql = `
+            SELECT *
+            FROM travail
+            WHERE id_charge = ?
+        `;
+
+        const result = await this.request(sql, [chargeId]);
+        return result || [];
+    }
+
     async getEtudiants(){
         const sql = `SELECT *
             FROM etudiant

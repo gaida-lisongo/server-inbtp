@@ -262,6 +262,90 @@ router.get('/communique/:id', async (req, res) => {
     }
 });
 
+router.get('/matiere/:id', async (req, res) => {
+    const matiereId = req.params.id;
+
+    try {
+        const {rows : anneeData, count } = await appModel.getCurrentAnnee();
+        if (count === 0) {
+            return res.status(404).json({ message: 'Aucune année trouvée' });
+        }
+
+        const annee = anneeData[0];
+
+        const { rows: matiereData, count: matiereCount } = await appModel.getMatiereById(matiereId);
+
+        if (matiereCount === 0) {
+            return res.status(404).json({ message: 'Matière non trouvée' });
+        }
+
+        const matiere = matiereData[0];
+
+        const { rows: chargeData, count: chargeCount } = await appModel.getChargeByMatiere({matiereId: matiere.id, anneeId: annee.id});
+
+        if (chargeCount === 0) {
+            return res.status(404).json({ message: 'Aucune charge trouvée pour cette matière' });
+        }
+
+        const charge = chargeData[0];
+
+        const { rows: ecueData, count : ecueCount } = await appModel.getMatieresByUE(matiere.id_unite);
+
+        if (ecueCount === 0) {
+            return res.status(404).json({ message: 'Aucune ECUE trouvée pour cette matière' });
+        }
+
+        const { rows: leconsData, count: leconsCount } = await appModel.getLeconsByCharge(charge.id);
+        const { rows: travauxData, count: travauxCount} = await appModel.getTravauxByCharge(charge.id);
+
+        const data = {
+            unite: {
+                annee: annee,
+                promotion: `${matiere.niveau} ${matiere.orientation}(${matiere.systeme})`,
+                designation: matiere.unite,
+                code: matiere.code_ue,
+                mention: matiere.mention,
+                filiere: matiere.filiere,
+                ecues: ecueData,
+                objectifs: matiere.objectifs
+            },
+            matiere: {
+                id: matiere.id,
+                designation: matiere.designation,
+                credit: parseInt(matiere.credit, 10),
+                semestre: matiere.semestre,
+                noteUrl: charge.url_document,
+                objectif: charge.objectifs_ec,
+                place: charge.place_ec,
+                penalites: charge.penalites_trvx,
+                mode_ens: charge.mode_ens,
+                horaire: charge.horaire,
+                anneId: charge.id_annee
+            },
+            seances: leconsData,
+            travaux: travauxData,
+            animateur: {
+                photo: charge.avatar,
+                nom: `${charge.nom} ${charge.post_nom} ${charge.prenom}`,
+                grade: charge.grade,
+                disponibilite: charge.disponibilite,
+                email: charge.e_mail,
+                telephone: charge.telephone,
+                id: charge.id_titulaire,
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Descripteur trouvé avec success",
+            data
+        })
+    } catch (error) {
+        console.error('Error fetching matiere:', error);
+        res.status(500).json({ success: false, message: 'Error fetching matiere', error });
+    }
+});
+
 router.post('/checkResultat', async (req, res) => {
     const { annee, matricule, promotionId, type } = req.body;
     const payload = {
