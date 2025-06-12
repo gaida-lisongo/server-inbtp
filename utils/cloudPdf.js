@@ -120,7 +120,7 @@ class PdfApi {
       const completeResponse = await this.uploadComplete(documentId, fileId);
       console.log('Upload complet:', completeResponse);
 
-      if (!completeResponse || !completeResponse.success) {
+      if (!completeResponse || !completeResponse.status) {
         throw new Error('Erreur lors de la finalisation de l’upload');
       }
 
