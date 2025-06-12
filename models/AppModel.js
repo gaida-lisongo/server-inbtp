@@ -276,6 +276,17 @@ class AppModel extends Model {
         return result || null;
     }
 
+    async updateDescriptif(data) {
+        const { id, objectif, place, penalites, mode_ens, horaire } = data;
+        const sql = `   
+            UPDATE charge_horaire
+            SET objectifs_ec = ?, place_ec = ?, penalites_trvx = ?, mode_ens = ?, horaire = ?
+            WHERE id = ?
+        `;
+        const result = await this.request(sql, [objectif, place, penalites, mode_ens, horaire, id]);
+        return result || null;
+    }
+
     async updateCharge(data) {
         const { id, objectif, place, penalites, mode_ens, horaire, documentId } = data;
         const sql = `   

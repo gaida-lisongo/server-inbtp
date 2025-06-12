@@ -120,15 +120,6 @@ router.get('/welcome', async (req, res) => {
 });
 
 router.post('/upload-pdf', multer().single('pdfFile'), async (req, res) => {
-    if (!req.file || req.file.mimetype !== 'application/pdf') {
-        return res.status(400).json({ success: false, message: 'Please upload a valid PDF file.' });
-    }
-
-    /**
-     * Other data from form are: edit-objectif, edit-place-ec, edit-penalite-ec, edit-mode-ec, edit-horaire
-     * getting these data from req.body in payload const
-     */
-
     let payload = {
         id: req.body['edit-id'],
         objectif: req.body['edit-objectif'],
@@ -140,36 +131,55 @@ router.post('/upload-pdf', multer().single('pdfFile'), async (req, res) => {
 
     console.log('Payload:', payload);
 
-    try {
-        const fileInfo = await pdfApi.createDocument('test_01');
-        console.log('Checking PDF API info : ', fileInfo);
+    if (!req.file || req.file.mimetype !== 'application/pdf') {
+        try {
+            const request = await appModel.updateDescriptif(payload);
 
-        if (!fileInfo || !fileInfo.uploadUrl || !fileInfo.documentId || !fileInfo.fileId) {
-            return res.status(500).json({ success: false, message: 'Failed to create document in CloudPDF.' });
+            const { rows } = request;
+
+            if (!request || !rows.affectedRows) {
+                return res.status(500).json({ success: false, message: 'Failed to update charge in database.' });
+            }
+
+            return res.status(200).json({ success: true, message: 'Descriptif updated successfully.' });
+            
+        } catch (error) {
+            console.error('Error updating descriptif:', error);
+            return res.status(500).json({ success: false, message: 'Error updating descriptif', error });
+        }
+    } else {
+        try {
+            const fileInfo = await pdfApi.createDocument(`${payload.id}_descriptif_${ new Date().getTime() }`);
+            console.log('Checking PDF API info : ', fileInfo);
+
+            if (!fileInfo || !fileInfo.uploadUrl || !fileInfo.documentId || !fileInfo.fileId) {
+                return res.status(500).json({ success: false, message: 'Failed to create document in CloudPDF.' });
+            } 
+
+            payload.documentId = fileInfo.documentId;
+
+            const updateResponse = await appModel.updateCharge(payload);
+            const { rows } = updateResponse;
+            
+            if (!updateResponse || !rows.affectedRows) {
+                return res.status(500).json({ success: false, message: 'Failed to update charge in database.' });
+            }
+
+            const pdfBuffer = req.file.buffer;
+
+            // Upload the PDF to CloudPDF
+            const response = await pdfApi.uploadDocument(pdfBuffer, fileInfo.uploadUrl, fileInfo.documentId, fileInfo.fileId);
+
+            res.status(200).json({
+                success: true,
+                message: 'PDF uploaded successfully',
+                data: response
+            });
+        } catch (error) {
+            console.error('Error uploading PDF:', error);
+            res.status(500).json({ success: false, message: 'Error uploading PDF', error });
         }
 
-        payload.documentId = fileInfo.documentId;
-
-        const updateResponse = await appModel.updateCharge(payload);
-
-        console.log('Update response:', updateResponse);
-        if (!updateResponse || !updateResponse.count) {
-            return res.status(500).json({ success: false, message: 'Failed to update charge in database.' });
-        }
-
-        const pdfBuffer = req.file.buffer;
-
-        // Upload the PDF to CloudPDF
-        const response = await pdfApi.uploadDocument(pdfBuffer, fileInfo.uploadUrl, fileInfo.documentId, fileInfo.fileId);
-
-        res.status(200).json({
-            success: true,
-            message: 'PDF uploaded successfully',
-            data: response
-        });
-    } catch (error) {
-        console.error('Error uploading PDF:', error);
-        res.status(500).json({ success: false, message: 'Error uploading PDF', error });
     }
 });
 
