@@ -129,8 +129,6 @@ router.post('/upload-pdf', multer().single('pdfFile'), async (req, res) => {
         horaire: req.body['edit-horaire']
     };
 
-    console.log('Payload:', payload);
-
     if (!req.file || req.file.mimetype !== 'application/pdf') {
         try {
             const request = await appModel.updateDescriptif(payload);

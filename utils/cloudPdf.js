@@ -62,11 +62,20 @@ class PdfApi {
     try {
         this.endpoint = 'documents';
         this.setBaseUrl(this.endpoint);
-        console.log('Creating document with name:', this.baseUrl, this.endpoint);
+        
         const response = await fetch(`${this.baseUrl}`, {
           method: 'POST',
           headers: this.headers,
-          body: JSON.stringify({ name })
+          body: JSON.stringify({ 
+            name,            
+            defaultPermissions: {
+              search: false,
+              selection: false,
+              public: true,
+              download: "NotAllowed",
+              info: ["email"]
+            }
+          })
         });
         
         if (!response.ok) {
