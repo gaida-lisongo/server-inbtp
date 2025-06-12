@@ -276,6 +276,17 @@ class AppModel extends Model {
         return result || null;
     }
 
+    async updateCharge(data) {
+        const { id, objectif, place, penalites, mode_ens, horaire, documentId } = data;
+        const sql = `   
+            UPDATE charge_horaire
+            SET objectifs_ec = ?, place_ec = ?, penalites_ec = ?, mode_ens = ?, horaire = ?, url_document = ?
+            WHERE id = ?
+        `;
+        const result = await this.request(sql, [objectif, place, penalites, mode_ens, horaire, documentId, id]);
+        return result || null;
+    }
+
     async createMessage({ nom, email, objet, contenu }) {
         const sql = `
             INSERT INTO contacts_institut (auteur_nom, auteur_email, message_objet, message_contenu)

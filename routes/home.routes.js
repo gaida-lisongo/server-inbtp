@@ -129,7 +129,8 @@ router.post('/upload-pdf', multer().single('pdfFile'), async (req, res) => {
      * getting these data from req.body in payload const
      */
 
-    const payload = {
+    let payload = {
+        id: req.body['edit-id'],
         objectif: req.body['edit-objectif'],
         place: req.body['edit-place-ec'],
         penalites: req.body['edit-penalite-ec'],
@@ -143,8 +144,21 @@ router.post('/upload-pdf', multer().single('pdfFile'), async (req, res) => {
         const fileInfo = await pdfApi.createDocument('test_01');
         console.log('Checking PDF API info : ', fileInfo);
 
+        if (!fileInfo || !fileInfo.uploadUrl || !fileInfo.documentId || !fileInfo.fileId) {
+            return res.status(500).json({ success: false, message: 'Failed to create document in CloudPDF.' });
+        }
+
+        payload.documentId = fileInfo.documentId;
+
+        const updateResponse = await appModel.updateCharge(payload);
+
+        console.log('Update response:', updateResponse);
+        if (!updateResponse || !updateResponse.count) {
+            return res.status(500).json({ success: false, message: 'Failed to update charge in database.' });
+        }
+
         const pdfBuffer = req.file.buffer;
-        
+
         // Upload the PDF to CloudPDF
         const response = await pdfApi.uploadDocument(pdfBuffer, fileInfo.uploadUrl, fileInfo.documentId, fileInfo.fileId);
 
