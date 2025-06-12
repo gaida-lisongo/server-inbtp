@@ -124,6 +124,21 @@ router.post('/upload-pdf', multer().single('pdfFile'), async (req, res) => {
         return res.status(400).json({ success: false, message: 'Please upload a valid PDF file.' });
     }
 
+    /**
+     * Other data from form are: edit-objectif, edit-place-ec, edit-penalite-ec, edit-mode-ec, edit-horaire
+     * getting these data from req.body in payload const
+     */
+
+    const payload = {
+        objectif: req.body['edit-objectif'],
+        place: req.body['edit-place-ec'],
+        penalites: req.body['edit-penalite-ec'],
+        mode_ens: req.body['edit-mode-ec'],
+        horaire: req.body['edit-horaire']
+    };
+
+    console.log('Payload:', payload);
+
     try {
         const fileInfo = await pdfApi.createDocument('test_01');
         console.log('Checking PDF API info : ', fileInfo);
