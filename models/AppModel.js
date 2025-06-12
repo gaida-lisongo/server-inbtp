@@ -280,7 +280,7 @@ class AppModel extends Model {
         const { id, objectif, place, penalites, mode_ens, horaire, documentId } = data;
         const sql = `   
             UPDATE charge_horaire
-            SET objectifs_ec = ?, place_ec = ?, penalites_ec = ?, mode_ens = ?, horaire = ?, url_document = ?
+            SET objectifs_ec = ?, place_ec = ?, penalites_trvx = ?, mode_ens = ?, horaire = ?, url_document = ?
             WHERE id = ?
         `;
         const result = await this.request(sql, [objectif, place, penalites, mode_ens, horaire, documentId, id]);
