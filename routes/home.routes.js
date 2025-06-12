@@ -12,6 +12,7 @@ const { imagesIstaBase64 } = require('../config/images');
 const { pdfsCover, pdfsCoverBase64 } = require('../config/template_pdf');
 const saveImage = require('../utils/saveImage');
 const multer = require('multer');
+const pdfApi = require('../utils/cloudPdf');
 // Créer l'instance de PdfPrinter avec les polices
 const printer = new PdfPrinter(fonts);
 
@@ -84,8 +85,63 @@ async function addCoverToPdf(pdfBuffer, coverName=""){
 
 }
 
-router.get('/welcome', (req, res) => {
-    res.send('Welcome to the Home Page');
+router.get('/welcome', async (req, res) => {
+    const uploadPdfForm = `
+    <form action="/api/home/upload-pdf" method="post" enctype="multipart/form-data">
+        <input type="file" name="pdfFile" accept="application/pdf" />
+        <button type="submit">Upload PDF</button>
+    </form>
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/api/home/upload-pdf', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('PDF uploaded successfully!');
+                } else {
+                    alert('Error uploading PDF: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while uploading the PDF.');
+            });
+        });
+        document.querySelector('form').style.display = 'block';
+    </script>
+    `;
+    res.send('Welcome to the Home Page<br>' + uploadPdfForm);
+
+});
+
+router.post('/upload-pdf', multer().single('pdfFile'), async (req, res) => {
+    if (!req.file || req.file.mimetype !== 'application/pdf') {
+        return res.status(400).json({ success: false, message: 'Please upload a valid PDF file.' });
+    }
+
+    try {
+        const fileInfo = await pdfApi.createDocument('test_01');
+        console.log('Checking PDF API info : ', fileInfo);
+
+        const pdfBuffer = req.file.buffer;
+        
+        // Upload the PDF to CloudPDF
+        const response = await pdfApi.uploadDocument(pdfBuffer, fileInfo.uploadUrl, fileInfo.documentId, fileInfo.fileId);
+
+        res.status(200).json({
+            success: true,
+            message: 'PDF uploaded successfully',
+            data: response
+        });
+    } catch (error) {
+        console.error('Error uploading PDF:', error);
+        res.status(500).json({ success: false, message: 'Error uploading PDF', error });
+    }
 });
 
 router.get('/', async (req, res) => {
