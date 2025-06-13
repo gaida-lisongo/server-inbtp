@@ -1155,17 +1155,18 @@ router.post('/seance', async (req, res) => {
     try {
         const {
             id,
-            localisation,
-            date_seance,
-            description_seance,
             titre,
             lieu,
+            date_seance,
+            objectif_seance,
+            description_seance,
             activite_seance,
-            objectif_seance
+            localisation,
         } = req.body;
+
         console.log('Données reçues pour la séance:', req.body);
         const newSeance = await appModel.createLecon({
-            id,
+            id_charge: id,
             localisation,
             date_seance,
             description: description_seance,
