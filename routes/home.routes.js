@@ -1151,5 +1151,43 @@ router.post('/contact', async (req, res) => {
     }
 });
 
+router.post('/seance', async (req, res) => {
+    const { 
+        id_charge,
+        localisation,
+        date_seance,
+        description,
+        titre,
+        lieu,
+        activite,
+        objectif
+    } = req.body;
+
+    try {
+        const newSeance = await appModel.createLecon({
+            titre,
+            date_seance,
+            description,
+            localisation,
+            id_charge,
+            lieu,
+            activite,
+            objectif
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Séance créée avec succès',
+            data: newSeance
+        });
+    } catch (error) {
+        console.error('Erreur lors de la création de la séance:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Erreur lors de la création de la séance',
+            error: process.env.NODE_ENV === 'development' ? error : undefined
+        });
+    }
+});
 
 module.exports = router;

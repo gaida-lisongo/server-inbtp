@@ -369,6 +369,19 @@ class AppModel extends Model {
         const result = await this.request(sql, [id_section, id_niveau, id_etudiant, 'PENDING', nref]);
         return result || null;
     }
+
+    async createLecon(data) {
+        /**
+         * lecons(titre, date_seance, `description`, `localisation`, `id_charge`, `lieu`, `activite`, `objectif`)
+         */
+        const { titre, date_seance, description, localisation, id_charge, lieu, activite, objectif } = data;
+        const sql = `
+            INSERT INTO lecons(titre, date_seance, description, localisation, id_charge, lieu, activite, objectif)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        const result = await this.request(sql, [titre, date_seance, description, localisation, id_charge, lieu, activite, objectif]);
+        return result || null;
+    }
 }
 
 module.exports = AppModel;
