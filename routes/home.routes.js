@@ -1152,7 +1152,7 @@ router.post('/contact', async (req, res) => {
 });
 
 router.post('/seance', async (req, res) => {
-
+    console.log("Création d'une nouvelle séance : ", req.body);
     try {
         const payload = { 
             id_charge: req.body['charge-id'],
