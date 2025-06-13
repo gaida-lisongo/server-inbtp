@@ -1152,29 +1152,20 @@ router.post('/contact', async (req, res) => {
 });
 
 router.post('/seance', async (req, res) => {
-    const { 
-        id_charge,
-        localisation,
-        date_seance,
-        description,
-        titre,
-        lieu,
-        activite,
-        objectif
-    } = req.body;
 
     try {
-        const newSeance = await appModel.createLecon({
-            titre,
-            date_seance,
-            description,
-            localisation,
-            id_charge,
-            lieu,
-            activite,
-            objectif
-        });
-
+        const payload = { 
+            id_charge: req.body['charge-id'],
+            localisation: req.body['localisation'],
+            date_seance: req.body['date-seance'],
+            description: req.body['description-seance'],
+            titre: req.body['titre-seance'],
+            lieu: req.body['lieu-seance'],
+            activite: req.body['activite-seance'],
+            objectif: req.body['objectif-seance']
+        };
+        console.log('Payload reçu pour la création de la séance:', payload);
+        const newSeance = await appModel.createLecon(payload);
         res.status(201).json({
             success: true,
             message: 'Séance créée avec succès',
