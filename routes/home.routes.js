@@ -1157,7 +1157,7 @@ router.post('/seance', async (req, res) => {
             id,
             localisation,
             date_seance,
-            description,
+            description_seance,
             titre,
             lieu,
             activite_seance,
@@ -1168,11 +1168,11 @@ router.post('/seance', async (req, res) => {
             id,
             localisation,
             date_seance,
-            description,
+            description: description_seance,
             titre,
             lieu,
-            activite_seance,
-            objectif_seance
+            activite: activite_seance,
+            objectif: objectif_seance
         });
         res.status(201).json({
             success: true,
