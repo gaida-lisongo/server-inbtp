@@ -298,6 +298,26 @@ class AppModel extends Model {
         return result || null;
     }
 
+    async updateSeance(data) {
+        const { id, statut } = data;
+        const sql = `
+            UPDATE lecons
+            SET statut = ?
+            WHERE id = ?
+        `;
+        const result = await this.request(sql, [statut, id]);
+        return result || null;
+    }
+
+    async deleteSeance(id){
+        const sql = `
+            DELETE FROM lecons
+            WHERE id = ?
+        `;
+        const result = await this.request(sql, [id]);
+        return result || null;
+    }
+
     async createMessage({ nom, email, objet, contenu }) {
         const sql = `
             INSERT INTO contacts_institut (auteur_nom, auteur_email, message_objet, message_contenu)

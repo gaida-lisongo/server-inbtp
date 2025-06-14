@@ -1190,4 +1190,69 @@ router.post('/seance', async (req, res) => {
     }
 });
 
+router.put('/seance/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { statut } = req.body;
+
+        const request = await appModel.updateSeance({ id, statut });
+        const { rows, count } = request;
+
+        console.log('Mise à jour de la séance:', rows);
+
+        if (!request || !rows) {
+            res.status(404).json({
+                success: false,
+                message: 'Séance non trouvée ou aucune modification effectuée'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Séance mise à jour avec succès',
+            data: rows
+        });
+
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour de la séance:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Erreur lors de la mise à jour de la séance',
+            error: process.env.NODE_ENV === 'development' ? error : undefined
+        });
+    }
+});
+
+router.delete('/seance/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const request = await appModel.deleteSeance(id);
+        const { rows, count } = request;
+
+        console.log('Suppression de la séance:', rows);
+
+        if (!request || !rows) {
+            res.status(404).json({
+                success: false,
+                message: 'Séance non trouvée ou aucune suppression effectuée'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Séance supprimée avec succès',
+            data: rows
+        });
+
+    } catch (error) {
+        console.error('Erreur lors de la suppression de la séance:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Erreur lors de la suppression de la séance',
+            error: process.env.NODE_ENV === 'development' ? error : undefined
+        });
+    }
+});
+
 module.exports = router;
