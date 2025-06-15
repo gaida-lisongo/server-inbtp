@@ -18,7 +18,7 @@ async function generatePassword() {
 async function verifyToken(token) {
     // vérifie le token JWT
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default secreat');
         return decoded;
     } catch (error) {
         console.error('Token verification failed:', error);
@@ -29,7 +29,7 @@ async function verifyToken(token) {
 async function generateToken(user) {
     console.log('Generating token for user:', user);
     // génère un token JWT
-    return jwt.sign({ id: user.id, matricule: user.matricule }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ id: user.id, matricule: user.matricule }, process.env.JWT_SECRET || 'default_secret', { expiresIn: '1h' });
 }
 
 router.post('/login', async (req, res) => {
