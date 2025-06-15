@@ -62,14 +62,14 @@ router.post('/reset-password', async (req, res) => {
         }
 
         const isValidMatricule = await UserModel.getUserByMatricule(matricule);
-        const { row, count } = isValidMatricule;
+        const { rows, count } = isValidMatricule;
         if (count === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        console.log('User found:', row[0]);
+        console.log('User found:', rows);
         
-        const etudiant = row[0];
+        const etudiant = rows[0];
         if (!etudiant) {
             return res.status(404).json({ error: 'User not found' });
         }
