@@ -70,15 +70,15 @@ router.post('/reset-password', async (req, res) => {
 
         
         const etudiant = rows[0];
-        console.log('User found:', etudiant);
         
         const newPassword = await generatePassword();
         const hashedPassword = await hashPassword(newPassword);
         const result = await UserModel.updatePassword({ etudiantId: etudiant.id, mdp: hashedPassword });
-
-        if (!result) {
-            return res.status(404).json({ error: 'User not found' });
-        }
+        console.log('Password update result:', result);
+        
+        // if (!result) {
+        //     return res.status(404).json({ error: 'User not found' });
+        // }
 
         // Ici, vous pouvez envoyer le nouveau mot de passe par email ou autre moyen
         res.json({ message: 'Password reset successfully', success: true, data:{

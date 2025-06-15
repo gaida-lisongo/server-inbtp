@@ -46,7 +46,7 @@ class UserModel extends AppModel {
             `;
             const result = await this.request(query, [data.mdp, data.etudiantId]);
 
-            return result.affectedRows > 0; // Retourne true si la mise à jour a réussi
+            return result || false;
         } catch (error) {
             console.error('Error updating password:', error);
             throw error; // Propagation de l'erreur pour gestion ultérieure
@@ -62,7 +62,7 @@ class UserModel extends AppModel {
             `;
             const result = await this.request(query, [data.matricule, data.etudiantId]);
 
-            return result.affectedRows > 0; // Retourne true si la mise à jour a réussi
+            return result || false;
         } catch (error) {
             console.error('Error updating matricule:', error);
             throw error; // Propagation de l'erreur pour gestion ultérieure
