@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { UserModel } = require('../models');
 const crypto = require('crypto');
-const userModel = new UserModel();
 const jwt = require('jsonwebtoken');
 require('dotenv').config(); // Assurez-vous que dotenv est configuré pour charger les variables d'environnement
 
@@ -41,7 +40,7 @@ router.post('/login', async (req, res) => {
         }
 
         const hashedPassword = await hashPassword(mdp);
-        const user = await userModel.getUserByAuth({ matricule, mdp: hashedPassword });
+        const user = await UserModel.getUserByAuth({ matricule, mdp: hashedPassword });
 
         if (user.length === 0) {
             return res.status(401).json({ error: 'Invalid credentials' });
@@ -62,7 +61,7 @@ router.post('/reset-password', async (req, res) => {
             return res.status(400).json({ error: 'Matricule is required' });
         }
 
-        const isValidMatricule = await userModel.getUserByMatricule(matricule);
+        const isValidMatricule = await UserModel.getUserByMatricule(matricule);
         const { row, count } = isValidMatricule;
         if (count === 0) {
             return res.status(404).json({ error: 'User not found' });
@@ -77,14 +76,17 @@ router.post('/reset-password', async (req, res) => {
         
         const newPassword = await generatePassword();
         const hashedPassword = await hashPassword(newPassword);
-        const result = await userModel.updatePassword({ etudiantId: etudiant.id, mdp: hashedPassword });
+        const result = await UserModel.updatePassword({ etudiantId: etudiant.id, mdp: hashedPassword });
 
         if (!result) {
             return res.status(404).json({ error: 'User not found' });
         }
 
         // Ici, vous pouvez envoyer le nouveau mot de passe par email ou autre moyen
-        res.json({ message: 'Password reset successfully', newPassword });
+        res.json({ message: 'Password reset successfully', success: true, data:{
+            etudiant: etudiant,
+            newPassword: newPassword
+        } });
     } catch (error) {
         console.error('Forgot password error:', error);
         res.status(500).json({ error: 'Internal server error' });
