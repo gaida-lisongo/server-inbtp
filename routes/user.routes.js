@@ -20,7 +20,7 @@ async function generatePassword() {
 async function verifyToken(token) {
     // vérifie le token JWT
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default secreat');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default secret');
         return decoded;
     } catch (error) {
         console.error('Token verification failed:', error);
@@ -120,8 +120,10 @@ router.post('/reset-password', async (req, res) => {
  */
 
 async function authenticate(req, res, next) {
+    console.log('Authenticating user...');
+    console.log('Headers:', req.headers);
     const token = req.headers['authorization']?.split(' ')[1]; // Récupère le token depuis l'en-tête Authorization
-
+    console.log('Token:', token);
     if (!token) {
         return res.status(401).json({ error: 'No token provided' });
     }
