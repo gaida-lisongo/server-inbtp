@@ -170,8 +170,35 @@ router.post('/update/:id'
     , async (req, res) => {
     try {
         const userId = req.params.id;
-        console.log('data to change:', req.body);
+        const { info, value } = req.body;
+        if (!info || !value) {
+            return res.status(400).json({ error: 'Info and value are required' });
+        }
 
+        let chmaps = {
+            'nom': 'nom',
+            'postnom': 'post_nom',
+            'prenom': 'prenom',
+            'sexe': 'sexe',
+            'datenaissance': 'date_naissance',
+            'lieunaissance': 'lieu_naissance',
+            'email': 'e_mail',
+            'telephone': 'telephone',
+            'adresse': 'adresse'
+        };
+
+        if (!chmaps[info]) {
+            return res.status(400).json({ error: 'Invalid info field' });
+        }
+
+        const dbField = chmaps[info];
+        const {rows, count} = await UserModel.updateUser(dbField, value, userId);
+        
+        if (!rows || rows.length === 0) {
+            console.error('User not found for ID:', userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
         res.json({ success: true, message: 'User updated successfully' });
     } catch (error) {
         console.error('Error updating user:', error);

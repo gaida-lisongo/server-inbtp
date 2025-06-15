@@ -107,6 +107,22 @@ class UserModel extends AppModel {
         }
     }
 
+    async updateUser(col, val, etudiantId) {
+        try {
+            const query = `
+                UPDATE etudiant 
+                SET ${col} = ? 
+                WHERE id = ?
+            `;
+            const result = await this.request(query, [val, etudiantId]);
+
+            return result || false;
+        } catch (error) {
+            console.error(`Error updating user ${col}:`, error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
 }
 
 module.exports = UserModel;
