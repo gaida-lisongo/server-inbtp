@@ -3,6 +3,7 @@ const router = express.Router();
 const { UserModel } = require('../models');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const jwtConfig = require('../config/jwt.config');
 require('dotenv').config(); // Assurez-vous que dotenv est configuré pour charger les variables d'environnement
 const saveImage = require('../utils/saveImage');
 const multer = require('multer');
@@ -17,16 +18,29 @@ async function generatePassword() {
     return crypto.randomBytes(4).toString('hex');
 }
 
-async function verifyToken(token) {
-    // vérifie le token JWT
+const verifyToken = (req, res, next) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default secret');
-        return decoded;
+        const token = req.headers.authorization?.split(' ')[1];
+        
+        if (!token) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'No token provided' 
+            });
+        }
+
+        const decoded = jwt.verify(token, jwtConfig.secret);
+        req.user = decoded;
+        next();
     } catch (error) {
         console.error('Token verification failed:', error);
-        throw new Error('Invalid token');
+        return res.status(401).json({ 
+            success: false, 
+            message: 'Invalid token',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
-}
+};
 
 async function generateToken(user) {
     console.log('Generating token for user:', user);

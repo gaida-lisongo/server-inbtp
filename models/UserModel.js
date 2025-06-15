@@ -1,8 +1,24 @@
 const AppModel = require('./AppModel');
+const jwt = require('jsonwebtoken');
+const jwtConfig = require('../config/jwt.config');
 
 class UserModel extends AppModel {
     constructor() {
         super();
+    }
+
+    generateToken(user) {
+        return jwt.sign(
+            { 
+                id: user.id, 
+                matricule: user.matricule 
+            }, 
+            jwtConfig.secret, 
+            { 
+                expiresIn: jwtConfig.expiresIn,
+                algorithm: jwtConfig.algorithm
+            }
+        );
     }
 
     async getUserByAuth(data) {
@@ -13,8 +29,14 @@ class UserModel extends AppModel {
                 WHERE matricule = ? AND mdp = ?
             `;
             const result = await this.request(query, [data.matricule, data.mdp]);
+            
+            if (result && result.length > 0) {
+                const user = result[0];
+                const token = this.generateToken(user);
+                return { user, token };
+            }
 
-            return result || [];
+            return null;
         } catch (error) {
             console.error('Error fetching user by auth:', error);
             throw error; // Propagation de l'erreur pour gestion ultérieure
