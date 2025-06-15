@@ -4,6 +4,8 @@ const { UserModel } = require('../models');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 require('dotenv').config(); // Assurez-vous que dotenv est configuré pour charger les variables d'environnement
+const saveImage = require('../utils/saveImage');
+const multer = require('multer');
 
 async function hashPassword(password) {
     // crypte le mot de passe avec SHA-256
@@ -30,6 +32,21 @@ async function generateToken(user) {
     console.log('Generating token for user:', user);
     // génère un token JWT
     return jwt.sign({ id: user.id, matricule: user.matricule }, process.env.JWT_SECRET || 'default_secret', { expiresIn: '1h' });
+}
+
+async function convertBufferToBase64(buffer) {
+    // Convertit un buffer en base64
+    return buffer.toString('base64');
+}
+
+async (userId)  => {
+    try {
+        const commandes = await UserModel.getCommandesByUserId(userId);
+        return commandes;
+    } catch (error) {
+        console.error('Error fetching user commandes:', error);
+        throw new Error('Failed to fetch user commandes');
+    }
 }
 
 router.post('/login', async (req, res) => {
@@ -119,15 +136,34 @@ async function authenticate(req, res, next) {
 }
 
 router.use(authenticate); // Applique le middleware d'authentification à toutes les routes suivantes
-router.get('/profile', async (req, res) => {
+
+const storage = multer.memoryStorage(); // Stockage en mémoire pour les images
+const upload = multer({ storage: storage });
+
+router.post('/photo/:id', upload.single('photo'), async (req, res) => {
     try {
-        const user = await UserModel.getUserByMatricule(req.user.matricule);
-        if (user.length === 0) {
+        const userId = req.params.id;
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const base64Image = await convertBufferToBase64(file.buffer);
+        const photoUrl = await saveImage(base64Image);
+        
+        console.log('Photo uploaded successfully:', photoUrl);
+        const {count, rows} = await UserModel.updatePhotoUser({ etudiantId: userId, avatar: photoUrl });
+
+        if (!rows || rows.length === 0) {
+            console.error('User not found for ID:', userId);
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json(user[0]);
+
+        res.json({ success: true, message: 'La photo a été mise à jour avec succès', data: { userId, photoUrl } });
+
     } catch (error) {
-        console.error('Profile fetch error:', error);
+        console.error('Error updating photo:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

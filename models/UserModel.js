@@ -69,6 +69,22 @@ class UserModel extends AppModel {
         }
     }
 
+    async updatePhotoUser(data) {
+        try {
+            const query = `
+                UPDATE etudiant 
+                SET avatar = ? 
+                WHERE id = ?
+            `;
+            const result = await this.request(query, [data.avatar, data.etudiantId]);
+
+            return result || false;
+        } catch (error) {
+            console.error('Error updating user avatar:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
 }
 
 module.exports = UserModel;
