@@ -180,7 +180,7 @@ router.post('/update/:id'
             'postnom': 'post_nom',
             'prenom': 'prenom',
             'sexe': 'sexe',
-            'datenaissance': 'date_naissance',
+            'datenaissance': 'date_naiss',
             'lieunaissance': 'lieu_naissance',
             'email': 'e_mail',
             'telephone': 'telephone',
@@ -198,7 +198,7 @@ router.post('/update/:id'
             console.error('User not found for ID:', userId);
             return res.status(404).json({ error: 'User not found' });
         }
-        
+
         res.json({ success: true, message: 'User updated successfully' });
     } catch (error) {
         console.error('Error updating user:', error);
