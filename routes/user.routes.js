@@ -138,7 +138,7 @@ router.use(authenticate); // Applique le middleware d'authentification à toutes
 const storage = multer.memoryStorage(); // Stockage en mémoire pour les images
 const upload = multer({ storage: storage });
 
-router.post('/photo/:id', upload.single('photo'), async (req, res) => {
+router.post('/photo/:id', upload.single('avatar'), async (req, res) => {
     try {
         const userId = req.params.id;
         const file = req.file;
