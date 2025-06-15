@@ -28,10 +28,10 @@ class UserModel extends AppModel {
                 FROM etudiant
                 WHERE matricule = ? AND mdp = ?
             `;
-            const result = await this.request(query, [data.matricule, data.mdp]);
+            const {rows, count} = await this.request(query, [data.matricule, data.mdp]);
             
-            if (result && result.length > 0) {
-                const user = result[0];
+            if (rows && rows.length > 0) {
+                const user = rows[0];
                 const token = this.generateToken(user);
                 return { user, token };
             }

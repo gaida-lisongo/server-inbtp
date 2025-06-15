@@ -18,27 +18,17 @@ async function generatePassword() {
     return crypto.randomBytes(4).toString('hex');
 }
 
-const verifyToken = (req, res, next) => {
+const verifyToken = (token) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-        
         if (!token) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'No token provided' 
-            });
+            return { error: 'No token provided' };
         }
 
         const decoded = jwt.verify(token, jwtConfig.secret);
-        req.user = decoded;
-        next();
+        return decoded;
     } catch (error) {
         console.error('Token verification failed:', error);
-        return res.status(401).json({ 
-            success: false, 
-            message: 'Invalid token',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
+        return { error: 'Invalid token' };
     }
 };
 
