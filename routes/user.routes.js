@@ -40,13 +40,17 @@ router.post('/login', async (req, res) => {
         }
 
         const hashedPassword = await hashPassword(mdp);
-        const user = await UserModel.getUserByAuth({ matricule, mdp: hashedPassword });
-
-        if (user.length === 0) {
+        const {rows} = await UserModel.getUserByAuth({ matricule, mdp: hashedPassword });
+        
+        if (rows.length === 0) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        const token = await generateToken(user[0]);
+        const user = rows[0];
+
+        console.log('User authenticated successfully:', user);
+
+        const token = await generateToken(user);
         res.json({ token });
     } catch (error) {
         console.error('Login error:', error);
