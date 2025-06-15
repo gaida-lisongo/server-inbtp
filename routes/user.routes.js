@@ -27,6 +27,7 @@ async function verifyToken(token) {
 }
 
 async function generateToken(user) {
+    console.log('Generating token for user:', user);
     // génère un token JWT
     return jwt.sign({ id: user.id, matricule: user.matricule }, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
