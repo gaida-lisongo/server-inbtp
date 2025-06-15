@@ -166,4 +166,17 @@ router.post('/photo/:id', upload.single('avatar'), async (req, res) => {
     }
 });
 
+router.post('/update/:id'
+    , async (req, res) => {
+    try {
+        const userId = req.params.id;
+        console.log('data to change:', req.body);
+
+        res.json({ success: true, message: 'User updated successfully' });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 module.exports = router;
