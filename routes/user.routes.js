@@ -63,16 +63,14 @@ router.post('/reset-password', async (req, res) => {
 
         const isValidMatricule = await UserModel.getUserByMatricule(matricule);
         const { rows, count } = isValidMatricule;
-        if (count === 0) {
+        if (rows.length === 0) {
+            console.error('User not found for matricule:', matricule);
             return res.status(404).json({ error: 'User not found' });
         }
 
-        console.log('User found:', rows);
         
         const etudiant = rows[0];
-        if (!etudiant) {
-            return res.status(404).json({ error: 'User not found' });
-        }
+        console.log('User found:', etudiant);
         
         const newPassword = await generatePassword();
         const hashedPassword = await hashPassword(newPassword);
@@ -89,6 +87,42 @@ router.post('/reset-password', async (req, res) => {
         } });
     } catch (error) {
         console.error('Forgot password error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * Dans les routes qui suivent nous devons au préalable verifier que l'utilisateur est authentifié
+ * et que le token JWT est valide.
+ * Pour cela, nous allons créer un middleware qui va vérifier le token JWT, grâce à la fonction verifyToken.
+ */
+
+async function authenticate(req, res, next) {
+    const token = req.headers['authorization']?.split(' ')[1]; // Récupère le token depuis l'en-tête Authorization
+
+    if (!token) {
+        return res.status(401).json({ error: 'No token provided' });
+    }
+
+    try {
+        const decoded = await verifyToken(token);
+        req.user = decoded; // Ajoute l'utilisateur décodé à la requête
+        next(); // Passe au middleware suivant ou à la route
+    } catch (error) {
+        return res.status(401).json({ error: 'Invalid token' });
+    }
+}
+
+router.use(authenticate); // Applique le middleware d'authentification à toutes les routes suivantes
+router.get('/profile', async (req, res) => {
+    try {
+        const user = await UserModel.getUserByMatricule(req.user.matricule);
+        if (user.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        res.json(user[0]);
+    } catch (error) {
+        console.error('Profile fetch error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
