@@ -23,8 +23,9 @@ const verifyToken = (token) => {
         if (!token) {
             return { error: 'No token provided' };
         }
-
+        console.log('Verifying token:', token);
         const decoded = jwt.verify(token, jwtConfig.secret);
+        console.log('Token decoded successfully:', decoded);
         return decoded;
     } catch (error) {
         console.error('Token verification failed:', error);
@@ -62,18 +63,9 @@ router.post('/login', async (req, res) => {
         }
 
         const hashedPassword = await hashPassword(mdp);
-        const {rows} = await UserModel.getUserByAuth({ matricule, mdp: hashedPassword });
+        const response = await UserModel.getUserByAuth({ matricule, mdp: hashedPassword });
         
-        if (rows.length === 0) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-
-        const user = rows[0];
-
-        console.log('User authenticated successfully:', user);
-
-        const token = await generateToken(user);
-        res.json({ success: true, message: "User authenticated successfully", data: { user, token } });
+        res.json({ success: true, message: "User authenticated successfully", data: response });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });
