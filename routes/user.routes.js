@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
         console.log('User authenticated successfully:', user);
 
         const token = await generateToken(user);
-        res.json({ token });
+        res.json({ success: true, message: "User authenticated successfully", data: { user, token } });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });
