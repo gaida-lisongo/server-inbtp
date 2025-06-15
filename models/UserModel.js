@@ -21,6 +21,54 @@ class UserModel extends AppModel {
         }
     }
 
+    async getUserByMatricule(matricule) {
+        try {
+            const query = `
+                SELECT * 
+                FROM etudiant
+                WHERE matricule = ?
+            `;
+            const result = await this.request(query, [matricule]);
+
+            return result || [];
+        } catch (error) {
+            console.error('Error fetching user by matricule:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
+    async updatePassword(data) {
+        try {
+            const query = `
+                UPDATE etudiant 
+                SET mdp = ? 
+                WHERE id = ?
+            `;
+            const result = await this.request(query, [data.mdp, data.etudiantId]);
+
+            return result.affectedRows > 0; // Retourne true si la mise à jour a réussi
+        } catch (error) {
+            console.error('Error updating password:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
+    async updateMatricule(data) {
+        try {
+            const query = `
+                UPDATE etudiant 
+                SET matricule = ? 
+                WHERE id = ?
+            `;
+            const result = await this.request(query, [data.matricule, data.etudiantId]);
+
+            return result.affectedRows > 0; // Retourne true si la mise à jour a réussi
+        } catch (error) {
+            console.error('Error updating matricule:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
 }
 
 module.exports = UserModel;
