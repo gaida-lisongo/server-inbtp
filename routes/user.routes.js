@@ -210,7 +210,7 @@ router.post('/password/:id', async (req, res) => {
     try {
         const userId = req.params.id;
         const { matricule, oldPassword, newPassword } = req.body;
-
+        console.log("Data received for password update:", req.body);
         if (!oldPassword || !newPassword || !matricule) {
             return res.status(400).json({ error: 'Old and new passwords are required' });
         }
