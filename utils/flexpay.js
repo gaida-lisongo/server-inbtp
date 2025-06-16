@@ -89,7 +89,12 @@ class FlexPay {
                 throw new Error('Tous les champs (orderNumber, id_recharge, id_etudiant, solde) sont requis');
             }
 
-            const request = await fetch(`${this.endpoints.check}/${orderNumber}`);
+            const request = await fetch(`${this.endpoints.check}/${orderNumber}`,
+                {
+                    method: 'GET',
+                    headers: this.headers
+                }
+            );
 
             if (!request.ok) {
                 throw new Error(`Erreur lors de la vérification du paiement: ${request.statusText}`);
