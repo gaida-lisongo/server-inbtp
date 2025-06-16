@@ -325,13 +325,13 @@ router.put('/payment/check', async (req, res) => {
         });
 
         if (!success) {
-            return res.status(400).json({ error: message });
+            return res.status(400).json({ success: false, message });
         }
 
         res.json({ success: true, message: 'Payment status retrieved successfully', data });
     } catch (error) {
         console.error('Error checking payment:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
 

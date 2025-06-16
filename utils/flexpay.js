@@ -104,7 +104,8 @@ class FlexPay {
             console.log('Response from FlexPay Check:', response);
 
             const { transaction } = response;
-            if (!transaction || transaction.status != 0) {
+            
+            if (!transaction || transaction.status == 1) {
                 return {
                     success: false,
                     message: 'Le paiement n\'a pas été trouvé ou n\'est pas valide',
