@@ -206,4 +206,35 @@ router.post('/update/:id'
     }
 });
 
+$('/password/:id', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { matricule, oldPassword, newPassword } = req.body;
+
+        if (!oldPassword || !newPassword || !matricule) {
+            return res.status(400).json({ error: 'Old and new passwords are required' });
+        }
+
+        const hashedOldPassword = await hashPassword(oldPassword);
+        const {rows, count } = await UserModel.getUserByAuth({ matricule, mdp: hashedOldPassword });
+
+        if (!rows || rows.length === 0) {
+            return res.status(401).json({ error: 'Invalid old password' });
+        }
+
+        const hashedNewPassword = await hashPassword(newPassword);
+        const result = await UserModel.updateUser('mdp', hashedNewPassword, userId);
+        console.log('Password update result:', result);
+
+        if (!result.rows || result.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ success: true, message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error updating password:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 module.exports = router;
