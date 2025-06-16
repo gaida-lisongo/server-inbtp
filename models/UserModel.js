@@ -75,6 +75,23 @@ class UserModel extends AppModel {
         }
     }
 
+    async getRechargesByUserId(id){
+        try {
+            const query = `
+                SELECT * 
+                FROM recharge
+                WHERE id_etudiant = ?
+                ORDER BY date_created DESC
+            `;
+            const result = await this.request(query, [id]);
+
+            return result || [];
+        } catch (error) {
+            console.error('Error fetching recharges by user ID:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
     async updatePassword(data) {
         try {
             const query = `

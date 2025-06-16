@@ -238,6 +238,22 @@ router.post('/password/:id', async (req, res) => {
     }
 });
 
+router.get('/recharges/:id', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const recharges = await UserModel.getRechargesByUserId(userId);
+
+        if (!recharges.rows || recharges.count === 0) {
+            return res.status(404).json({ success: false, message: 'No recharges found for this user' });
+        }
+
+        res.json({ success: true, message: 'Recharges retrieved successfully', data: recharges.rows });
+    } catch (error) {
+        console.error('Error retrieving recharges:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }   
+});
+
 router.post('/payment', async (req, res) => {
     try {
         const { montant, reference, devise, telephone, id_etudiant } = req.body;
