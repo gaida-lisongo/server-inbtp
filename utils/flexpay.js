@@ -4,6 +4,8 @@ const { UserModel } = require('../models');
 class FlexPay {
     constructor() {
         this.token = process.env.FLEX_TOKEN;
+        console.log('FlexPay Token:', this.token);
+
         this.endpoints = {
             payment: process.env.FLEX_HOST,
             check: process.env.FLEX_CHECK            
