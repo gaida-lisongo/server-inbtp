@@ -39,8 +39,8 @@ class FlexPay {
                     amount: amount,
                     currency,
                     reference,
-                    merchant: this.merchant,
-                    callback: `https://server-ista-gm-sncd.onrender.com/api/etudiant/flexpay`
+                    merchant: 'ELMESAC',
+                    callbackUrl: `https://server-ista-gm-sncd.onrender.com/api/etudiant/flexpay`
                 })
             });
             if (!request.ok) {
