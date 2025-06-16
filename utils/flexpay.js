@@ -103,13 +103,13 @@ class FlexPay {
             const response = await request.json();
             console.log('Response from FlexPay Check:', response);
 
-            if (response.code !== 0) {
-                throw new Error(`Erreur FlexPay Check: ${response.message}`);
-            }
-
             const { transaction } = response;
-            if (!transaction || transaction.status !== 0) {
-                throw new Error('Le paiement n\'a pas été effectué ou est en attente');
+            if (!transaction || transaction.status != 0) {
+                return {
+                    success: false,
+                    message: 'Le paiement n\'a pas été trouvé ou n\'est pas valide',
+                    data: { ...response }
+                }
             }
 
             let newSolde = 0.0;
