@@ -206,7 +206,7 @@ router.post('/update/:id'
     }
 });
 
-route.post('/password/:id', async (req, res) => {
+router.post('/password/:id', async (req, res) => {
     try {
         const userId = req.params.id;
         const { matricule, oldPassword, newPassword } = req.body;
