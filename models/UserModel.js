@@ -22,6 +22,7 @@ class UserModel extends AppModel {
     }
 
     async getUserByAuth(data) {
+        console.log('Fetching user by auth with data:', data);
         try {
             const query = `
                 SELECT * 

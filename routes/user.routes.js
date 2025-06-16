@@ -216,9 +216,9 @@ router.post('/password/:id', async (req, res) => {
         }
 
         const hashedOldPassword = await hashPassword(oldPassword);
-        const {rows, count } = await UserModel.getUserByAuth({ matricule, mdp: hashedOldPassword });
-        console.log('User found for password update:', rows, count);
-        if (!rows) {
+        const {user } = await UserModel.getUserByAuth({ matricule, mdp: hashedOldPassword });
+        console.log('User found for password update:', user);
+        if (!user) {
             return res.status(401).json({ error: 'Invalid old password' });
         }
 
