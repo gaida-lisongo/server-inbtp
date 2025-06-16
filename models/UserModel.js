@@ -21,8 +21,23 @@ class UserModel extends AppModel {
         );
     }
 
+    async createRecharge(data) {
+        try {
+            const { id_etudiant, montant, telephone, reference, devise } = data;
+            const query = `
+                INSERT INTO recharge (id_etudiant, date_created, montant, telephone, reference, devise)
+                VALUES (?, NOW(), ?, ?, ?, ?)
+            `;
+            const result = await this.request(query, [id_etudiant, montant, telephone, reference, devise]);
+
+            return result || false;
+        } catch (error) {
+            console.error('Error creating recharge:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
     async getUserByAuth(data) {
-        console.log('Fetching user by auth with data:', data);
         try {
             const query = `
                 SELECT * 
@@ -120,6 +135,22 @@ class UserModel extends AppModel {
             return result || false;
         } catch (error) {
             console.error(`Error updating user ${col}:`, error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
+    async updateRecharge(col, val, id_recharge) {
+        try {
+            const query = `
+                UPDATE recharge 
+                SET ${col} = ? 
+                WHERE id = ?
+            `;
+            const result = await this.request(query, [val, id_recharge]);
+
+            return result || false;
+        } catch (error) {
+            console.error('Error updating recharge status:', error);
             throw error; // Propagation de l'erreur pour gestion ultérieure
         }
     }

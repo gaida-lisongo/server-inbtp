@@ -7,6 +7,7 @@ const jwtConfig = require('../config/jwt.config');
 require('dotenv').config(); // Assurez-vous que dotenv est configuré pour charger les variables d'environnement
 const saveImage = require('../utils/saveImage');
 const multer = require('multer');
+const flexpay = require('../utils/flexpay'); // Assurez-vous que flexpay est correctement configuré
 
 async function hashPassword(password) {
     // crypte le mot de passe avec SHA-256
@@ -233,6 +234,103 @@ router.post('/password/:id', async (req, res) => {
         res.json({ success: true, message: 'Password updated successfully' });
     } catch (error) {
         console.error('Error updating password:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post('/payment', async (req, res) => {
+    try {
+        const { montant, reference, devise, telephone, id_etudiant } = req.body;
+
+        if (!montant || !reference || !devise || !telephone || !id_etudiant) {
+            return res.status(400).json({ error: 'All fields (montant, reference, devise, telephone, id_etudiant) are required' });
+        }
+
+        const {rows, count, lastInsertedId } = await UserModel.createRecharge({
+            montant,
+            reference,
+            devise,
+            telephone,
+            id_etudiant
+        });
+
+        console.log('Recharge created successfully:', rows);
+        if (!rows || !lastInsertedId) {
+            return res.status(404).json({ error: 'Failed to create recharge' });
+        }
+
+        const paymentData = {
+            phone: telephone,
+            amount: montant,
+            currency: devise,
+            reference: reference,
+            id: lastInsertedId,
+            orderNumber: null,
+            statut: 'NO',
+            date_created: new Date().toISOString(),
+        };
+
+        console.log('Creating payment with data:', paymentData);
+
+        res.json({ success: true, message: 'Recharge created successfully', data: paymentData });
+    } catch (error) {
+        console.error('Error creating payment:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.put('/payment', async (req, res) => {
+    try {
+        const { phone, amount, currency, reference, id_recharge } = req.body;
+        if (!phone || !amount || !currency || !reference || !id_recharge) {
+            return res.status(400).json({ error: 'All fields (phone, amount, currency, reference, id_recharge) are required' });
+        }
+
+        const {success, message, data} = await flexpay.createPayment({
+            phone,
+            amount,
+            currency,
+            reference,
+            id_recharge
+        });
+
+        if (!success) {
+            return res.status(400).json({ error: message });
+        }
+
+        console.log('Payment created successfully:', data);
+        res.json({ success: true, message: 'Payment created successfully', data: {
+            ...data,
+            statut: 'PENDING',
+            id_recharge: id_recharge,
+        } });
+    } catch (error) {
+        console.error('Error updating payment:', error);
+        res.status(500).json({ error: 'Internal server error' });    
+    }
+});
+
+router.put('/payment/check', async (req, res) => {
+    try {
+        const { orderNumber, id, id_etudiant, solde } = req.body;
+        if (!orderNumber || !id || !id_etudiant || solde === undefined) {
+            return res.status(400).json({ error: 'All fields (orderNumber, id, id_etudiant, solde) are required' });
+        }
+
+        const { success, message, data } = await flexpay.checkPayment({
+            orderNumber,
+            id_recharge: id,
+            id_etudiant,
+            solde
+        });
+
+        if (!success) {
+            return res.status(400).json({ error: message });
+        }
+
+        res.json({ success: true, message: 'Payment status retrieved successfully', data });
+    } catch (error) {
+        console.error('Error checking payment:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
