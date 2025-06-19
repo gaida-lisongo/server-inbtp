@@ -3,8 +3,24 @@ const router = express.Router();
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../config/jwt.config');
-const { AgentModel } = require('../models')
+const { AgentModel } = require('../models');
+const mailService = require('../utils/sendMail');
 require('dotenv').config();
+
+let otps = [];
+
+function generateOTP(userId) {
+    //Exemple de génération d'un OTP aléatoire 236879
+    const lengthOTP = 6;
+    let otp = [];
+    for (let i = 0; i < lengthOTP; i++) {
+        otp.push(Math.floor(Math.random() * 10));
+    }
+    otp = otp.join('');
+    console.log(`Generated OTP for user ${userId}: ${otp}`);
+    otps.push({ id: userId, otp });
+    return otp;
+}
 
 async function hashPassword(password) {
     // crypte le mot de passe avec SHA-256
@@ -68,9 +84,13 @@ router.get('/checkAccount', async (req, res) => {
 
     try {
         const agent = await AgentModel.getAgentByMatricule(matricule);
+        
 
         if (agent) {
-            return res.status(200).json({ success: true, message: 'Agent found', data: agent });
+            // Génération d'un OTP pour l'agent
+            const otp = generateOTP(agent.id);
+            // Envoi de l'OTP par email
+            await mailService.sendMailOTP(agent, otp);
         } else {
             return res.status(404).json({ success: false, message: 'Agent not found' });
         }
@@ -80,7 +100,36 @@ router.get('/checkAccount', async (req, res) => {
     }
 });
 
-router.put('/updateAccount', async (req, res) => {
+router.post('/verifyOTP', async (req, res) => {
+    const { matricule, otp } = req.body;
+
+    if (!matricule || !otp) {
+        return res.status(400).json({ error: 'Matricule and OTP are required' });
+    }
+
+    try {
+        const agent = await AgentModel.getAgentByMatricule(matricule);
+
+        if (!agent) {
+            return res.status(404).json({ success: false, message: 'Agent not found' });
+        }
+
+        const storedOtp = otps.find(o => o.id === agent.id && o.otp === otp);
+
+        if (storedOtp) {
+            // OTP is valid, remove it from the list
+            otps = otps.filter(o => o.id !== agent.id);
+            return res.status(200).json({ success: true, message: 'OTP verified successfully' });
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid OTP' });
+        }
+    } catch (error) {
+        console.error('Error verifying OTP:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.put('/resetPassword', async (req, res) => {
     const { matricule, col, val } = req.body;
 
     if (!matricule || !col || !val) {
@@ -97,9 +146,10 @@ router.put('/updateAccount', async (req, res) => {
         const result = await AgentModel.updateAgent(col, val, agent.id);
 
         if (result) {
-            return res.status(200).json({ success: true, message: 'Account updated successfully' });
+            const token = AgentModel.generateToken(agent);
+            return res.status(200).json({ success: true, message: 'Password reset successfully', data: { agent, token } });
         } else {
-            return res.status(500).json({ success: false, message: 'Failed to update account' });
+            return res.status(200).json({ success: true, message: 'Account updated successfully' });
         }
     } catch (error) {
         console.error('Error updating account:', error);
