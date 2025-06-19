@@ -45,7 +45,7 @@ async function convertBufferToBase64(buffer) {
     return buffer.toString('base64');
 }
 
-async (userId)  => {
+async function getUserCommandes(userId) {
     try {
         const commandes = await UserModel.getCommandesByUserId(userId);
         return commandes;

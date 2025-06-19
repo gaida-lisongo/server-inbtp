@@ -1,10 +1,12 @@
 const Model = require('./Model');
 const AppModel = require('./AppModel');
 const UserModel = require('./UserModel');
+const AgentModel = require('./AgentModel');
 
 const model = new Model();
 const appModel = new AppModel();
 const userModel = new UserModel();
+const agentModel = new AgentModel();
 
 // Exportez tous vos modèles de manière organisée
 module.exports = {
@@ -12,6 +14,7 @@ module.exports = {
     Model: model,
     AppModel: appModel,
     UserModel: userModel,
+    AgentModel: agentModel, 
     // Fonction pour initialiser tous les modèles si nécessaire
     init: async () => {
         try {
