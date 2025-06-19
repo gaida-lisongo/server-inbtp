@@ -89,8 +89,16 @@ router.get('/checkAccount', async (req, res) => {
         if (agent) {
             // Génération d'un OTP pour l'agent
             const otp = generateOTP(agent.id);
+
+            console.log('Current User : ', agent);
+
             // Envoi de l'OTP par email
             await mailService.sendMailOTP(agent, otp);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Agent found, OTP sent to email',
+            })
         } else {
             return res.status(404).json({ success: false, message: 'Agent not found' });
         }

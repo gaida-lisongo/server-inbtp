@@ -12,6 +12,15 @@ class MailService {
                 pass: process.env.MAIL_PASSWORD
             }
         });
+
+        // Vérification de la connexion au transporteur
+        this.transporter.verify((error, success) => {
+            if (error) {
+                console.error('Error connecting to mail server:', error);
+            } else {
+                console.log('Mail server is ready to take messages');
+            }
+        });
     }
 
     async sendMail(to, subject, text, html) {
