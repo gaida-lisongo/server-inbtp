@@ -24,10 +24,12 @@ class BibliothequeModel extends AgentModel {
             const query = `
                 SELECT theme.*, COUNT(ouvrage.id) AS ouvrage_count
                 FROM theme
-                INNER JOIN ouvrage ON theme.id = ouvrage.id_theme
+                LEFT JOIN ouvrage ON theme.id = ouvrage.id_theme
                 GROUP BY theme.id
             `;
             const { rows, count } = await this.request(query);
+            console.log('Total categories:', count);
+            console.log('Categories:', rows);
             return rows || [];
         } catch (error) {
             console.error('Error fetching all categories:', error);
