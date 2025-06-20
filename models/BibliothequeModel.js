@@ -227,13 +227,19 @@ class BibliothequeModel extends AgentModel {
     async getBibliothequeData() {
         try {
             const query = `
-                SELECT ouvrage.*, CONCAT(auteur.nom, ' ', auteur.post_nom) AS auteur_name,
-                       theme.designation AS theme_name, theme.description AS theme_description,
-                       document_type.designation AS document_name, document_type.description AS document_description
+                SELECT 
+                    theme.*, f.designation AS 'filiere',
+                    COUNT(DISTINCT ouvrage.id) AS total_ouvrage,
+                    COUNT(DISTINCT auteur.id) AS total_auteur,
+                    COUNT(DISTINCT document_type.id) AS total_type,
+                    COUNT(DISTINCT r.id) AS total_reservation
                 FROM theme
-                INNER JOIN ouvrage ON theme.id = ouvrage.id_theme
-                INNER JOIN auteur ON ouvrage.id_auteur = auteur.id
-                INNER JOIN document_type ON ouvrage.id_document = document_type.id
+                INNER JOIN section f ON f.id = theme.id_filiere
+                LEFT JOIN ouvrage ON theme.id = ouvrage.id_theme
+                LEFT JOIN reservation r ON r.id_ouvrage = ouvrage.id
+                LEFT JOIN auteur ON ouvrage.id_auteur = auteur.id
+                LEFT JOIN document_type ON ouvrage.id_document = document_type.id
+                GROUP BY theme.id
             `;
             const { rows } = await this.request(query);
             return rows || [];
