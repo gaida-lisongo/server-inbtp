@@ -355,7 +355,7 @@ router.delete('/auteur/:id', async (req, res) => {
     }
 });
 
-routeur.delete('/theme/:id', async (req, res) => {
+router.delete('/theme/:id', async (req, res) => {
     try {
         const { id } = req.params;
         if (!id) {
