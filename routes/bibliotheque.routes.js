@@ -8,8 +8,8 @@ router.use(authenticate);
 
 router.get('/', async (req, res) => {
     try {
-        const { rows, count } = await BibliothequeModel.getBibliothequeData();
-        console.log('Total ouvrages:', count);
+        const rows = await BibliothequeModel.getBibliothequeData();
+        console.log('Total ouvrages:', rows.length);
         console.log('Ouvrages:', rows);
         return res.status(200).json({ 
             success: true, 
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 
 router.get('/ouvrages', async (req, res) => {
     try {
-        const { rows } = await BibliothequeModel.getAllOuvrages();
+        const rows = await BibliothequeModel.getAllOuvrages();
         return res.status(200).json({ 
             success: true, 
             message: 'Liste des ouvrages de la bibliotheque', 
@@ -47,7 +47,7 @@ router.get('/ouvrages/theme/:themeId', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid Theme ID' });
         }
 
-        const { rows } = await BibliothequeModel.getOuvragesByTheme(id);
+        const rows = await BibliothequeModel.getOuvragesByTheme(id);
         return res.status(200).json({ 
             success: true, 
             message: `Liste des ouvrages pour le thème ${id}`, 
@@ -62,7 +62,7 @@ router.get('/ouvrages/theme/:themeId', async (req, res) => {
 
 router.get('/documents', async (req, res) => {
     try {
-        const { rows } = await BibliothequeModel.getAllDocuments();
+        const rows = await BibliothequeModel.getAllDocuments();
         return res.status(200).json({ 
             success: true, 
             message: 'Liste des types de documents de la bibliotheque', 
@@ -77,7 +77,7 @@ router.get('/documents', async (req, res) => {
 
 router.get('/authors', async (req, res) => {
     try {
-        const { rows } = await BibliothequeModel.getAllAuteurs();
+        const rows = await BibliothequeModel.getAllAuteurs();
         return res.status(200).json({ 
             success: true, 
             message: 'Liste des auteurs de la bibliotheque', 
@@ -90,7 +90,7 @@ router.get('/authors', async (req, res) => {
 
 router.get('/themes', async (req, res) => {
     try {
-        const { rows } = await BibliothequeModel.getAllCategories();
+        const rows = await BibliothequeModel.getAllCategories();
         return res.status(200).json({ 
             success: true, 
             message: 'Liste des thématiques de la bibliotheque', 
@@ -112,7 +112,7 @@ router.get('/reservations/:anneeId', async (req, res) => {
         if (isNaN(id)) {
             return res.status(400).json({ success: false, message: 'Invalid Annee ID' });
         }
-        const { rows } = await BibliothequeModel.getReservationsByAnnee(id);
+        const rows = await BibliothequeModel.getReservationsByAnnee(id);
         return res.status(200).json({ 
             success: true, 
             message: 'Liste des réservations par année', 
@@ -137,7 +137,7 @@ router.get('/reservations', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid Theme ID or Annee ID' });
         }
 
-        const { rows } = await BibliothequeModel.getReservationsByThemeAndAnnee(theme, annee);
+        const rows = await BibliothequeModel.getReservationsByThemeAndAnnee(theme, annee);
         return res.status(200).json({
             success: true, 
             message: 'Liste des réservations par thème et année', 
@@ -163,7 +163,7 @@ router.get('/reservations/theme/:theme/:annee', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid Theme ID or Annee ID' });
         }
 
-        const { rows } = await BibliothequeModel.getReservationByTheme(themeId, anneeId);
+        const rows = await BibliothequeModel.getReservationByTheme(themeId, anneeId);
         return res.status(200).json({
             success: true,
             message: `Liste des réservations pour le thème ${themeId} et l'année ${anneeId}`,
