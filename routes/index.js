@@ -6,11 +6,13 @@ const homeRoutes = require('./home.routes');
 const pdfRoutes = require('./pdf.routes');
 const userRoutes = require('./user.routes');
 const agentRoutes = require('./agent.routes');
+const bibliothequeRoutes = require('./bibliotheque.routes');
 
 // Routes publiques
 router.use('/home', homeRoutes);
 router.use('/pdf', pdfRoutes);
 router.use('/etudiant', userRoutes);
 router.use('/agent', agentRoutes);
+router.use('/bibliotheque', bibliothequeRoutes);
 
 module.exports = router;
