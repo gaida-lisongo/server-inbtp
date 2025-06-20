@@ -35,6 +35,31 @@ router.get('/ouvrages', async (req, res) => {
     }
 });
 
+router.get('/ouvrages/theme/:themeId', async (req, res) => {
+    try{
+        const { themeId } = req.params;
+        if (!themeId) {
+            return res.status(400).json({ success: false, message: 'Theme ID is required' });
+        }
+
+        const id = parseInt(themeId, 10);
+        if (isNaN(id)) {
+            return res.status(400).json({ success: false, message: 'Invalid Theme ID' });
+        }
+
+        const { rows } = await BibliothequeModel.getOuvragesByTheme(id);
+        return res.status(200).json({ 
+            success: true, 
+            message: `Liste des ouvrages pour le thème ${id}`, 
+            data: rows 
+        });
+
+    } catch (error){
+        console.error('Error fetching ouvrages by theme:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.get('/documents', async (req, res) => {
     try {
         const { rows } = await BibliothequeModel.getAllDocuments();
@@ -47,6 +72,8 @@ router.get('/documents', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
+
+
 
 router.get('/authors', async (req, res) => {
     try {
