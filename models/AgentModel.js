@@ -49,6 +49,27 @@ class AgentModel extends UserModel {
         }
     }
 
+    async checkUserSession(userId, session) {
+        try {
+            const query = `
+                SELECT * 
+                FROM affectation
+                INNER JOIN poste ON affectation.id_poste = poste.id
+                WHERE affectation.id_agent = ? AND poste.designation = ?
+            `;
+            const {rows, count} = await this.request(query, [userId, session]);
+
+            if (rows && rows.length > 0) {
+                return rows[0];
+            }
+
+            return null;
+        } catch (error) {
+            console.error('Error checking user session:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
     async updateAgent(col, val, agentId) {
         try {
             const query = `
@@ -67,6 +88,8 @@ class AgentModel extends UserModel {
             throw error; // Propagation de l'erreur pour gestion ultérieure
         }
     }
+
+
 
 
 }

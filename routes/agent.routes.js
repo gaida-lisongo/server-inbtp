@@ -166,4 +166,46 @@ router.put('/resetPassword', async (req, res) => {
     }
 });
 
+async function authenticate(req, res, next) {
+    console.log('Authenticating user...');
+    console.log('Headers:', req.headers);
+    const token = req.headers['authorization']?.split(' ')[1]; // Récupère le token depuis l'en-tête Authorization
+    console.log('Token:', token);
+    if (!token) {
+        return res.status(401).json({ error: 'No token provided' });
+    }
+
+    try {
+        const decoded = await verifyToken(token);
+        req.user = decoded; // Ajoute l'utilisateur décodé à la requête
+        next(); // Passe au middleware suivant ou à la route
+    } catch (error) {
+        return res.status(401).json({ error: 'Invalid token' });
+    }
+}
+
+router.use(authenticate); // Applique le middleware d'authentification à toutes les routes suivantes
+
+router.get('/checkAutorization', async (req, res) => {
+    try {
+        const { session } = req.query;
+        const  { user } = req;
+        if (!session || !user) {
+            return res.status(400).json({ success: false, message: 'Session and user are required' });
+        }
+        console.log('Checking authorization for session:', session, 'and user:', user);
+        // Vérifiez si l'utilisateur a accès à la session
+        const hasAccess = await AgentModel.checkUserSession(user.id, session);
+        if (!hasAccess) {
+            return res.status(403).json({ success: false, message: 'Access denied' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Access granted' });
+
+    } catch (error) {
+        console.error('Error checking authorization:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+        
+    }
+});
 module.exports = router;
