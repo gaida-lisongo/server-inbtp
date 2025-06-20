@@ -8,11 +8,14 @@ router.use(authenticate);
 
 router.get('/', async (req, res) => {
     try {
-        const { rows } = await BibliothequeModel.getBibliothequeData();
+        const { rows, count } = await BibliothequeModel.getBibliothequeData();
+        console.log('Total ouvrages:', count);
+        console.log('Ouvrages:', rows);
         return res.status(200).json({ 
             success: true, 
             message: 'Liste des ouvrages de la bibliotheque, par thématique', 
-            data: rows });
+            data: rows 
+        });
     } catch (error) {
         console.error('Error fetching bibliotheque:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
