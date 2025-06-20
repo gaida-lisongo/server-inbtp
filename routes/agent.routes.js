@@ -148,8 +148,8 @@ router.put('/resetPassword', async (req, res) => {
         if (!agent) {
             return res.status(404).json({ success: false, message: 'Agent not found' });
         }
-
-        const result = await AgentModel.updateAgent(col, hashPassword(val), agent.id);
+        const mdp = await hashPassword(val);
+        const result = await AgentModel.updateAgent(col, mdp, agent.id);
         console.log('Update result:', result);
         if (result) {
             const token = AgentModel.generateToken(agent);
