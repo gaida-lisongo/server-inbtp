@@ -149,6 +149,33 @@ router.get('/reservations', async (req, res) => {
     }
 });
 
+router.get('/reservations/theme/:theme/:annee', async (req, res) => {
+    try {
+        const { theme, annee } = req.params;
+        if (!theme || !annee) {
+            return res.status(400).json({ success: false, message: 'Theme ID and Annee ID are required' });
+        }
+
+        const themeId = parseInt(theme, 10);
+        const anneeId = parseInt(annee, 10);
+        
+        if (isNaN(themeId) || isNaN(anneeId)) {
+            return res.status(400).json({ success: false, message: 'Invalid Theme ID or Annee ID' });
+        }
+
+        const { rows } = await BibliothequeModel.getReservationByTheme(themeId, anneeId);
+        return res.status(200).json({
+            success: true,
+            message: `Liste des réservations pour le thème ${themeId} et l'année ${anneeId}`,
+            data: rows 
+        });
+
+    } catch (error) {
+        console.error('Error fetching reservations by theme:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/', async (req, res) => {
     try {
         const { 
