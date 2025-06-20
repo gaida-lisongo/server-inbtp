@@ -47,7 +47,7 @@ class MailService {
             const { nom, post_nom, prenom, matricule, e_mail } = user;
             const innerHTML = `
             <div style="font-family: Arial, sans-serif; color: #333;">
-                <h2 style="color: #4CAF50;">Bonjour ${nom} ${prenom} ${post_nom},</h2>
+                <h2 style="color: #4CAF50;">Bonjour ${prenom} ${nom} ${post_nom},</h2>
                 <p>Votre code OTP est : <strong>${otp}</strong></p>
                 <p>Veuillez utiliser ce code pour compléter votre vérification.</p>
                 <p>Si vous n'avez pas demandé cette vérification, veuillez ignorer cet e-mail.</p>

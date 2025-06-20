@@ -59,9 +59,7 @@ class AgentModel extends UserModel {
             const {rows, count} = await this.request(query, [val, agentId]);
 
             if( rows && rows.length > 0){
-                const user = rows[0];
-                const token = this.generateToken(user);
-                return { user, token };
+                return rows[0];
             }
             return null;
         } catch (error) {

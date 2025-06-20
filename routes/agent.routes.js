@@ -90,8 +90,6 @@ router.get('/checkAccount', async (req, res) => {
             // Génération d'un OTP pour l'agent
             const otp = generateOTP(agent.id);
 
-            console.log('Current User : ', agent);
-
             // Envoi de l'OTP par email
             await mailService.sendMailOTP(agent, otp);
 
@@ -151,10 +149,13 @@ router.put('/resetPassword', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Agent not found' });
         }
 
-        const result = await AgentModel.updateAgent(col, val, agent.id);
-
+        const result = await AgentModel.updateAgent(col, hashPassword(val), agent.id);
+        console.log('Update result:', result);
         if (result) {
             const token = AgentModel.generateToken(agent);
+
+            console.log('Password reset successfully for agent:', agent);
+            console.log('Generated token:', token);
             return res.status(200).json({ success: true, message: 'Password reset successfully', data: { agent, token } });
         } else {
             return res.status(200).json({ success: true, message: 'Account updated successfully' });
