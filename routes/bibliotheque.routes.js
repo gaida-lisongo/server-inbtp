@@ -5,7 +5,10 @@ const { BibliothequeModel } = require('../models');
 require('dotenv').config();
 const multer = require('multer');
 const saveImage = require('../utils/saveImage');
+const path = require('path');
+const fs = require('fs');
 router.use(authenticate);
+
 
 router.get('/', async (req, res) => {
     try {
@@ -222,17 +225,32 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/auteur', async (req, res) => {
+router.post('/auteur', multer.single('auteurPhoto'), async (req, res) => {
     try {
-        const { nom, post_nom, photo, prenom, description } = req.body;
+        // const { nom, post_nom, photo, prenom, description } = req.body;
+        const payload = {
+            nom: req.body['nom'],
+            post_nom: req.body['post_nom'],
+            prenom: req.body['prenom'],
+            description: req.body['description']
+        }
 
-        if (!nom || !post_nom || !photo || !prenom || !description) {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'Photo is required' });
+            
+        }
+
+        //Convert fille buffet to base 64
+        let photo = fs.readFileSync(req.file.buffer);
+        const requestData = {...payload, photo};
+
+        if (!requestData.nom || !requestData.post_nom || !requestData.photo || !requestData.prenom || !requestData.description) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        const photoUrl = photo ? await saveImage(photo, 'auteurs') : "https://via.placeholder.com/150"; // Default image if none provided
-
-        const result = await BibliothequeModel.createAuteur({ nom, post_nom, photoUrl, prenom, description });
+        const photoUrl = photo ? await saveImage(requestData.photo, 'auteurs') : "https://via.placeholder.com/150"; // Default image if none provided
+        const reqData = {...requestData, photoUrl}
+        const result = await BibliothequeModel.createAuteur(reqData);
 
         if (result) {
             return res.status(201).json({ success: true, message: 'Auteur added successfully', data: result });
