@@ -230,7 +230,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Utiliser upload.single au lieu de multer.single
-router.post('/auteur', upload.single('auteurPhoto'), async (req, res) => {
+router.post('/auteur', upload.single('photo'), async (req, res) => {
     try {
         const payload = {
             nom: req.body['nom'],
