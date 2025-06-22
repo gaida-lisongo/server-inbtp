@@ -969,7 +969,6 @@ router.post('/message-section', async (req, res) => {
 });
 
 router.post('/subscrib', async (req, res) => {
-    console.log('Données reçues:', req.body);
     
     try {
         const { etudiantData, identitesData, scolariteData, promotionData } = req.body;

@@ -3,7 +3,8 @@ const router = express.Router();
 const { authenticate } = require('../middleware/authJwt');
 const { BibliothequeModel } = require('../models');
 require('dotenv').config();
-
+const multer = require('multer');
+const saveImage = require('../utils/saveImage');
 router.use(authenticate);
 
 router.get('/', async (req, res) => {
@@ -229,7 +230,9 @@ router.post('/auteur', async (req, res) => {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        const result = await BibliothequeModel.createAuteur({ nom, post_nom, photo, prenom, description });
+        const photoUrl = photo ? await saveImage(photo, 'auteurs') : "https://via.placeholder.com/150"; // Default image if none provided
+
+        const result = await BibliothequeModel.createAuteur({ nom, post_nom, photoUrl, prenom, description });
 
         if (result) {
             return res.status(201).json({ success: true, message: 'Auteur added successfully', data: result });
