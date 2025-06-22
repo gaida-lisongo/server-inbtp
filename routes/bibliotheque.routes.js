@@ -225,9 +225,13 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/auteur', multer.single('auteurPhoto'), async (req, res) => {
+// Configurer multer pour le stockage en mémoire
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+// Utiliser upload.single au lieu de multer.single
+router.post('/auteur', upload.single('auteurPhoto'), async (req, res) => {
     try {
-        // const { nom, post_nom, photo, prenom, description } = req.body;
         const payload = {
             nom: req.body['nom'],
             post_nom: req.body['post_nom'],
@@ -237,19 +241,19 @@ router.post('/auteur', multer.single('auteurPhoto'), async (req, res) => {
 
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'Photo is required' });
-            
         }
 
-        //Convert fille buffet to base 64
-        let photo = fs.readFileSync(req.file.buffer);
+        // Utiliser directement req.file.buffer au lieu de fs.readFileSync
+        let photo = req.file.buffer;
         const requestData = {...payload, photo};
 
-        if (!requestData.nom || !requestData.post_nom || !requestData.photo || !requestData.prenom || !requestData.description) {
+        if (!requestData.nom || !requestData.post_nom || !requestData.prenom || !requestData.description) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        const photoUrl = photo ? await saveImage(requestData.photo, 'auteurs') : "https://via.placeholder.com/150"; // Default image if none provided
-        const reqData = {...requestData, photoUrl}
+        // Utiliser la photo directement
+        const photoUrl = photo ? await saveImage(photo, 'auteurs') : "https://via.placeholder.com/150";
+        const reqData = {...requestData, photoUrl};
         const result = await BibliothequeModel.createAuteur(reqData);
 
         if (result) {
