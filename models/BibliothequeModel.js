@@ -281,7 +281,7 @@ class BibliothequeModel extends AgentModel {
                 INSERT INTO auteur (nom, post_nom, prenom, photo, description)
                 VALUES (?, ?, ?, ?, ?)
             `;
-            const { rows } = await this.request(query, [data.nom, data.post_nom, data.prenom, data.photo, data.description]);
+            const { rows } = await this.request(query, [data.nom, data.post_nom, data.prenom, data.photoUrl, data.description]);
             return rows || [];
         } catch (error) {
             console.error('Error creating author:', error);
