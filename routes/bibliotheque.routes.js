@@ -243,16 +243,18 @@ router.post('/auteur', upload.single('photo'), async (req, res) => {
             return res.status(400).json({ success: false, message: 'Photo is required' });
         }
 
-        // Utiliser directement req.file.buffer au lieu de fs.readFileSync
-        let photo = req.file.buffer;
-        const requestData = {...payload, photo};
+        // Convertir le buffer en base64
+        const base64Photo = req.file.buffer.toString('base64');
+        const base64Image = `data:${req.file.mimetype};base64,${base64Photo}`;
+        
+        const requestData = {...payload, photo: base64Image};
 
         if (!requestData.nom || !requestData.post_nom || !requestData.prenom || !requestData.description) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
         // Utiliser la photo directement
-        const photoUrl = photo ? await saveImage(photo, 'auteurs') : "https://via.placeholder.com/150";
+        const photoUrl = base64Image ? await saveImage(base64Image, 'auteurs') : "https://via.placeholder.com/150";
         const reqData = {...requestData, photoUrl};
         const result = await BibliothequeModel.createAuteur(reqData);
 
