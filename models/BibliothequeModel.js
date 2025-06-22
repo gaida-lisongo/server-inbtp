@@ -214,7 +214,7 @@ class BibliothequeModel extends AgentModel {
                 INNER JOIN theme ON ouvrage.id_theme = theme.id
                 INNER JOIN document_type ON ouvrage.id_document = document_type.id
                 WHERE ouvrage.id_theme = ? AND reservation.id_annee = ?
-                ORDER BY reservation.date_created DESC
+                ORDER BY reservation.id DESC
             `;
             const { rows } = await this.request(query, [themeId, anneeId]);
             return rows || [];
