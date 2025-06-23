@@ -347,7 +347,7 @@ router.put('/ouvrage', async (req, res) => {
         if (!column || !val || !id) {
             return res.status(400).json({ success: false, message: 'Column, value, and ouvrage ID are required' });
         } 
-        const result = await BibliothequeModel.updateOuvrage(column, val, id);
+        const result = await BibliothequeModel.updateOuvrage(id, column, val);
         if (result) {
             return res.status(200).json({ success: true, message: 'Ouvrage updated successfully', data: result });
         }
@@ -365,7 +365,7 @@ router.put('/auteur', async (req, res) => {
         if (!column || !val || !id) {
             return res.status(400).json({ success: false, message: 'Column, value, and auteur ID are required' });
         } 
-        const result = await BibliothequeModel.updateAuteur(column, val, id);
+        const result = await BibliothequeModel.updateAuteur(id, column, val);
         if (result) {
             return res.status(200).json({ success: true, message: 'Auteur updated successfully', data: result });
         }
@@ -383,7 +383,7 @@ router.put('/theme', async (req, res) => {
         if (!column || !val || !id) {
             return res.status(400).json({ success: false, message: 'Column, value, and theme ID are required' });
         } 
-        const result = await BibliothequeModel.updateTheme(column, val, id);
+        const result = await BibliothequeModel.updateTheme(id, column, val);
         if (result) {
             return res.status(200).json({ success: true, message: 'Theme updated successfully', data: result });
         }
@@ -401,7 +401,7 @@ router.put('/document', async (req, res) => {
         if (!column || !val || !id) {
             return res.status(400).json({ success: false, message: 'Column, value, and document ID are required' });
         } 
-        const result = await BibliothequeModel.updateDocumentType(column, val, id);
+        const result = await BibliothequeModel.updateDocumentType(id, column, val);
         if (result) {
             return res.status(200).json({ success: true, message: 'Document updated successfully', data: result });
         }
@@ -419,7 +419,7 @@ router.put('/reservation', async (req, res) => {
         if (!column || !val || !id) {
             return res.status(400).json({ success: false, message: 'Column, value, and reservation ID are required' });
         } 
-        const result = await BibliothequeModel.updateReservation(column, val, id);
+        const result = await BibliothequeModel.updateReservation(id, column, val);
         if (result) {
             return res.status(200).json({ success: true, message: 'Reservation updated successfully', data: result });
         }
