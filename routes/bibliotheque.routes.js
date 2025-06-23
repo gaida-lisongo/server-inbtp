@@ -39,6 +39,35 @@ router.get('/ouvrages', async (req, res) => {
     }
 });
 
+router.get('/ouvrages/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({ success: false, message: 'Ouvrage ID is required' });
+        }
+
+        const ouvrageId = parseInt(id, 10);
+        if (isNaN(ouvrageId)) {
+            return res.status(400).json({ success: false, message: 'Invalid Ouvrage ID' });
+        }
+
+        const rows = await BibliothequeModel.getOuvrageById(ouvrageId);
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Ouvrage not found' });
+        }
+
+        return res.status(200).json({ 
+            success: true, 
+            message: `Details of ouvrage with ID ${ouvrageId}`, 
+            data: rows[0] 
+        });
+
+    } catch (error) {
+        console.error('Error fetching ouvrage by ID:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.get('/ouvrages/theme/:themeId', async (req, res) => {
     try{
         const { themeId } = req.params;
@@ -180,6 +209,10 @@ router.get('/reservations/theme/:theme/:annee', async (req, res) => {
     }
 });
 
+// Configurer multer pour le stockage en mémoire
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 router.post('/', async (req, res) => {
     try {
         const { 
@@ -224,10 +257,6 @@ router.post('/', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
-
-// Configurer multer pour le stockage en mémoire
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 // Utiliser upload.single au lieu de multer.single
 router.post('/auteur', upload.single('photo'), async (req, res) => {

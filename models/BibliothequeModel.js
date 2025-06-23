@@ -69,6 +69,25 @@ class BibliothequeModel extends AgentModel {
         }
     }
 
+    async getOuvrageById(id) {
+        try {
+            const query = `
+                SELECT ouvrage.*, CONCAT(auteur.nom, ' ', auteur.post_nom) AS auteur_name,
+                       theme.designation AS theme_name, theme.description AS theme_description, document_type.designation AS document, document_type.description AS document_description
+                FROM ouvrage
+                INNER JOIN auteur ON ouvrage.id_auteur = auteur.id
+                INNER JOIN theme ON ouvrage.id_theme = theme.id
+                INNER JOIN document_type ON ouvrage.id_document = document_type.id
+                WHERE ouvrage.id = ?
+            `;
+            const { rows, count } = await this.request(query, [id]);
+            return rows || [];
+        } catch (error) {
+            console.error('Error fetching all works:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
     async getOuvragesByTheme(themeId) {
         try {
             const query = `
