@@ -225,7 +225,7 @@ class BibliothequeModel extends AgentModel {
     async getReservationByTheme(themeId, anneeId) {
         try {
             const query = `
-                SELECT reservation.*, CONCAT(etudiant.nom, ' ', etudiant.post_nom) AS etudiant
+                SELECT reservation.*, CONCAT(etudiant.nom, ' ', etudiant.post_nom) AS etudiant, ouvrage.titre, ouvrage.description, theme.designation AS "theme_name", document_type.designation AS "document"
                 FROM reservation
                 INNER JOIN etudiant ON reservation.id_etudiant = etudiant.id
                 INNER JOIN ouvrage ON reservation.id_ouvrage = ouvrage.id
