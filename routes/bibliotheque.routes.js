@@ -343,6 +343,7 @@ router.post('/document', async (req, res) => {
 router.put('/ouvrage', async (req, res) => {
     try {
         const { column, val, id } = req.body;
+        console.log('Update Ouvrage Request:', req.body);
         if (!column || !val || !id) {
             return res.status(400).json({ success: false, message: 'Column, value, and ouvrage ID are required' });
         } 
