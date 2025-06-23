@@ -116,10 +116,10 @@ class FlexPay {
             let newSolde = 0.0;
 
             if (transaction.currency !== 'CDF') {
-                newSolde = (solde ? floatval(solde) : 0) + this.convertUSDtoCDF((floatval(transaction.amount)));
+                newSolde = (solde ? parseFloat(solde) : 0) + this.convertUSDtoCDF((parseFloat(transaction.amount)));
                 // Mettre à jour le solde de l'utilisateur dans la base de données
             } else {
-                newSolde = (solde ? floatval(solde) : 0) + floatval(transaction.amount);
+                newSolde = (solde ? parseFloat(solde) : 0) + parseFloat(transaction.amount);
             }
 
             const { rows } = await UserModel.updateRecharge('statut', 'OK', id_recharge);
