@@ -19,7 +19,7 @@ class AppModel extends Model {
             SELECT s.*, m.designation AS 'mention', CONCAT(chef_mention.nom, ' ', chef_mention.post_nom, ' ', chef_mention.prenom) AS 'chef_section'
             FROM section s
             INNER JOIN mention m ON m.id = s.id_mention
-            INNER JOIN agent chef_mention ON chef_mention.id = m.id_agent
+            INNER JOIN agent chef_mention ON chef_mention.id = s.id_chef
         `;
 
         const result = await this.request(sql);
