@@ -23,7 +23,7 @@ app.get('/', async (req, res) => {
 
     console.log('Request:', request);
     const allConnexions = request ? request.length : 0;
-    res.json({ message: 'Welcome to ISTA API', connexions: allConnexions });
+    res.json({ message: 'Welcome to INBTP API', connexions: allConnexions });
 });
 
 app.get('/lamp/:state', (req, res) => {
