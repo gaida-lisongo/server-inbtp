@@ -13,7 +13,6 @@ class AppModel extends Model {
         const result = await this.request(sql);
         return result || [];
     }
-
     async getProgrammes() {
         const sql = `
             SELECT s.*, m.designation AS 'mention', CONCAT(chef_mention.nom, ' ', chef_mention.post_nom, ' ', chef_mention.prenom) AS 'chef_section'
