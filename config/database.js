@@ -16,17 +16,14 @@ class Database {
             database: process.env.DB_NAME || 'inbtp_db',
             port: process.env.DB_PORT || 3306,
             waitForConnections: true,
-            connectionLimit: 10, // Réduire le nombre de connexions pour Koyeb
+            connectionLimit: 500, // Réduire le nombre de connexions pour Koyeb
             queueLimit: 0, // Pas de limite de file d'attente
             enableKeepAlive: true,
             keepAliveInitialDelay: 10000,
             connectTimeout: 60000, // Augmenter le timeout
             acquireTimeout: 60000,
             timeout: 120000,
-            ssl: {
-                // Activer SSL mais permettre les certificats auto-signés
-                rejectUnauthorized: false
-            },
+            ssl: false,
             // Configuration spécifique pour gérer les déconnexions
             multipleStatements: true,
             timezone: 'Z'
