@@ -47,7 +47,7 @@ async function generatePdf(docDefinition) {
 
 async function addCoverToPdf(pdfBuffer, coverName=""){
     try {
-        const coverPdf = await PDFDocument.load(pdfsCoverBase64.carnetIsta);
+        const coverPdf = await PDFDocument.load(pdfsCoverBase64.carnetInbtp);
         const page = coverPdf.getPage(0);
         const nameFormat = coverName.split(' ');
         

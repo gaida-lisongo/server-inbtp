@@ -2,13 +2,13 @@ const path = require('path');
 const fs = require('fs');
 
 const pdfsCover = {
-    carnetIsta: path.resolve(
-        __dirname, 'page_garde_carnet.pdf'
+    carnetInbtp: path.resolve(
+        __dirname, 'cover-pdf.pdf'
     )
 }
 
 const pdfsCoverBase64 = {
-    carnetIsta: fs.readFileSync(pdfsCover.carnetIsta).toString('base64')
+    carnetInbtp: fs.readFileSync(pdfsCover.carnetInbtp).toString('base64')
 }
 
 module.exports = {
