@@ -236,17 +236,21 @@ class AppController extends Controller {
             }
             
             console.log('Etudiant Data:', etudiantData);
-            const promotionData = await this.model.getPromotionById(promotionId);
 
+            const promotionData = await this.model.getPromotionById(promotionId);
             if (!promotionData) {
                 return this.result('Promotion not found', null, 404);
             }
-            
+
+            console.log('Promotion Data:', promotionData);
+
             const checkCmd = await this.model.getCommandeEtudiant({
                 etudiantId: etudiantData.id,
                 anneeId: anneeId,
                 promotionId: promotionId
-            })
+            });
+
+            console.log('Check Commande Data:', checkCmd);
 
             if (!checkCmd || checkCmd.rows.length === 0) {
                 return this.result('No command found for the student in the given year and promotion', null, 404);
