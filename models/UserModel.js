@@ -92,6 +92,38 @@ class UserModel extends AppModel {
         }
     }
 
+    async getCommandesByUserId(id_etudiant) {
+        try {
+            const query = `
+                SELECT * 
+                FROM commande
+                WHERE id_etudiant = ?
+                ORDER BY date_created DESC
+            `;
+            const result = await this.request(query, [id_etudiant]);
+
+            return result || [];
+        } catch (error) {
+            console.error('Error fetching commandes by user ID:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
+    async updateCommande(col, val, id_commande) {
+        try {
+            const query = `
+                UPDATE commande
+                SET ${col} = ? 
+                WHERE id = ?
+            `;
+            const result = await this.request(query, [val, id_commande]);
+            return result || false;
+        } catch (error) {
+            console.error('Error updating commande:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
     async updatePassword(data) {
         try {
             const query = `
@@ -172,6 +204,24 @@ class UserModel extends AppModel {
         }
     }
 
+    async createCommande(data) {
+        try {
+            const { id_etudiant, type, reference, id_produit } = data;
+            const query = `
+                INSERT INTO commande (id_etudiant, date_created, type, reference, id_produit)
+                VALUES (?, NOW(), ?, ?, ?)
+            `;
+            const result = await this.request(query, [id_etudiant, type, reference, id_produit]);
+
+            return result || false;
+        } catch (error) {
+            console.error('Error creating commande:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
 }
+
+
 
 module.exports = UserModel;

@@ -45,16 +45,6 @@ async function convertBufferToBase64(buffer) {
     return buffer.toString('base64');
 }
 
-async function getUserCommandes(userId) {
-    try {
-        const commandes = await UserModel.getCommandesByUserId(userId);
-        return commandes;
-    } catch (error) {
-        console.error('Error fetching user commandes:', error);
-        throw new Error('Failed to fetch user commandes');
-    }
-}
-
 router.post('/login', async (req, res) => {
     try {
         const { matricule, mdp } = req.body;
@@ -356,6 +346,72 @@ router.put('/payment/check', async (req, res) => {
     } catch (error) {
         console.error('Error checking payment:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.get('/commandes/:id', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const commandes = await UserModel.getCommandesByUserId(userId);
+
+        if (!commandes || commandes.length === 0) {
+            return res.status(404).json({ success: false, message: 'No commandes found for this user' });
+        }
+        console.log('Commandes retrieved successfully:', commandes);
+        res.json({ success: true, message: 'Commandes retrieved successfully', data: commandes });
+    } catch (error) {
+        console.error('Error retrieving commandes:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.put('/commande/:id', async (req, res) => {
+    try {
+        const { col, val } = req.body;
+        const commandeId = req.params.id;
+
+        if (!col || !val) {
+            return res.status(400).json({ error: 'Column and value are required' });
+        }
+
+        const result = await UserModel.updateCommande(col, val, commandeId);
+        console.log('Commande update result:', result);
+
+        if (!result || result.count === 0) {
+            return res.status(404).json({ error: 'Commande not found' });
+        }
+
+        res.json({ success: true, message: 'Commande updated successfully' });
+    } catch (error) {
+        console.error('Error updating commande:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post('/commande', async (req, res) => {
+    try {
+        const { id_etudiant, type, reference, id_produit } = req.body;
+
+        if (!id_etudiant || !type || !reference || !id_produit) {
+            return res.status(400).json({ error: 'All fields (id_etudiant, type, reference, id_produit) are required' });
+        }
+
+        const {rows, count, lastInsertedId} = await UserModel.createCommande({
+            id_etudiant,
+            type,
+            reference,
+            id_produit
+        });
+
+        console.log('Commande created successfully:', rows);
+        if (!rows || !lastInsertedId) {
+            return res.status(404).json({ error: 'Failed to create commande' });
+        }
+
+        res.json({ success: true, message: 'Commande created successfully', data: { id: lastInsertedId } });
+    } catch (error) {
+        console.error('Error creating commande:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
