@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
         const response = await UserModel.getUserByAuth({ matricule, mdp: hashedPassword });
         console.log('Login response:', response);
         if(!response){
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
         res.json({ success: true, message: "User authenticated successfully", data: response });
