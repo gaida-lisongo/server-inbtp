@@ -413,7 +413,8 @@ router.get('/matiere/:id', async (req, res) => {
                 penalites: charge.penalites_trvx,
                 mode_ens: charge.mode_ens,
                 horaire: charge.horaire,
-                anneId: charge.id_annee
+                anneId: charge.id_annee,
+                chargeId: charge.id
             },
             seances: leconsData,
             travaux: travauxData,
