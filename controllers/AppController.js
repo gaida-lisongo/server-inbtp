@@ -202,7 +202,6 @@ class AppController extends Controller {
 
     async getNotesEtudiant({anneeId, matricule, promotionId, type}) {
         
-        matricule = matricule.toUpperCase();
         try {
             const anneeData = await this.model.getAnneeById(anneeId);
             if (!anneeData) {
