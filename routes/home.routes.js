@@ -677,42 +677,15 @@ router.post('/checkResultat', async (req, res) => {
                         {
                             width: '40%',
                             stack: [
-                                { text: 'République Démocratique du Congo', style: { fontSize: 12, bold: true, alignment: 'center' } },
-                                { text: 'Ministère de l\'Enseignement Supérieur et Universitaire', style: { fontSize: 10, italics: true, alignment: 'center' } },
-                                { 
-                                    image: `data:image/png;base64,${imagesIstaBase64.logoIsta}`,
-                                    width: 100,
-                                    height: 100,
-                                    alignment: 'center',
-                                    margin: [0, 0, 0, 0]
-                                },
-                                { text: 'Institut Supérieur des Techniques Appliquées', style: { fontSize: 10, italics: true, alignment: 'center' } },
-                                { text: 'ISTA/GM à Mbanza-Ngungu', style: { fontSize: 10, italics: true, alignment: 'center' } },
-                                { text:  `JURY ${promotion.section}`, style: { fontSize: 12, bold: true, alignment: 'center' } },
-                            ]
-
-                        },                    
-                        {
-                            width: '*',
-                            stack: [
                                 { 
                                     text: `N/Ref: ${commande.id_etudiant}/${commande.id_promotion}/${commande.id}/${new Date().getTime()}`, 
                                     style: 'title',
                                     alignment: 'right'
                                 },
-                            ],
-                            margin: [0, 0, 0, 0]
-                        }
-                    ]
-                },
-                {
-                    columns: [
-                        {
-                            width: '40%',
-                            stack: [
-                                ""
+                                { text:  `JURY ${promotion.section}`, style: { fontSize: 12, bold: true, alignment: 'center' } },
                             ]
-                        },
+
+                        },                    
                         {
                             width: '*',
                             stack: [
@@ -754,7 +727,8 @@ router.post('/checkResultat', async (req, res) => {
                                     alignment: 'right'
                                 }
 
-                            ]
+                            ],
+                            margin: [0, 0, 0, 0]
                         }
                     ]
                 },
@@ -878,7 +852,7 @@ router.post('/checkResultat', async (req, res) => {
                                 {text: 'Fait à Mbanza-Ngungu, le ' + new Date().toLocaleDateString('fr-FR'), style: 'subheader', alignment: 'right', margin: [0, 15, 0, 0]},
                                 "",
                                 {
-                                    qr: `https://ista-gm.net/check-result/${commande.id}`,
+                                    qr: `https://inbtp.net/check-result/${commande.id}`,
                                     fit: 120,
                                     alignment: 'right',
                                     margin: [0, 20, 0, 10]
