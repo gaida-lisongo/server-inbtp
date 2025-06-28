@@ -415,4 +415,32 @@ router.post('/commande', async (req, res) => {
     }
 });
 
+router.put('/debit/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { solde, montant } = req.body;
+
+        if(!id || !solde || !montant){
+            return res.status(400).json({ error: 'Id, solde and montant are required' })
+        }
+        
+        const newSolde = parseFloat(solde ? solde : '0') - parseFloat(montant ? montant : '0')
+
+        const {rows, count} = await UserModel.updateUser('solde', newSolde, id)
+
+        if (count === 0) {
+            return res.status(404).json({ status: false, message: 'User not found' })
+        }
+
+        return res.status(201).json({
+            status: true,
+            message: "Le solde a tété débité",
+            data: rows
+        })
+    } catch (error) {
+        console.error('Error debiting user:', error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+});
+
 module.exports = router;
