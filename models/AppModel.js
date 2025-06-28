@@ -29,7 +29,7 @@ class AppModel extends Model {
         const sql = `SELECT s.*, m.designation AS 'mention', CONCAT(chef_section.grade, '. ', chef_section.nom, ' ', chef_section.post_nom) AS 'chef_section', chef_section.telephone AS 'chef-phone', chef_section.avatar AS 'chef-photo', CONCAT(sec_section.grade, '. ', sec_section.nom, ' ', sec_section.post_nom) AS 'sec_section', sec_section.telephone AS 'sec-phone', sec_section.avatar AS 'sec-photo', chef_section.e_mail
             FROM section s
             INNER JOIN mention m ON m.id = s.id_mention
-            INNER JOIN agent chef_section ON chef_section.id = m.id_agent
+            INNER JOIN agent chef_section ON chef_section.id = s.id_chef
             INNER JOIN agent sec_section ON sec_section.id = s.id_sec
             WHERE s.id = ?
         `;
@@ -41,21 +41,12 @@ class AppModel extends Model {
         const sql = `SELECT s.*, m.designation AS 'mention', CONCAT(chef_section.grade, '. ', chef_section.nom, ' ', chef_section.post_nom) AS 'chef_section', chef_section.telephone AS 'chef-phone', chef_section.avatar AS 'chef-photo', CONCAT(sec_section.grade, '. ', sec_section.nom, ' ', sec_section.post_nom) AS 'sec_section', sec_section.telephone AS 'sec-phone', sec_section.avatar AS 'sec-photo', chef_section.e_mail
             FROM section s
             INNER JOIN mention m ON m.id = s.id_mention
-            INNER JOIN agent chef_section ON chef_section.id = m.id_agent
+            INNER JOIN agent chef_section ON chef_section.id = s.id_chef
             INNER JOIN agent sec_section ON sec_section.id = s.id_sec
             WHERE s.designation = ?
         `;
         const result = await this.request(sql, [name]);
         return result || [];
-    }
-
-    async getNiveauByName({name}) {
-        const sql = `SELECT *
-            FROM niveau
-            WHERE intitule = ?
-        `;
-        const result = await this.request(sql, [name]);
-        return result || null;
     }
 
     async getAnnees() {
@@ -200,6 +191,15 @@ class AppModel extends Model {
         `;
         const result = await this.request(sql);
         return result || [];
+    }
+
+    async getNiveauByName({name}) {
+        const sql = `SELECT *
+            FROM niveau
+            WHERE intitule = ?
+        `;
+        const result = await this.request(sql, [name]);
+        return result || null;
     }
 
     async getEtudiantById(etudiantId) {
