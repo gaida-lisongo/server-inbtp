@@ -210,6 +210,7 @@ class AppController extends Controller {
             console.log('Annee Data:', anneeData.rows[0]);
             let matieres = [];
             const matieresData = await this.model.getMatieresByPromotion(promotionId);
+            console.log('Matieres Data:', matieresData.rows);
             switch (type) {
                 case 'S1':
                     matieres = matieresData.rows.filter(matiere => matiere.semestre == 'Premier');
@@ -229,7 +230,7 @@ class AppController extends Controller {
             }
             
             const etudiantData = await this.model.getEtudiantByMatricule(matricule);
-
+            console.log('Etudiant Data:', etudiantData);
             if (!etudiantData) {
                 return this.result('Etudiant not found', null, 404);
             }
