@@ -207,10 +207,10 @@ class AppController extends Controller {
             if (!anneeData) {
                 return this.result('Annee not found', null, 404);
             }
-            console.log('Annee Data:', anneeData.rows[0]);
+            
             let matieres = [];
             const matieresData = await this.model.getMatieresByPromotion(promotionId);
-            console.log('Matieres Data:', matieresData.rows);
+            
             switch (type) {
                 case 'S1':
                     matieres = matieresData.rows.filter(matiere => matiere.semestre == 'Premier');
@@ -229,8 +229,9 @@ class AppController extends Controller {
                 return this.result('No matieres found for the given promotion', null, 404);
             }
             
-            const etudiantData = await this.model.getEtudiantByMatricule(matricule);
-            console.log('Etudiant Data:', etudiantData);
+            const etudiantInfo = await this.model.getEtudiantByMatricule(matricule);
+            const etudiantData = etudiantInfo.count > 0 ? etudiantInfo.rows[0] : null;
+
             if (!etudiantData) {
                 return this.result('Etudiant not found', null, 404);
             }
@@ -255,7 +256,7 @@ class AppController extends Controller {
             const notes = [];
             for (const matiere of matieres) {
                 const cotes = await this.model.getCotesEtudiant({
-                    etudiantId: etudiantData.rows[0].id,
+                    etudiantId: etudiantData.id,
                     matiereId: matiere.id,
                     anneeId: anneeId
                 });
@@ -296,7 +297,7 @@ class AppController extends Controller {
             return this.result(
                 'Notes retrieved successfully', 
                 {
-                    etudiant: etudiantData.rows[0],
+                    etudiant: etudiantData,
                     promotion: promotionData.rows[0],
                     matieres: unites,
                     annee: anneeData.rows[0],
