@@ -243,7 +243,7 @@ class AppController extends Controller {
             }
             
             const checkCmd = await this.model.getCommandeEtudiant({
-                etudiantId: etudiantData.rows[0].id,
+                etudiantId: etudiantData.id,
                 anneeId: anneeId,
                 promotionId: promotionId
             })
