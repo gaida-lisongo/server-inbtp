@@ -64,6 +64,10 @@ router.post('/login', async (req, res) => {
         }
 
         const hashedPassword = await hashPassword(mdp);
+        console.log(
+            "Current user : ",
+            { matricule, mdp: hashedPassword }
+        )
         const response = await UserModel.getUserByAuth({ matricule, mdp: hashedPassword });
         
         res.json({ success: true, message: "User authenticated successfully", data: response });

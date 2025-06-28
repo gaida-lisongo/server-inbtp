@@ -390,8 +390,8 @@ router.get('/matiere/:id', async (req, res) => {
 
         const { rows: leconsData, count: leconsCount } = await appModel.getLeconsByCharge(charge.id);
         const { rows: travauxData, count: travauxCount} = await appModel.getTravauxByCharge(charge.id);
-
-        const data = {
+        
+        const data = {  
             unite: {
                 annee: annee,
                 promotion: `${matiere.niveau} ${matiere.orientation}(${matiere.systeme})`,
@@ -931,7 +931,6 @@ router.post('/checkResultat', async (req, res) => {
     }
 
 });
-
 
 router.post('/message-section', async (req, res) => {
     const { nom, email, objet, contenu, sectionId } = req.body;
