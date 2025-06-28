@@ -42,7 +42,7 @@ class FlexPay {
                     currency,
                     reference,
                     merchant: 'ELMESAC',
-                    callbackUrl: `https://server-ista-gm-sncd.onrender.com/api/etudiant/flexpay`
+                    callbackUrl: `https://he-section.site/api/etudiant/flexpay`
                 })
             });
             if (!request.ok) {
@@ -105,7 +105,7 @@ class FlexPay {
 
             const { transaction } = response;
             
-            if (!transaction || transaction.status == 1) {
+            if (!transaction || transaction.status == 1  || transaction.status == 2) {
                 return {
                     success: false,
                     message: 'Le paiement n\'a pas été trouvé ou n\'est pas valide',
