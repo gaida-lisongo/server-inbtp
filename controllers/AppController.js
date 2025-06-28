@@ -231,7 +231,7 @@ class AppController extends Controller {
             
             const etudiantInfo = await this.model.getEtudiantByMatricule(matricule);
             const etudiantData = etudiantInfo.count > 0 ? etudiantInfo.rows[0] : null;
-
+            console.log('Etudiant Data:', etudiantData);
             if (!etudiantData) {
                 return this.result('Etudiant not found', null, 404);
             }
