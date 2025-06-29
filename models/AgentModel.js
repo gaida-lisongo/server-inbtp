@@ -79,9 +79,8 @@ class AgentModel extends UserModel {
             `;
             const response = await this.request(query, [val, agentId]);
 
-            console.log(`Update result for ${col}:`, response);
-            if(response && response.affectedRows > 0){
-                return response;
+            if(response){
+                return response.rows;
             }
             return null;
         } catch (error) {
