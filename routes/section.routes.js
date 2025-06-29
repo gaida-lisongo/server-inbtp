@@ -65,11 +65,26 @@ router.get('/:id_section', async (req, res) => {
         
         const { rows: sectionData, count } = await SectionModel.getProgrammeById(id_section);
         console.log('Section Data:', sectionData);
-        if (!sectionData) {
+
+        if (!count || count === 0) {
             return res.status(404).json({ success: false, message: 'Section not found' });
         }
 
-        res.json({ success: true, message: 'Section retrieved successfully', data: sectionData });
+        const { rows: enrollementData, count: enrollementCount } = await SectionModel.getEnrollementsByPromotion(id_section);
+        console.log('Enrollement Data:', enrollementData);
+
+        if (!enrollementCount || enrollementCount === 0) {
+            return res.status(404).json({ success: false, message: 'No enrollements found for this section' });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Section retrieved successfully', 
+            data: {
+                section: sectionData,
+                enrollements: enrollementData
+            } 
+        });
     } catch (error) {
         console.error('Error retrieving section:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
