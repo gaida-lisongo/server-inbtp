@@ -77,10 +77,10 @@ class AgentModel extends UserModel {
                 SET ${col} = ? 
                 WHERE id = ?
             `;
-            const {rows, count} = await this.request(query, [val, agentId]);
+            const response = await this.request(query, [val, agentId]);
 
-            if( rows && rows.length > 0){
-                return rows[0];
+            if(response && response.affectedRows > 0){
+                return response;
             }
             return null;
         } catch (error) {
