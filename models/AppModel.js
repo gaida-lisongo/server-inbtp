@@ -14,11 +14,39 @@ class AppModel extends Model {
         return result || [];
     }
     async getProgrammes() {
-        const sql = `
-            SELECT s.*, m.designation AS 'mention', CONCAT(chef_mention.nom, ' ', chef_mention.post_nom, ' ', chef_mention.prenom) AS 'chef_section'
+        const sql = `SELECT 
+                s.*, 
+                (
+                    SELECT COUNT(DISTINCT pe.id)
+                    FROM promotion p2
+                    JOIN promotion_etudiant pe ON pe.id_promotion = p2.id
+                    WHERE p2.id_section = s.id AND pe.id_annee_acad = 3
+                ) AS etudiants,
+                (
+                    SELECT COUNT(*)
+                    FROM promotion p2
+                    WHERE p2.id_section = s.id
+                ) AS promotions,
+                (
+                    SELECT COUNT(*)
+                    FROM unite u2
+                    JOIN promotion p2 ON p2.id = u2.id_promotion
+                    WHERE p2.id_section = s.id
+                ) AS unites,
+                (
+                    SELECT COUNT(*)
+                    FROM matiere m2
+                    JOIN unite u2 ON u2.id = m2.id_unite
+                    JOIN promotion p2 ON p2.id = u2.id_promotion
+                    WHERE p2.id_section = s.id
+                ) AS ecs, m.designation AS 'mention', CONCAT(chef_section.grade, '. ', chef_section.nom, ' ', chef_section.post_nom) AS 'chef_section', chef_section.telephone AS 'chef-phone', chef_section.avatar AS 'chef-photo', CONCAT(sec_section.grade, '. ', sec_section.nom, ' ', sec_section.post_nom) AS 'sec_section', sec_section.telephone AS 'sec-phone', sec_section.avatar AS 'sec-photo', chef_section.e_mail, CONCAT(ens.grade, '. ', ens.nom, ' ', ens.post_nom) AS 'ens_section', CONCAT(rech.grade, '. ', rech.nom, ' ', rech.post_nom) AS 'rech_section', CONCAT(cais.grade, '. ', cais.nom, ' ', cais.post_nom) AS 'caissier_section'
             FROM section s
             INNER JOIN mention m ON m.id = s.id_mention
-            INNER JOIN agent chef_mention ON chef_mention.id = s.id_chef
+            INNER JOIN agent chef_section ON chef_section.id = s.id_chef
+            INNER JOIN agent ens ON ens.id = s.id_ens
+            INNER JOIN agent rech ON rech.id = s.id_rech
+            INNER JOIN agent cais ON cais.id = s.id_caissier
+            INNER JOIN agent sec_section ON sec_section.id = s.id_sec
         `;
 
         const result = await this.request(sql);
@@ -26,7 +54,32 @@ class AppModel extends Model {
     }
 
     async getProgrammeById(id) {
-        const sql = `SELECT s.*, m.designation AS 'mention', CONCAT(chef_section.grade, '. ', chef_section.nom, ' ', chef_section.post_nom) AS 'chef_section', chef_section.telephone AS 'chef-phone', chef_section.avatar AS 'chef-photo', CONCAT(sec_section.grade, '. ', sec_section.nom, ' ', sec_section.post_nom) AS 'sec_section', sec_section.telephone AS 'sec-phone', sec_section.avatar AS 'sec-photo', chef_section.e_mail, CONCAT(ens.grade, '. ', ens.nom, ' ', ens.post_nom) AS 'ens_section', CONCAT(rech.grade, '. ', rech.nom, ' ', rech.post_nom) AS 'rech_section', CONCAT(cais.grade, '. ', cais.nom, ' ', cais.post_nom) AS 'caissier_section'
+        const sql = `SELECT 
+            s.*, 
+            (
+                SELECT COUNT(DISTINCT pe.id)
+                FROM promotion p2
+                JOIN promotion_etudiant pe ON pe.id_promotion = p2.id
+                WHERE p2.id_section = s.id AND pe.id_annee_acad = 3
+            ) AS etudiants,
+            (
+                SELECT COUNT(*)
+                FROM promotion p2
+                WHERE p2.id_section = s.id
+            ) AS promotions,
+            (
+                SELECT COUNT(*)
+                FROM unite u2
+                JOIN promotion p2 ON p2.id = u2.id_promotion
+                WHERE p2.id_section = s.id
+            ) AS unites,
+            (
+                SELECT COUNT(*)
+                FROM matiere m2
+                JOIN unite u2 ON u2.id = m2.id_unite
+                JOIN promotion p2 ON p2.id = u2.id_promotion
+                WHERE p2.id_section = s.id
+            ) AS ecs, m.designation AS 'mention', CONCAT(chef_section.grade, '. ', chef_section.nom, ' ', chef_section.post_nom) AS 'chef_section', chef_section.telephone AS 'chef-phone', chef_section.avatar AS 'chef-photo', CONCAT(sec_section.grade, '. ', sec_section.nom, ' ', sec_section.post_nom) AS 'sec_section', sec_section.telephone AS 'sec-phone', sec_section.avatar AS 'sec-photo', chef_section.e_mail, CONCAT(ens.grade, '. ', ens.nom, ' ', ens.post_nom) AS 'ens_section', CONCAT(rech.grade, '. ', rech.nom, ' ', rech.post_nom) AS 'rech_section', CONCAT(cais.grade, '. ', cais.nom, ' ', cais.post_nom) AS 'caissier_section'
             FROM section s
             INNER JOIN mention m ON m.id = s.id_mention
             INNER JOIN agent chef_section ON chef_section.id = s.id_chef
@@ -46,7 +99,7 @@ class AppModel extends Model {
             INNER JOIN mention m ON m.id = s.id_mention
             INNER JOIN agent chef_section ON chef_section.id = s.id_chef
             INNER JOIN agent sec_section ON sec_section.id = s.id_sec
-            WHERE s.designation = ?
+            WHERE s.sigle = ?
         `;
         const result = await this.request(sql, [name]);
         return result || [];
