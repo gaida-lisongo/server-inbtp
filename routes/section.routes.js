@@ -63,7 +63,7 @@ router.get('/:id_section', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Section ID is required' });
         }
         
-        const { rows: sectionData, count } = await SectionModel.getSectionById(id_section);
+        const { rows: sectionData, count } = await SectionModel.getProgrammeById(id_section);
 
         if (!sectionData) {
             return res.status(404).json({ success: false, message: 'Section not found' });
