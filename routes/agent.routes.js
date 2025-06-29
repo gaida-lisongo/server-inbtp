@@ -135,6 +135,7 @@ router.put('/resetPassword', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Agent not found' });
         }
         const mdp = await hashPassword(val);
+        console.log('Updating agent:', agent, 'with column:', col, 'and value:', val);
         const result = await AgentModel.updateAgent(col, mdp, agent.id);
         console.log('Update result:', result);
         if (result) {
@@ -144,7 +145,7 @@ router.put('/resetPassword', async (req, res) => {
             console.log('Generated token:', token);
             return res.status(200).json({ success: true, message: 'Password reset successfully', data: { agent, token } });
         } else {
-            return res.status(200).json({ success: true, message: 'Account updated successfully' });
+            return res.status(500).json({ success: false, message: 'Account updated successfully' });
         }
     } catch (error) {
         console.error('Error updating account:', error);
