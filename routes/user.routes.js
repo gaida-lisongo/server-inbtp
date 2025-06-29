@@ -474,4 +474,38 @@ router.put('/debit/:id', async (req, res) => {
     }
 });
 
+router.get('/travail/:id', async (req, res) => {
+    try {
+        const travailId = req.params.id;
+        const travaux = await UserModel.getTravailById(travailId);
+
+        if (!travaux || travaux.length === 0) {
+            return res.status(404).json({ success: false, message: 'Travail not found' });
+        }
+
+        console.log('Travail retrieved successfully:', travaux);
+        res.json({ success: true, message: 'Travail retrieved successfully', data: travaux });
+    } catch (error) {
+        console.error('Error retrieving travaux:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.get('/syllabys/:id', async (req, res) => {
+    try {
+        const chargeId = req.params.id;
+        const syllabus = await UserModel.getChargeById(chargeId);
+
+        if (!syllabus || syllabus.length === 0) {
+            return res.status(404).json({ success: false, message: 'Syllabus not found' });
+        }
+
+        console.log('Syllabus retrieved successfully:', syllabus);
+        res.json({ success: true, message: 'Syllabus retrieved successfully', data: syllabus });
+    } catch (error) {
+        console.error('Error retrieving syllabus:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 module.exports = router;

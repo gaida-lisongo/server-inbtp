@@ -108,7 +108,7 @@ class UserModel extends AppModel {
             throw error; // Propagation de l'erreur pour gestion ultérieure
         }
     }
-
+    
     async updateCommande(col, val, id_commande) {
         try {
             const query = `

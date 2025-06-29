@@ -136,6 +136,22 @@ class AppModel extends Model {
         return result || null;
     }
 
+    async getChargeById(chargeId) {
+        const sql = `SELECT matiere.*, unite.designation AS 'unite', unite.id_promotion, unite.code AS code_ue, unite.competences, unite.objectifs, p.id_section, p.id_niveau, p.orientation, p.vision, s.designation AS 'mention', mt.designation AS 'filiere', n.intitule AS 'niveau', n.systeme, ch.url_document, CONCAT(a.debut, ' - ', a.fin) AS 'annee', CONCAT(tit.nom, ' ', tit.post_nom, ' - ', tit.grade) AS 'tit_nom', tit.matricule AS 'tit_mat'
+            FROM matiere 
+            INNER JOIN unite ON unite.id = matiere.id_unite
+            INNER JOIN promotion p ON p.id = unite.id_promotion
+            INNER JOIN section s ON s.id = p.id_section
+            INNER JOIN mention mt ON mt.id = s.id_mention
+            INNER JOIN niveau n ON n.id = p.id_niveau
+            INNER JOIN charge_horaire ch ON ch.id_matiere = matiere.id
+            INNER JOIN agent tit ON tit.id = ch.id_titulaire
+            INNER JOIN annee a ON a.id = ch.id_annee
+            WHERE ch.id = ?`;
+        const result = await this.request(sql, [chargeId]);
+        return result || null;
+    }
+
     async getChargeByMatiere({matiereId, anneeId}){
         const sql = `SELECT ch.*, tit.nom, tit.post_nom, tit.prenom, tit.avatar, tit.statut, tit.telephone, tit.e_mail, tit.grade
                 FROM charge_horaire ch
@@ -174,6 +190,17 @@ class AppModel extends Model {
 
         const result = await this.request(sql, [chargeId]);
         return result || [];
+    }
+
+    async getTravailById(travailId) {
+        const sql = `SELECT tr.*, m.designation, m.credit, m.code, ch.penalites_trvx
+            FROM travail tr
+            INNER JOIN charge_horaire ch ON ch.id = tr.id_charge
+            INNER JOIN matiere m ON m.id = ch.id_matiere
+            WHERE tr.id = ?
+        `;
+        const result = await this.request(sql, [travailId]);
+        return result || null;
     }
 
     async getEtudiants(){
