@@ -93,6 +93,7 @@ router.get('/checkAccount', async (req, res) => {
 
 router.post('/verifyOTP', async (req, res) => {
     const { matricule, otp } = req.body;
+    console.log("Current user : ", { matricule, otp })
 
     if (!matricule || !otp) {
         return res.status(400).json({ error: 'Matricule and OTP are required' });
