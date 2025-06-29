@@ -26,10 +26,13 @@ class AppModel extends Model {
     }
 
     async getProgrammeById(id) {
-        const sql = `SELECT s.*, m.designation AS 'mention', CONCAT(chef_section.grade, '. ', chef_section.nom, ' ', chef_section.post_nom) AS 'chef_section', chef_section.telephone AS 'chef-phone', chef_section.avatar AS 'chef-photo', CONCAT(sec_section.grade, '. ', sec_section.nom, ' ', sec_section.post_nom) AS 'sec_section', sec_section.telephone AS 'sec-phone', sec_section.avatar AS 'sec-photo', chef_section.e_mail
+        const sql = `SELECT s.*, m.designation AS 'mention', CONCAT(chef_section.grade, '. ', chef_section.nom, ' ', chef_section.post_nom) AS 'chef_section', chef_section.telephone AS 'chef-phone', chef_section.avatar AS 'chef-photo', CONCAT(sec_section.grade, '. ', sec_section.nom, ' ', sec_section.post_nom) AS 'sec_section', sec_section.telephone AS 'sec-phone', sec_section.avatar AS 'sec-photo', chef_section.e_mail, CONCAT(ens.grade, '. ', ens.nom, ' ', ens.post_nom) AS 'ens_section', CONCAT(rech.grade, '. ', rech.nom, ' ', rech.post_nom) AS 'rech_section', CONCAT(cais.grade, '. ', cais.nom, ' ', cais.post_nom) AS 'caissier_section'
             FROM section s
             INNER JOIN mention m ON m.id = s.id_mention
             INNER JOIN agent chef_section ON chef_section.id = s.id_chef
+            INNER JOIN agent ens ON ens.id = s.id_ens
+            INNER JOIN agent rech ON rech.id = s.id_rech
+            INNER JOIN agent cais ON cais.id = s.id_caissier
             INNER JOIN agent sec_section ON sec_section.id = s.id_sec
             WHERE s.id = ?
         `;
