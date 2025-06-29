@@ -12,7 +12,7 @@ class AgentModel extends UserModel {
             const query = `
                 SELECT * 
                 FROM agent
-                WHERE matricule = ? AND secure = ?
+                WHERE matricule = ? AND mdp = ?
             `;
             const {rows, count} = await this.request(query, [data.matricule, data.mdp]);
             
