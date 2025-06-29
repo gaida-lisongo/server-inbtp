@@ -393,18 +393,18 @@ router.post('/commande', async (req, res) => {
         const { id_etudiant, type, reference, id_produit, prix } = req.body;
 
         if (!id_etudiant || !type || !reference || !id_produit || !prix) {
-            return res.status(400).json({ error: 'All fields (id_etudiant, type, reference, id_produit, prix) are required' });
+            return res.status(400).json({ success: false, message: 'All fields (id_etudiant, type, reference, id_produit, prix) are required' });
         }
         const isValidUser = await UserModel.getUserById(id_etudiant);
         if (!isValidUser || isValidUser.count === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
         const currentEtudiant = isValidUser.rows[0];
         console.log('Current user for commande:', currentEtudiant);
 
         // Vérification du solde de l'étudiant
         if (parseFloat(currentEtudiant.solde) < parseFloat(prix)) {
-            return res.status(400).json({ error: 'Insufficient balance for this commande' });
+            return res.status(400).json({ success: false, message: 'Insufficient balance for this commande' });
         }
 
         // Création de la commande
@@ -417,7 +417,7 @@ router.post('/commande', async (req, res) => {
 
         console.log('Commande created successfully:', rows);
         if (!rows || !lastInsertedId) {
-            return res.status(404).json({ error: 'Failed to create commande' });
+            return res.status(404).json({ success: false, message: 'Failed to create commande' });
         }
 
         // Débit du solde de l'étudiant
@@ -425,7 +425,7 @@ router.post('/commande', async (req, res) => {
         const {rows: updatedRows, count: updateCount} = await UserModel.updateUser('solde', newSolde, id_etudiant);
 
         if (updateCount === 0) {
-            return res.status(404).json({ error: 'User not found for balance update' });
+            return res.status(404).json({ success: false, message: 'User not found for balance update' });
         }
 
         console.log('User balance updated successfully:', updatedRows);
@@ -442,7 +442,7 @@ router.post('/commande', async (req, res) => {
         });
     } catch (error) {
         console.error('Error creating commande:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({success: false, message: 'Internal server error' });
     }
 });
 
