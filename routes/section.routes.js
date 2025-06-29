@@ -64,7 +64,7 @@ router.get('/:id_section', async (req, res) => {
         }
         
         const { rows: sectionData, count } = await SectionModel.getProgrammeById(id_section);
-
+        console.log('Section Data:', sectionData);
         if (!sectionData) {
             return res.status(404).json({ success: false, message: 'Section not found' });
         }
