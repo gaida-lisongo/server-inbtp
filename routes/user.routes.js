@@ -395,7 +395,7 @@ router.post('/commande', async (req, res) => {
         if (!id_etudiant || !type || !reference || !id_produit || !prix) {
             return res.status(400).json({ success: false, message: 'All fields (id_etudiant, type, reference, id_produit, prix) are required' });
         }
-        const isValidUser = await UserModel.getUserById(id_etudiant);
+        const isValidUser = await UserModel.getEtudiantById(id_etudiant);
         if (!isValidUser || isValidUser.count === 0) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
