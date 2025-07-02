@@ -160,7 +160,7 @@ router.post('/enrollement', async (req, res) => {
         const payload = {
             id_promotion: req.body['id_promotion'],
             id_annee: req.body['id_annee'],
-            designation: req.body['id_etudiant'],
+            designation: req.body['designation'],
             type: req.body['type'],
             montant: req.body['montant'],
             tranche: req.body['tranche'],
