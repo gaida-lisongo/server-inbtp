@@ -42,6 +42,19 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, params);
         return result;
     }
+
+    async createPromotion(promotionData) {
+        const sql = `INSERT INTO promotion (id_section, id_niveau, orientation, description)
+            VALUES (?, ?, ?, ?)`;
+        const params = [
+            promotionData.id_section,
+            promotionData.id_niveau,
+            promotionData.orientation,
+            promotionData.description
+        ];
+        const result = await this.request(sql, params);
+        return result;
+    }
 }
 
 module.exports = SectionModel;

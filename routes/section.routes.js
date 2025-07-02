@@ -102,6 +102,29 @@ router.get('/grades', async (req, res) => {
     }
 });
 
+router.post('/promotion', async (req, res) => {
+    try {
+        const payload = {
+            id_section: req.body['id_section'],
+            id_niveau: req.body['id_niveau'],
+            orientation: req.body['orientation'],
+            description: req.body['description']
+        }
+
+        console.log('Payload for Promotion:', payload);
+        const result = await SectionModel.createPromotion(payload);
+
+        if (result) {
+            res.json({ success: true, message: 'Promotion created successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to create promotion' });
+        }
+    } catch (error) {
+        console.error('Error creating promotion:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/titulaire', async (req, res) => {
     try {
         const payload = {
