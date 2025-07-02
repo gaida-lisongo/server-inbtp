@@ -95,7 +95,7 @@ router.get('/grades', async (req, res) => {
         if (!count || count === 0) {
             return res.status(404).json({ success: false, message: 'No grades found' });
         }
-        res.json({ success: true, message: 'Grades retrieved successfully', data: grades });
+        res.json({ success: true, message: 'Grades retrieved successfully', data: rows });
     } catch (error) {
         console.error('Error retrieving grades:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
