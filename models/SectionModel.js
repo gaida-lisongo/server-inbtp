@@ -24,7 +24,7 @@ class SectionModel extends AgentModel {
     }
 
     async createTitulaire(titulaireData) {
-        const sql = `INSERT INTO titulaire (nom, post_nom, prenom, sexe, date_naiss, matricule, id_grade, grade, e_mail, telephone, adresse)
+        const sql = `INSERT INTO agent (nom, post_nom, prenom, sexe, date_naiss, matricule, id_grade, grade, e_mail, telephone, adresse)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const params = [
             titulaireData.nom,
