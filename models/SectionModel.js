@@ -22,6 +22,26 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, []);
         return result || [];
     }
+
+    async createTitulaire(titulaireData) {
+        const sql = `INSERT INTO titulaire (nom, post_nom, prenom, sexe, date_naiss, matricule, id_grade, grade, e_mail, telephone, addresse)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const params = [
+            titulaireData.nom,
+            titulaireData.post_nom,
+            titulaireData.prenom,
+            titulaireData.sexe,
+            titulaireData.date_naiss,
+            titulaireData.matricule,
+            titulaireData.id_grade,
+            titulaireData.grade,
+            titulaireData.e_mail,
+            titulaireData.telephone,
+            titulaireData.addresse
+        ];
+        const result = await this.request(sql, params);
+        return result;
+    }
 }
 
 module.exports = SectionModel;

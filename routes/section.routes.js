@@ -102,4 +102,33 @@ router.get('/grades', async (req, res) => {
     }
 });
 
+router.post('/titulaire', async (req, res) => {
+    try {
+        const payload = {
+            nom: req.body['nom'],
+            post_nom: req.body['post_nom'],
+            prenom: req.body['prenom'],
+            sexe: req.body['sexe'],
+            date_naiss: req.body['date_naiss'],
+            matricule: req.body['matricule'],
+            id_grade: req.body['id_grade'],
+            grade: req.body['grade'],
+            e_mail: req.body['e_mail'],
+            telephone: req.body['telephone'],
+            addresse: req.body['addresse'],
+        }
+
+        console.log('Payload for Titulaire:', payload);
+        const result = await SectionModel.createTitulaire(payload);
+
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: 'Titulaire created successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to create titulaire' });
+        }
+    } catch (error) {
+        console.error('Error creating title:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
 module.exports = router;
