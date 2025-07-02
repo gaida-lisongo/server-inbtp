@@ -55,7 +55,7 @@ const router = express.Router();
  * 6. Répondre à un message reçu depuis le site web de l'institut
         */
 
-router.get('/:id_section', async (req, res) => {
+router.get('/current/:id_section', async (req, res) => {
     try {
         const { id_section } = req.params;
 
