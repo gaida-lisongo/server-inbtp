@@ -154,4 +154,56 @@ router.post('/titulaire', async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
+
+router.post('/enrollement', async (req, res) => {
+    try {
+        const payload = {
+            id_promotion: req.body['id_promotion'],
+            id_annee: req.body['id_annee'],
+            designation: req.body['id_etudiant'],
+            type: req.body['type'],
+            montant: req.body['montant'],
+            tranche: req.body['tranche'],
+            q_section: req.body['q_section'],
+            q_code: req.body['q_code'],
+            q_jury: req.body['q_jury'],
+            date_fin: req.body['date_fin']
+        }
+
+        console.log('Payload for Enrollement:', payload);
+        const result = await SectionModel.createEnrollement(payload);
+
+        if (result) {
+            res.json({ success: true, message: 'Enrollement created successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to create enrollement' });
+        }
+    } catch (error) {
+        console.error('Error creating enrollement:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.post('/examen-session', async (req, res) => {
+    try {
+        const payload = {
+            id_session: req.body['id_session'],
+            id_matiere: req.body['id_matiere'],
+            date_epreuve: req.body['date_epreuve']
+        }
+
+        console.log('Payload for Examen Session:', payload);
+        const result = await SectionModel.createExamen(payload);
+
+        if (result) {
+            res.json({ success: true, message: 'Examen session created successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to create examen session' });
+        }
+    } catch (error) {
+        console.error('Error creating examen session:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 module.exports = router;

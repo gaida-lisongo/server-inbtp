@@ -55,6 +55,38 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, params);
         return result;
     }
+
+    async createEnrollement(enrollementData) {
+        const sql = `INSERT INTO enrollements (id_promotion, id_annee, date_fin, q_jury, q_section, q_coge, tranche, montant, type, designation)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const params = [
+            enrollementData.id_promotion,
+            enrollementData.id_annee,
+            enrollementData.date_fin,
+            enrollementData.q_jury,
+            enrollementData.q_section,
+            enrollementData.q_coge,
+            enrollementData.tranche,
+            enrollementData.montant,
+            enrollementData.type,
+            enrollementData.designation
+        ];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async createExamen(examenData) {
+        const sql = `INSERT INTO examen (id_session, id_matiere, date_epreuve)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const params = [
+            examenData.id_session,
+            examenData.id_matiere,
+            examenData.date_epreuve
+        ];
+        const result = await this.request(sql, params);
+        return result;
+
+    }
 }
 
 module.exports = SectionModel;
