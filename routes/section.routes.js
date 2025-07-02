@@ -73,10 +73,6 @@ router.get('/:id_section', async (req, res) => {
         const { rows: enrollementData, count: enrollementCount } = await SectionModel.getEnrollementsByPromotion(id_section);
         console.log('Enrollement Data:', enrollementData);
 
-        if (!enrollementCount || enrollementCount === 0) {
-            return res.status(404).json({ success: false, message: 'No enrollements found for this section' });
-        }
-
         res.json({ 
             success: true, 
             message: 'Section retrieved successfully', 
