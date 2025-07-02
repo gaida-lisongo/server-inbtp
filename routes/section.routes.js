@@ -87,4 +87,19 @@ router.get('/:id_section', async (req, res) => {
         
     }
 });
+
+router.get('/grades', async (req, res) => {
+    try {
+        const { rows, count } = await SectionModel.getGradesAcademic();
+        console.log('Grades Data:', rows);
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No grades found' });
+        }
+        res.json({ success: true, message: 'Grades retrieved successfully', data: grades });
+    } catch (error) {
+        console.error('Error retrieving grades:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 module.exports = router;

@@ -16,6 +16,12 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, [idProgramme]);
         return result || [];
     }
+
+    async getGradesAcademic() {
+        const sql = `SELECT * FROM grade `;
+        const result = await this.request(sql, []);
+        return result || [];
+    }
 }
 
 module.exports = SectionModel;
