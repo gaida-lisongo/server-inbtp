@@ -121,7 +121,7 @@ router.post('/titulaire', async (req, res) => {
         console.log('Payload for Titulaire:', payload);
         const result = await SectionModel.createTitulaire(payload);
 
-        if (result.affectedRows > 0) {
+        if (result) {
             res.json({ success: true, message: 'Titulaire created successfully', data: result });
         } else {
             res.status(400).json({ success: false, message: 'Failed to create titulaire' });
