@@ -166,6 +166,7 @@ class AppController extends Controller {
                     });
                 }
             });
+            
             return this.result(
                 'Promotion retrieved successfully',
                 {

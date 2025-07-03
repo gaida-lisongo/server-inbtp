@@ -60,6 +60,73 @@ class SectionModel extends AgentModel {
         return result || [];
     }    
 
+    async getChargesByPromotion(id_promotion, id_annee) {
+        const sql = `SELECT 
+                        m.id AS id_matiere,
+                        m.designation AS matiere,
+                        m.credit,
+                        u.designation AS unite,
+                        u.id_promotion AS promotion,
+                        ch.id AS id_charge,
+                        ch.id_titulaire,
+                        agent.avatar,
+                        agent.matricule,
+                        agent.nom,
+                        agent.post_nom,
+                        agent.sexe,
+                        grade.designation AS titre_acad,
+                        CASE 
+                            WHEN ch.id IS NULL THEN 'NO'
+                            ELSE 'OK'
+                        END AS statut_charge,
+
+                        -- Nb d'affectations pour le titulaire dans l'année
+                        CASE 
+                            WHEN ch.id_titulaire IS NOT NULL THEN (
+                            SELECT COUNT(*)
+                            FROM charge_horaire ch2
+                            WHERE ch2.id_titulaire = ch.id_titulaire
+                                AND ch2.id_annee = ?
+                            )
+                            ELSE 0
+                        END AS nb_affectations,
+
+                        -- Somme des crédits pour ce titulaire dans l'année, convertis en heures
+                        CASE 
+                            WHEN ch.id_titulaire IS NOT NULL THEN (
+                            SELECT SUM(m2.credit)
+                            FROM charge_horaire ch2
+                            INNER JOIN matiere m2 ON m2.id = ch2.id_matiere
+                            WHERE ch2.id_titulaire = ch.id_titulaire
+                                AND ch2.id_annee = ?
+                            )
+                            ELSE 0
+                        END AS total_credits,
+                        -- Somme des crédits pour ce titulaire dans l'année, convertis en heures
+                        CASE 
+                            WHEN ch.id_titulaire IS NOT NULL THEN (
+                            SELECT CONCAT(SUM(m2.credit) * 17, ' h')
+                            FROM charge_horaire ch2
+                            INNER JOIN matiere m2 ON m2.id = ch2.id_matiere
+                            WHERE ch2.id_titulaire = ch.id_titulaire
+                                AND ch2.id_annee = ?
+                            )
+                            ELSE '0 h'
+                        END AS volume_charge
+
+                        FROM promotion p
+                        INNER JOIN unite u ON u.id_promotion = p.id
+                        INNER JOIN matiere m ON m.id_unite = u.id
+                        LEFT JOIN charge_horaire ch ON ch.id_matiere = m.id AND ch.id_annee = ?
+                        LEFT JOIN agent ON agent.id = ch.id_titulaire
+                        LEFT JOIN grade ON agent.id_grade = grade.id
+                        WHERE p.id = ?;
+                        `
+        const params = [id_annee, id_annee, id_annee, id_promotion];
+        const result = await this.request(sql, params);
+        return result || [];
+    }
+
     async createTitulaire(titulaireData) {
         const sql = `INSERT INTO agent (nom, post_nom, prenom, sexe, date_naiss, matricule, id_grade, grade, e_mail, telephone, adresse)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
