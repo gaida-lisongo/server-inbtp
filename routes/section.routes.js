@@ -206,4 +206,27 @@ router.post('/examen-session', async (req, res) => {
     }
 });
 
+router.post('/communique', async (req, res) => {
+    try {
+        const payload = {
+            id_section: req.body['id_section'],
+            titre: req.body['titre'],
+            contenu: req.body['contenu'],
+            date_publication: new Date()
+        }
+
+        console.log('Payload for Communication:', payload);
+        const result = await SectionModel.createCommunication(payload);
+
+        if (result) {
+            res.json({ success: true, message: 'Communication created successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to create communication' });
+        }
+    } catch (error) {
+        console.error('Error creating communication:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 module.exports = router;

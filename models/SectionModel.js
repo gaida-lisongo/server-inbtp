@@ -87,6 +87,24 @@ class SectionModel extends AgentModel {
         return result;
 
     }
+    
+    async createCommunication(communicationData) {
+        const sql = `INSERT INTO communiques (
+            id_auteur, 
+            titre, 
+            contenu, 
+            date_created, 
+            service
+            ) VALUES (?, ?, ?, NOW(), ?)`;
+        const params = [
+            communicationData.id_section,
+            communicationData.titre,
+            communicationData.contenu,
+            communicationData.service
+        ];
+        const result = await this.request(sql, params);
+        return result;
+    }
 }
 
 module.exports = SectionModel;
