@@ -212,7 +212,7 @@ router.post('/communique', async (req, res) => {
             id_section: req.body['id_section'],
             titre: req.body['titre'],
             contenu: req.body['contenu'],
-            date_publication: new Date()
+            service: req.body['service'] || 'section' // Default to 'section' if not provided
         }
 
         console.log('Payload for Communication:', payload);
