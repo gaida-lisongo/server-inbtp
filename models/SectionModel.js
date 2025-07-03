@@ -89,7 +89,7 @@ class SectionModel extends AgentModel {
     }
     
     async createCommunication(communicationData) {
-        const sql = `INSERT INTO communiques (
+        const sql = `INSERT INTO communique (
             id_auteur, 
             titre, 
             contenu, 
