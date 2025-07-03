@@ -29,6 +29,27 @@ class SectionModel extends AgentModel {
         return result || [];
     }
 
+    async getTitulaireBySection(idSection) {
+        const sql = `SELECT 
+                        connected,
+                        COUNT(*) AS total_titulaires
+                        FROM (
+                    SELECT 
+                        agent.id,
+                        EXISTS (
+                        SELECT 1
+                        FROM logs_titulaire logs
+                        WHERE logs.id_section = ? AND logs.id_agent = agent.id
+                        ) AS connected
+                    FROM agent
+                    INNER JOIN grade ON grade.id = agent.id_grade
+                    WHERE grade.id_personnel = 1
+                    ) AS sub
+                    GROUP BY connected;`
+        const result = await this.request(sql, [idSection]);
+        return result || [];
+    }
+
     async createTitulaire(titulaireData) {
         const sql = `INSERT INTO agent (nom, post_nom, prenom, sexe, date_naiss, matricule, id_grade, grade, e_mail, telephone, adresse)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;

@@ -124,6 +124,28 @@ router.get('/messages/:id_section', async (req, res) => {
     }
 });
 
+router.get('/logs_titulaire/:id_section', async (req, res) => {
+    try {
+        const { id_section } = req.params;
+
+        if (!id_section) {
+            return res.status(400).json({ success: false, message: 'Section ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getTitulaireBySection(id_section);
+        console.log('Titulaire Data:', rows);
+
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No titulaire found for this section' });
+        }
+
+        res.json({ success: true, message: 'Titulaire retrieved successfully', data: rows });
+    } catch (error) {
+        console.error('Error retrieving titulaire:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/promotion', async (req, res) => {
     try {
         const payload = {
