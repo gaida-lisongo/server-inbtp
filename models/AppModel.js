@@ -147,11 +147,20 @@ class AppModel extends Model {
     }
 
     async getPromotionsByProgramme(idProgramme) {
-        const sql = `SELECT p.*, s.designation AS 'section', n.intitule AS 'niveau', n.systeme
-            FROM promotion p
-            INNER JOIN section s ON p.id_section = s.id
-            INNER JOIN niveau n ON n.id = p.id_niveau
-            WHERE p.id_section = ?
+        const sql = `SELECT p.*, s.designation AS 'section', n.intitule AS 'niveau', n.systeme, (
+                        SELECT SUM(m.credit)
+                        FROM matiere m
+                        INNER JOIN unite u ON m.id_unite = u.id
+                        WHERE u.id_promotion = p.id
+                    ) AS total_credit, (
+                        SELECT COUNT(*)
+                        FROM unite
+                        WHERE unite.id_promotion = p.id
+                    ) AS total_unites
+                    FROM promotion p
+                    INNER JOIN section s ON p.id_section = s.id
+                    INNER JOIN niveau n ON n.id = p.id_niveau
+                    WHERE p.id_section = ?
         `;
         const result = await this.request(sql, [idProgramme]);
         return result || [];
