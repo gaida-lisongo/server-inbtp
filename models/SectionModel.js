@@ -80,7 +80,6 @@ class SectionModel extends AgentModel {
                             ELSE 'OK'
                         END AS statut_charge,
 
-                        -- Nb d'affectations pour le titulaire dans l'année
                         CASE 
                             WHEN ch.id_titulaire IS NOT NULL THEN (
                             SELECT COUNT(*)
@@ -91,7 +90,6 @@ class SectionModel extends AgentModel {
                             ELSE 0
                         END AS nb_affectations,
 
-                        -- Somme des crédits pour ce titulaire dans l'année, convertis en heures
                         CASE 
                             WHEN ch.id_titulaire IS NOT NULL THEN (
                             SELECT SUM(m2.credit)
@@ -102,7 +100,6 @@ class SectionModel extends AgentModel {
                             )
                             ELSE 0
                         END AS total_credits,
-                        -- Somme des crédits pour ce titulaire dans l'année, convertis en heures
                         CASE 
                             WHEN ch.id_titulaire IS NOT NULL THEN (
                             SELECT CONCAT(SUM(m2.credit) * 17, ' h')
@@ -122,7 +119,7 @@ class SectionModel extends AgentModel {
                         LEFT JOIN grade ON agent.id_grade = grade.id
                         WHERE p.id = ?;
                         `
-        const params = [id_annee, id_annee, id_annee, id_promotion];
+        const params = [id_annee, id_annee, id_annee, id_annee, id_promotion];
         const result = await this.request(sql, params);
         return result || [];
     }
