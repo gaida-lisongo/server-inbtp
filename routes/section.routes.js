@@ -198,6 +198,28 @@ router.get('/charges-horaire/:id_promotion/:id_annee', async (req, res) => {
     }
 });
 
+router.post('/find-titulaire', async (req, res) => {
+    try {
+        const searchTerm = req.body.search || '';
+
+        if (!searchTerm) {
+            return res.status(400).json({ success: false, message: 'Search term is required' });
+        }
+
+        const { rows, count } = await SectionModel.findTitulaireByRechearch(searchTerm);
+        console.log('Titulaire Search Results:', rows);
+
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No titulaire found matching the search term' });
+        }
+
+        res.json({ success: true, message: 'Titulaire search results', data: rows });
+    } catch (error) {
+        console.error('Error searching titulaire:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/promotion', async (req, res) => {
     try {
         const payload = {

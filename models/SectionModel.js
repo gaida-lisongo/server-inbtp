@@ -45,7 +45,7 @@ class SectionModel extends AgentModel {
                     INNER JOIN grade ON grade.id = agent.id_grade
                     WHERE grade.id_personnel = 1
                     ) AS sub
-                    GROUP BY connected;`
+                    GROUP BY connected`
         const result = await this.request(sql, [idSection]);
         return result || [];
     }
@@ -120,6 +120,49 @@ class SectionModel extends AgentModel {
                         WHERE p.id = ?;
                         `
         const params = [id_annee, id_annee, id_annee, id_annee, id_promotion];
+        const result = await this.request(sql, params);
+        return result || [];
+    }
+
+    async findTitulaireByRechearch(searchTerm) {
+        const sql = `
+            SELECT a.*, 
+                CASE 
+                    WHEN ch.id_titulaire IS NOT NULL THEN (
+                        SELECT CONCAT(CAST(SUM(m2.credit) * 17 AS CHAR), ' h')
+                        FROM charge_horaire ch2
+                        INNER JOIN matiere m2 ON m2.id = ch2.id_matiere
+                        WHERE ch2.id_titulaire = ch.id_titulaire
+                        AND ch2.id_annee = 3
+                    )
+                    ELSE '0 h'
+                END AS volume_charge,
+                CASE 
+                    WHEN ch.id_titulaire IS NOT NULL THEN (
+                    SELECT SUM(m2.credit)
+                    FROM charge_horaire ch2
+                    INNER JOIN matiere m2 ON m2.id = ch2.id_matiere
+                    WHERE ch2.id_titulaire = ch.id_titulaire
+                        AND ch2.id_annee = 3
+                    )
+                    ELSE 0
+                END AS total_credits,
+                CASE 
+                    WHEN ch.id_titulaire IS NOT NULL THEN (
+                    SELECT COUNT(*)
+                    FROM charge_horaire ch2
+                    WHERE ch2.id_titulaire = ch.id_titulaire
+                        AND ch2.id_annee = 3
+                    )
+                    ELSE 0
+                END AS nb_affectations,
+                g.designation AS titre_acad
+            FROM agent a
+            INNER JOIN grade g ON g.id = a.id_grade
+            LEFT JOIN charge_horaire ch ON ch.id_titulaire = a.id
+            WHERE a.nom LIKE '%?%' OR a.post_nom LIKE '%?' OR a.matricule LIKE '%?%'
+            `
+        const params = [searchTerm, searchTerm, searchTerm];
         const result = await this.request(sql, params);
         return result || [];
     }
