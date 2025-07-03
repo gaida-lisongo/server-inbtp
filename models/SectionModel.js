@@ -50,12 +50,13 @@ class SectionModel extends AgentModel {
         return result || [];
     }
 
-    async getEnrollementsBySection(idSection) {
+    async getEnrollementsBySection(idSection, id_annee) {
         const sql = `SELECT *
                     FROM enrollements e
                     INNER JOIN promotion p ON p.id = e.id_promotion
-                    WHERE p.id_section = ?`;
-        const result = await this.request(sql, [idSection]);    
+                    WHERE p.id_section = ? AND e.id_annee = ?
+                    ORDER BY e.date_fin DESC`;
+        const result = await this.request(sql, [idSection, id_annee]);    
         return result || [];
     }    
 

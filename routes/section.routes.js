@@ -146,15 +146,19 @@ router.get('/logs_titulaire/:id_section', async (req, res) => {
     }
 });
 
-router.get('/enrollements/:id_section', async (req, res) => {
+router.get('/enrollements/:id_section/:id_annee', async (req, res) => {
     try {
-        const { id_section } = req.params;
+        const { id_section, id_annee } = req.params;
 
         if (!id_section) {
             return res.status(400).json({ success: false, message: 'Section ID is required' });
         }
 
-        const { rows, count } = await SectionModel.getEnrollementsBySection(id_section);
+        if (!id_annee) {
+            return res.status(400).json({ success: false, message: 'Academic year ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getEnrollementsBySection(id_section, id_annee);
         console.log('Enrollements Data:', rows);
 
         if (!count || count === 0) {
