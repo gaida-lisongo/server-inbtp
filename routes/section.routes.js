@@ -146,6 +146,28 @@ router.get('/logs_titulaire/:id_section', async (req, res) => {
     }
 });
 
+router.get('/enrollements/:id_section', async (req, res) => {
+    try {
+        const { id_section } = req.params;
+
+        if (!id_section) {
+            return res.status(400).json({ success: false, message: 'Section ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getEnrollementsBySection(id_section);
+        console.log('Enrollements Data:', rows);
+
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No enrollements found for this section' });
+        }
+
+        res.json({ success: true, message: 'Enrollements retrieved successfully', data: rows });
+    } catch (error) {
+        console.error('Error retrieving enrollements:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/promotion', async (req, res) => {
     try {
         const payload = {

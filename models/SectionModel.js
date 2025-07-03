@@ -50,6 +50,15 @@ class SectionModel extends AgentModel {
         return result || [];
     }
 
+    async getPromotionsBySection(idSection) {
+        const sql = `SELECT *
+                    FROM enrollements e
+                    INNER JOIN promotion p ON p.id = e.id_promotion
+                    WHERE p.id_section = ?`;
+        const result = await this.request(sql, [idSection]);    
+        return result || [];
+    }    
+
     async createTitulaire(titulaireData) {
         const sql = `INSERT INTO agent (nom, post_nom, prenom, sexe, date_naiss, matricule, id_grade, grade, e_mail, telephone, adresse)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
