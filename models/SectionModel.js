@@ -50,7 +50,7 @@ class SectionModel extends AgentModel {
         return result || [];
     }
 
-    async getPromotionsBySection(idSection) {
+    async getEnrollementsBySection(idSection) {
         const sql = `SELECT *
                     FROM enrollements e
                     INNER JOIN promotion p ON p.id = e.id_promotion
