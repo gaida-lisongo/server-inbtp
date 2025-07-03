@@ -102,6 +102,28 @@ router.get('/grades', async (req, res) => {
     }
 });
 
+router.get('/messages/:id_section', async (req, res) => {
+    try {
+        const { id_section } = req.params;
+
+        if (!id_section) {
+            return res.status(400).json({ success: false, message: 'Section ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getMessagesBySection(id_section);
+        console.log('Messages Data:', rows);
+
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No messages found for this section' });
+        }
+
+        res.json({ success: true, message: 'Messages retrieved successfully', data: rows });
+    } catch (error) {
+        console.error('Error retrieving messages:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/promotion', async (req, res) => {
     try {
         const payload = {

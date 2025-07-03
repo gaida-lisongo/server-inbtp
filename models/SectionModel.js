@@ -23,6 +23,12 @@ class SectionModel extends AgentModel {
         return result || [];
     }
 
+    async getMessagesBySection(idSection) {
+        const sql = `SELECT * FROM contacts_sections WHERE sectionId = ? ORDER BY date_creation DESC`;
+        const result = await this.request(sql, [idSection]);
+        return result || [];
+    }
+
     async createTitulaire(titulaireData) {
         const sql = `INSERT INTO agent (nom, post_nom, prenom, sexe, date_naiss, matricule, id_grade, grade, e_mail, telephone, adresse)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
