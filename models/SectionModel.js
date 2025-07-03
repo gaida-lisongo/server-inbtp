@@ -76,8 +76,8 @@ class SectionModel extends AgentModel {
     }
 
     async createExamen(examenData) {
-        const sql = `INSERT INTO examen (id_session, id_matiere, date_epreuve)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO examen_matiere (id_session, id_matiere, date_epreuve)
+            VALUES (?, ?, ?)`;
         const params = [
             examenData.id_session,
             examenData.id_matiere,
