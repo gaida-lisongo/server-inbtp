@@ -283,6 +283,56 @@ router.post('/createChargeHoraire', async (req, res) => {
     }
 });
 
+router.post('/unite', async (req, res) => {
+    try {
+        const payload = {
+            id_promotion: req.body['id_promotion'],
+            code: req.body['code'],
+            intitule: req.body['intitule'],
+            semestre: req.body['semestre'],
+            credits: req.body['credits'],
+            type: req.body['type'],
+            volume_horaire: req.body['volume_horaire']
+        }
+
+        console.log('Payload for Unite:', payload);
+        const result = await SectionModel.createUnite(payload);
+
+        if (result) {
+            res.json({ success: true, message: 'Unité created successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to create unité' });
+        }
+    } catch (error) {
+        console.error('Error creating unité:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.post('/matiere', async (req, res) => {
+    try {
+        const payload = {
+            id_unite: req.body['id_unite'],
+            code: req.body['code'],
+            designation: req.body['designation'],
+            credit: req.body['credit'],
+            semestre: req.body['semestre']
+        }
+
+        console.log('Payload for Matiere:', payload);
+        const result = await SectionModel.createMatiere(payload);
+
+        if (result) {
+            res.json({ success: true, message: 'Matière created successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to create matière' });
+        }
+    } catch (error) {
+        console.error('Error creating matière:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/promotion', async (req, res) => {
     try {
         const payload = {
@@ -453,4 +503,79 @@ router.delete('/chargeHoraire/:id_charge', async (req, res) => {
     }
 });
 
+router.put('/unite/:id_unite', async (req, res) => {
+    try {
+        const { id_unite } = req.params;
+        const payload = {
+            col: req.body['col'],
+            value: req.body['value']
+        }
+
+        console.log('Payload for Update Unité:', payload);
+        const result = await SectionModel.updateUnite(payload.col, payload.value, id_unite);
+
+        if (result) {
+            res.json({ success: true, message: 'Unité updated successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to update Unité' });
+        }
+    } catch (error) {
+        console.error('Error updating charge horaire:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.delete('/unite/:id_unite', async (req, res) => {
+    try {
+        const { id_unite } = req.params;
+        const result = await SectionModel.deleteUnite(id_unite);
+
+        if (result) {
+            res.json({ success: true, message: 'Unité deleted successfully' });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to delete Unité' });
+        }
+    } catch (error) {
+        console.error('Error deleting Unité:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.put('/matiere/:id_matiere', async (req, res) => {
+    try {
+        const { id_matiere } = req.params;
+        const payload = {
+            col: req.body['col'],
+            value: req.body['value']
+        }
+
+        console.log('Payload for Update Matière:', payload);
+        const result = await SectionModel.updateMatiere(payload.col, payload.value, id_matiere);
+
+        if (result) {
+            res.json({ success: true, message: 'Matière updated successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to update Matière' });
+        }
+    } catch (error) {
+        console.error('Error updating matière:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.delete('/matiere/:id_matiere', async (req, res) => {
+    try {
+        const { id_matiere } = req.params;
+        const result = await SectionModel.deleteMatiere(id_matiere);
+
+        if (result) {
+            res.json({ success: true, message: 'Matière deleted successfully' });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to delete Matière' });
+        }
+    } catch (error) {
+        console.error('Error deleting Matière:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
 module.exports = router;

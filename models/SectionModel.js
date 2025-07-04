@@ -332,7 +332,6 @@ class SectionModel extends AgentModel {
                 code,
                 credit,
                 id_unite,
-                statut,
                 semestre
             ) VALUES (?, ?, ?, ?, ?, ?)
         `;
@@ -342,7 +341,6 @@ class SectionModel extends AgentModel {
             matiereData.code,
             matiereData.credit,
             matiereData.id_unite,
-            matiereData.statut,
             matiereData.semestre
         ];
 
