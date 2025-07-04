@@ -286,13 +286,13 @@ router.post('/createChargeHoraire', async (req, res) => {
 router.post('/unite', async (req, res) => {
     try {
         const payload = {
-            id_promotion: req.body['id_promotion'],
             code: req.body['code'],
-            intitule: req.body['intitule'],
-            semestre: req.body['semestre'],
-            credits: req.body['credits'],
+            designation: req.body['designation'],
             type: req.body['type'],
-            volume_horaire: req.body['volume_horaire']
+            competences: req.body['competences'],
+            objectifs: req.body['objectifs'],
+            id_responsable: req.body['id_responsable'],
+            id_promotion: req.body['id_promotion']
         }
 
         console.log('Payload for Unite:', payload);
