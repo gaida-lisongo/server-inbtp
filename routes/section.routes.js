@@ -230,7 +230,8 @@ router.post('/createChargeHoraire', async (req, res) => {
             id_matiere: req.body['id_matiere'],
             id_titulaire: req.body['id_titulaire'],
             id_annee: req.body['id_annee'],
-            semestre: req.body['semestre']
+            semestre: req.body['semestre'],
+            horaire: req.body['horaire']
         }
 
         console.log('Payload for Charge Horaire:', payload);
