@@ -70,6 +70,7 @@ class SectionModel extends AgentModel {
                         u.id_promotion AS promotion,
                         ch.id AS id_charge,
                         ch.id_titulaire,
+                        ch.horaire,
                         agent.avatar,
                         agent.matricule,
                         agent.nom,
