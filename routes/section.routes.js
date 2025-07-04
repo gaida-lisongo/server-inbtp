@@ -225,6 +225,29 @@ router.post('/find-titulaire', async (req, res) => {
     }
 });
 
+router.post('/createChargeHoraire', async (req, res) => {
+    try {
+        const payload = {
+            id_matiere: req.body['id_matiere'],
+            id_titulaire: req.body['id_titulaire'],
+            id_annee: req.body['id_annee'],
+            semestre: req.body['semestre']
+        }
+
+        console.log('Payload for Charge Horaire:', payload);
+        const result = await SectionModel.createChargeHoraire(payload);
+
+        if (result) {
+            res.json({ success: true, message: 'Charge horaire created successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to create charge horaire' });
+        }
+    } catch (error) {
+        console.error('Error creating charge horaire:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/promotion', async (req, res) => {
     try {
         const payload = {
@@ -348,6 +371,49 @@ router.post('/communique', async (req, res) => {
         }
     } catch (error) {
         console.error('Error creating communication:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.put('/chargeHoraire/:id_charge', async (req, res) => {
+    try {
+        const { id_charge } = req.params;
+        const payload = {
+            col: req.body['col'],
+            value: req.body['value']
+        }
+
+        console.log('Payload for Update Charge Horaire:', payload);
+        const result = await SectionModel.updateChargeHoraire(payload.col, payload.value, id_charge);
+
+        if (result) {
+            res.json({ success: true, message: 'Charge horaire updated successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to update charge horaire' });
+        }
+    } catch (error) {
+        console.error('Error updating charge horaire:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.delete('/chargeHoraire/:id_charge', async (req, res) => {
+    try {
+        const { id_charge } = req.params;
+
+        if (!id_charge) {
+            return res.status(400).json({ success: false, message: 'Charge ID is required' });
+        }
+
+        const result = await SectionModel.deleteChargeHoraire(id_charge);
+
+        if (result) {
+            res.json({ success: true, message: 'Charge horaire deleted successfully' });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to delete charge horaire' });
+        }
+    } catch (error) {
+        console.error('Error deleting charge horaire:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });

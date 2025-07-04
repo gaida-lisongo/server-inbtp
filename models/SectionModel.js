@@ -172,6 +172,7 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, params);
         return result || [];
     }
+
     async createTitulaire(titulaireData) {
         const sql = `INSERT INTO agent (nom, post_nom, prenom, sexe, date_naiss, matricule, id_grade, grade, e_mail, telephone, adresse)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -251,6 +252,34 @@ class SectionModel extends AgentModel {
             communicationData.contenu,
             communicationData.service
         ];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async createChargeHoraire(chargeData) {
+        const sql = `INSERT INTO charge_horaire (id_matiere, id_titulaire, id_annee, semestre, horaire)
+            VALUES (?, ?, ?, ?, ?)`;
+        const params = [
+            chargeData.id_matiere,
+            chargeData.id_titulaire,
+            chargeData.id_annee,
+            chargeData.semestre,
+            chargeData.horaire
+        ];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async updateChargeHoraire(col, value, id) {
+        const sql = `UPDATE charge_horaire SET ${col} = ? WHERE id = ?`;
+        const params = [value, id];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async deleteChargeHoraire(id) {
+        const sql = `DELETE FROM charge_horaire WHERE id = ?`;
+        const params = [id];
         const result = await this.request(sql, params);
         return result;
     }
