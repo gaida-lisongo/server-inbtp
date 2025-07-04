@@ -185,7 +185,6 @@ router.get('/charges-horaire/:id_promotion/:id_annee', async (req, res) => {
         }
 
         const { rows, count } = await SectionModel.getChargesByPromotion(id_promotion, id_annee);
-        console.log('Charges Horaire Data:', rows);
 
         if (!count || count === 0) {
             return res.status(404).json({ success: false, message: 'No charges horaire found for this promotion' });
