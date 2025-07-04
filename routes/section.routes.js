@@ -197,6 +197,37 @@ router.get('/charges-horaire/:id_promotion/:id_annee', async (req, res) => {
     }
 });
 
+router.get('/unites/:id_promotion', async (req, res) => {
+    try {
+        const id_promotion = req.params.id_promotion;
+
+        if (!id_promotion) {
+            return res.status(400).json({ success: false, message: 'Promotion ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getUnitesByPromotion(id_promotion);
+        console.log('Unites Data:', rows);
+
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No units found for this promotion' });
+        }
+
+        const unites = rows.map(async unite => {
+            const { rows : matieresData } = await SectionModel.getMatieresByUE(unite.id)
+
+            return {
+                ...unite,
+                ecue: matieresData
+            }
+        })
+
+        res.json({ success: true, message: 'Units retrieved successfully', data: unites });
+    } catch (error) {
+        console.error('Error retrieving units:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+})
+
 router.post('/find-titulaire', async (req, res) => {
     try {
         const searchTerm = req.body.search || '';

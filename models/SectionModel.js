@@ -126,13 +126,34 @@ class SectionModel extends AgentModel {
         return result || [];
     }
 
+    async getUnitesByPromotion(id_promotion) {
+        const sql = `SELECT 
+                        unite.*, 
+                        SUM(m.credit) AS total_credit, 
+                        COUNT(m.id) AS total_ecue, 
+                        CASE
+                            WHEN unite.id_responsable IS NOT NULL THEN (
+                                SELECT CONCAT(grade.designation, ' ', agent.nom, ' ', agent.post_nom, ' - ', agent.matricule)
+                                FROM agent
+                                INNER JOIN grade ON grade.id = agent.id_grade
+                                WHERE agent.id = unite.id_responsable
+                            ) ELSE 'Sans Responsable'
+                        END AS responsable
+                    FROM unite
+                    LEFT JOIN matiere m ON m.id_unite = unite.id
+                    WHERE unite.id_promotion = ?
+                    GROUP BY unite.id`;
+        const result = await this.request(sql, [id_promotion]);
+        return result || [];
+    }
+
     async findTitulaireByRechearch(searchTerm, id_annee) {
         // Le problème est ici - la syntaxe pour les paramètres est incorrecte
         // Vous utilisez '%?%' au lieu d'utiliser la concaténation ou des espaces réservés MySQL
         
         // Version corrigée:
         const searchPattern = `%${searchTerm.toUpperCase()}%`;
-        console.log(`Recherche de titulaire avec le terme: ${searchTerm}, pattern: ${searchPattern}`);
+        
         const sql = `
             SELECT a.*, 
                 CASE 
@@ -276,6 +297,59 @@ class SectionModel extends AgentModel {
         return result;
     }
 
+    async createUnite(uniteData){
+        const sql = `
+            INSERT INTO unite(
+                code,
+                type,
+                designation,
+                competences,
+                objectifs,
+                id_promotion,
+                id_responsable
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        const params = [
+            uniteData.code,
+            uniteData.type,
+            uniteData.designation,
+            uniteData.competences,
+            uniteData.objectifs,
+            uniteData.id_promotion,
+            uniteData.id_responsable
+        ];
+
+        const result = await this.request(sql, params);
+
+        return result || []
+    }
+
+    async createMatiere(matiereData){
+        const sql = `
+            INSERT INTO matiere(
+                designation,
+                code,
+                credit,
+                id_unite,
+                statut,
+                semestre
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        `;
+
+        const params = [
+            matiereData.designation,
+            matiereData.code,
+            matiereData.credit,
+            matiereData.id_unite,
+            matiereData.statut,
+            matiereData.semestre
+        ];
+
+        const result = await this.request(sql, params);
+        return result || [];
+    }
+
     async updateChargeHoraire(col, value, id) {
         const sql = `UPDATE charge_horaire SET ${col} = ? WHERE id = ?`;
         const params = [value, id];
@@ -285,6 +359,34 @@ class SectionModel extends AgentModel {
 
     async deleteChargeHoraire(id) {
         const sql = `DELETE FROM charge_horaire WHERE id = ?`;
+        const params = [id];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async updateUnite(col, value, id) {
+        const sql = `UPDATE unite SET ${col} = ? WHERE id = ?`;
+        const params = [value, id];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async deleteUnite(id) {
+        const sql = `DELETE FROM unite WHERE id = ?`;
+        const params = [id];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async updateMatiere(col, value, id) {
+        const sql = `UPDATE matiere SET ${col} = ? WHERE id = ?`;
+        const params = [value, id];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async deleteMatiere(id) {
+        const sql = `DELETE FROM matiere WHERE id = ?`;
         const params = [id];
         const result = await this.request(sql, params);
         return result;
