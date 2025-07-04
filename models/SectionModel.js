@@ -147,6 +147,31 @@ class SectionModel extends AgentModel {
         return result || [];
     }
 
+    async getJuryByPromotion(payload){
+        const sql = `SELECT *
+            FROM jury j
+            INNER JOIN promotion_jury pj ON pj.id_jury = j.id
+            WHERE pj.id_annee = ? AND pj.id_promotion = ?`;
+
+        const result = await this.request(sql, [payload.id_annee, payload.id_promotion]);
+        return result || [];
+    }
+
+    async getInsertionByPromotion({id_promotion, id_annee}) {
+        const sql = `SELECT *, CONCAT(grade.designation, ' ', agent.nom, ' ', agent.post_nom, ' (', agent.matricule, ')') AS 'auteur_nom', agent.telephone, agent.e_mail, agent.avatar,
+                        CONCAT(e.nom, ' ', e.post_nom, ' (', e.matricule, ')') AS 'etudiant_nom', e.sexe, f.id_etudiant, f.id_matiere, f.tp, f.td, f.examen, f.rattrapage, f.updated_by, f.updated_at, f.created_at, f.created_by, m.designation AS 'matiere', m.credit, m.semestre
+                    FROM insertion
+                    INNER JOIN agent ON agent.id = insertion.id_agent
+                    INNER JOIN grade ON grade.id = agent.id_grade
+                    INNER JOIN fiche_cotation f ON f.id = insertion.id_fiche_cotation
+                    INNER JOIN matiere m ON m.id = f.id_matiere
+                    INNER JOIN unite u ON u.id = m.id_unite
+                    INNER JOIN etudiant e ON e.id = f.id_etudiant 
+                    WHERE u.id_promotion = ? AND f.id_annee = ?`;
+        const result = await this.request(sql, [id_promotion, id_annee]);
+        return result || [];
+    }
+
     async findTitulaireByRechearch(searchTerm, id_annee) {
         // Le problème est ici - la syntaxe pour les paramètres est incorrecte
         // Vous utilisez '%?%' au lieu d'utiliser la concaténation ou des espaces réservés MySQL
@@ -348,6 +373,43 @@ class SectionModel extends AgentModel {
         return result || [];
     }
 
+    async createJury(juryData){
+        const sql = `
+            INSERT INTO jury(
+                id_section, 
+                designation, 
+                code, 
+                id_president, 
+                id_secretaire, 
+                id_membre
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        `;
+        const params = [
+            juryData.id_section,
+            juryData.designation,
+            juryData.code,
+            juryData.id_president,
+            juryData.id_secretaire,
+            juryData.id_membre
+        ];
+        const result = await this.request(sql, params);
+        return result || [];
+    }
+
+    async updateJury(col, value, id) {
+        const sql = `UPDATE jury SET ${col} = ? WHERE id = ?`;
+        const params = [value, id];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async deleteJury(id) {
+        const sql = `DELETE FROM jury WHERE id = ?`;
+        const params = [id];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
     async updateChargeHoraire(col, value, id) {
         const sql = `UPDATE charge_horaire SET ${col} = ? WHERE id = ?`;
         const params = [value, id];
@@ -382,6 +444,8 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, params);
         return result;
     }
+
+
 
     async deleteMatiere(id) {
         const sql = `DELETE FROM matiere WHERE id = ?`;

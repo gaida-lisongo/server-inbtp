@@ -182,6 +182,51 @@ router.get('/unites/:id_promotion', async (req, res) => {
     }
 })
 
+router.get('/jury/:id_promotion/:id_annee', async (req, res) => {
+    try {
+        const { id_promotion, id_annee } = req.params;
+        if (!id_promotion) {
+            return res.status(400).json({ success: false, message: 'Promotion ID is required' });
+        }
+        if (!id_annee) {
+            return res.status(400).json({ success: false, message: 'Academic year ID is required' });
+        }
+        const { rows, count } = await SectionModel.getJuryByPromotion({id_promotion, id_annee});
+        console.log('Jury Data:', rows);
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No jury found for this promotion' });
+        }
+        res.json({ success: true, message: 'Jury retrieved successfully', data: rows });
+    } catch (error) {
+        console.error('Error retrieving jury:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.get('/inscriptions/:id_promotion/:id_annee', async (req, res) => {
+    try {
+        const { id_promotion, id_annee } = req.params;
+        if (!id_promotion) {
+            return res.status(400).json({ success: false, message: 'Promotion ID is required' });
+        }
+        if (!id_annee) {
+            return res.status(400).json({ success: false, message: 'Academic year ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getInsertionByPromotion({id_promotion, id_annee});
+
+        console.log('Inscriptions Data:', rows);
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No inscriptions found for this promotion' });
+        }
+
+        res.json({ success: true, message: 'Inscriptions retrieved successfully', data: rows });
+    } catch (error) {
+        console.error('Error retrieving inscriptions:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/find-titulaire', async (req, res) => {
     try {
         const searchTerm = req.body.search || '';
@@ -246,7 +291,7 @@ router.post('/unite', async (req, res) => {
 
         console.log('Payload for Unite:', payload);
         const result = await SectionModel.createUnite(payload);
-
+        
         if (result) {
             res.json({ success: true, message: 'Unité created successfully', data: result });
         } else {
