@@ -123,8 +123,8 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, params);
         return result || [];
     }
-    
-    async findTitulaireByRechearch(searchTerm) {
+
+    async findTitulaireByRechearch(searchTerm, id_annee) {
         // Le problème est ici - la syntaxe pour les paramètres est incorrecte
         // Vous utilisez '%?%' au lieu d'utiliser la concaténation ou des espaces réservés MySQL
         
@@ -138,7 +138,7 @@ class SectionModel extends AgentModel {
                         FROM charge_horaire ch2
                         INNER JOIN matiere m2 ON m2.id = ch2.id_matiere
                         WHERE ch2.id_titulaire = ch.id_titulaire
-                        AND ch2.id_annee = 3
+                        AND ch2.id_annee = ?
                     )
                     ELSE '0 h'
                 END AS volume_charge,
@@ -148,7 +148,7 @@ class SectionModel extends AgentModel {
                     FROM charge_horaire ch2
                     INNER JOIN matiere m2 ON m2.id = ch2.id_matiere
                     WHERE ch2.id_titulaire = ch.id_titulaire
-                        AND ch2.id_annee = 3
+                        AND ch2.id_annee = ?
                     )
                     ELSE 0
                 END AS total_credits,
@@ -157,7 +157,7 @@ class SectionModel extends AgentModel {
                     SELECT COUNT(*)
                     FROM charge_horaire ch2
                     WHERE ch2.id_titulaire = ch.id_titulaire
-                        AND ch2.id_annee = 3
+                        AND ch2.id_annee = ?
                     )
                     ELSE 0
                 END AS nb_affectations,
@@ -168,7 +168,7 @@ class SectionModel extends AgentModel {
             WHERE a.nom LIKE ? OR a.post_nom LIKE ? OR a.matricule LIKE ?
             GROUP BY a.id  -- Ajout d'un GROUP BY pour éviter les doublons
             `;
-        const params = [searchPattern, searchPattern, searchPattern];
+        const params = [id_annee, id_annee, id_annee , searchPattern, searchPattern, searchPattern];
         const result = await this.request(sql, params);
         return result || [];
     }

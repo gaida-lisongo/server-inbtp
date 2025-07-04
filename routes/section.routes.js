@@ -201,12 +201,17 @@ router.get('/charges-horaire/:id_promotion/:id_annee', async (req, res) => {
 router.post('/find-titulaire', async (req, res) => {
     try {
         const searchTerm = req.body.search || '';
+        const id_annee = req.bodu.annee
+
+        if(!id_annee){
+            return res.status(400).json({ success: false, message: 'Academic year ID is required' });
+        }
 
         if (!searchTerm) {
             return res.status(400).json({ success: false, message: 'Search term is required' });
         }
 
-        const { rows, count } = await SectionModel.findTitulaireByRechearch(searchTerm);
+        const { rows, count } = await SectionModel.findTitulaireByRechearch(id_annee, searchTerm);
         console.log('Titulaire Search Results:', rows);
 
         if (!count || count === 0) {
