@@ -211,7 +211,7 @@ router.post('/find-titulaire', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Search term is required' });
         }
 
-        const { rows, count } = await SectionModel.findTitulaireByRechearch(id_annee, searchTerm);
+        const { rows, count } = await SectionModel.findTitulaireByRechearch(searchTerm, id_annee);
 
         if (!count || count === 0) {
             return res.status(404).json({ success: false, message: 'No titulaire found matching the search term' });
