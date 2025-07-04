@@ -201,7 +201,7 @@ router.get('/charges-horaire/:id_promotion/:id_annee', async (req, res) => {
 router.post('/find-titulaire', async (req, res) => {
     try {
         const searchTerm = req.body.search || '';
-        const id_annee = req.bodu.annee
+        const id_annee = req.body.annee
 
         if(!id_annee){
             return res.status(400).json({ success: false, message: 'Academic year ID is required' });
