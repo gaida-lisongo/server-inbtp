@@ -212,7 +212,7 @@ router.get('/unites/:id_promotion', async (req, res) => {
             return res.status(404).json({ success: false, message: 'No units found for this promotion' });
         }
 
-        const unites = rows.map(async unite => {
+        const unitesPromises = rows.map(async unite => {
             const { rows : matieresData } = await SectionModel.getMatieresByUE(unite.id)
 
             return {
@@ -221,7 +221,12 @@ router.get('/unites/:id_promotion', async (req, res) => {
             }
         })
 
-        res.json({ success: true, message: 'Units retrieved successfully', data: unites });
+        // Attendre que toutes les promesses soient résolues
+        const unitesWithECUE = await Promise.all(unitesPromises);
+
+        // Vérifier que les données sont correctes
+        console.log('Unites with ECUE:', JSON.stringify(unitesWithECUE.slice(0, 1), null, 2)); // Log du premier élément pour vérification
+        res.json({ success: true, message: 'Units retrieved successfully', data: unitesWithECUE });
     } catch (error) {
         console.error('Error retrieving units:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
