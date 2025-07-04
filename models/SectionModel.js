@@ -130,6 +130,7 @@ class SectionModel extends AgentModel {
         
         // Version corrigée:
         const searchPattern = `%${searchTerm.toUpperCase()}%`;
+        console.log(`Recherche de titulaire avec le terme: ${searchTerm}, pattern: ${searchPattern}`);
         const sql = `
             SELECT a.*, 
                 CASE 

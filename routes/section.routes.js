@@ -212,7 +212,6 @@ router.post('/find-titulaire', async (req, res) => {
         }
 
         const { rows, count } = await SectionModel.findTitulaireByRechearch(id_annee, searchTerm);
-        console.log('Titulaire Search Results:', rows);
 
         if (!count || count === 0) {
             return res.status(404).json({ success: false, message: 'No titulaire found matching the search term' });
