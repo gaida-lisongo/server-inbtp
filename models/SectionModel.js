@@ -333,7 +333,7 @@ class SectionModel extends AgentModel {
                 credit,
                 id_unite,
                 semestre
-            ) VALUES (?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?)
         `;
 
         const params = [
