@@ -65,6 +65,7 @@ class SectionModel extends AgentModel {
                         m.id AS id_matiere,
                         m.designation AS matiere,
                         m.credit,
+                        m.semestre,
                         u.designation AS unite,
                         u.id_promotion AS promotion,
                         ch.id AS id_charge,
