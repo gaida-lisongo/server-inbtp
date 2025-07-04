@@ -129,7 +129,7 @@ class SectionModel extends AgentModel {
         // Vous utilisez '%?%' au lieu d'utiliser la concaténation ou des espaces réservés MySQL
         
         // Version corrigée:
-        const searchPattern = `%${searchTerm}%`;
+        const searchPattern = `%${searchTerm.toUpperCase()}%`;
         const sql = `
             SELECT a.*, 
                 CASE 
