@@ -259,6 +259,9 @@ class SectionModel extends AgentModel {
     }
 
     async createChargeHoraire(chargeData) {
+
+        // Vérification des données
+        console.log('Données de charge horaire:', chargeData);
         const sql = `INSERT INTO charge_horaire (id_matiere, id_titulaire, id_annee, semestre, horaire)
             VALUES (?, ?, ?, ?, ?)`;
         const params = [
