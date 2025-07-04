@@ -123,8 +123,13 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, params);
         return result || [];
     }
-
+    
     async findTitulaireByRechearch(searchTerm) {
+        // Le problème est ici - la syntaxe pour les paramètres est incorrecte
+        // Vous utilisez '%?%' au lieu d'utiliser la concaténation ou des espaces réservés MySQL
+        
+        // Version corrigée:
+        const searchPattern = `%${searchTerm}%`;
         const sql = `
             SELECT a.*, 
                 CASE 
@@ -160,13 +165,13 @@ class SectionModel extends AgentModel {
             FROM agent a
             INNER JOIN grade g ON g.id = a.id_grade
             LEFT JOIN charge_horaire ch ON ch.id_titulaire = a.id
-            WHERE a.nom LIKE '%?%' OR a.post_nom LIKE '%?' OR a.matricule LIKE '%?%'
-            `
-        const params = [searchTerm, searchTerm, searchTerm];
+            WHERE a.nom LIKE ? OR a.post_nom LIKE ? OR a.matricule LIKE ?
+            GROUP BY a.id  -- Ajout d'un GROUP BY pour éviter les doublons
+            `;
+        const params = [searchPattern, searchPattern, searchPattern];
         const result = await this.request(sql, params);
         return result || [];
     }
-
     async createTitulaire(titulaireData) {
         const sql = `INSERT INTO agent (nom, post_nom, prenom, sexe, date_naiss, matricule, id_grade, grade, e_mail, telephone, adresse)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
