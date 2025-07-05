@@ -410,6 +410,14 @@ class SectionModel extends AgentModel {
         return result;
     }
 
+    async createPromotionJury({id_promotion, id_annee, id_jury}) {
+        const sql = `INSERT INTO promotion_jury (id_promotion, id_annee, id_jury)
+            VALUES (?, ?, ?)`;
+        const params = [id_promotion, id_annee, id_jury];
+        const result = await this.request(sql, params);
+        return result || [];
+    }
+
     async updateChargeHoraire(col, value, id) {
         const sql = `UPDATE charge_horaire SET ${col} = ? WHERE id = ?`;
         const params = [value, id];

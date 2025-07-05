@@ -230,25 +230,42 @@ router.get('/deliberations/:id_promotion/:id_annee', async (req, res) => {
 router.post('/create-jury', async (req, res) => {
     try {
         const payload = {
-            id_promotion: req.body['id_promotion'],
-            id_annee: req.body['id_annee'],
             id_section: req.body['id_section'],
             designation: req.body['designation'],
             code: req.body['code'],
             id_president: req.body['id_president'],
             id_secretaire: req.body['id_secretaire'],
-            id_membre: req.body['id_membre'] || null, // Optional field
-            autorisation: req.body['autorisation'] || false // Optional field, default to false
+            id_membre: req.body['id_membre'], // Optional field
+            id_promotion: req.body['id_promotion'],
+            id_annee: req.body['id_annee'],
+            autorisation: false // Optional field, default to false
         }
 
         console.log('Payload for Jury:', payload);
-        const result = await SectionModel.createJury(payload);
+        const {rows, count, lastInsertedId} = await SectionModel.createJury(payload);
 
-        if (result) {
-            res.json({ success: true, message: 'Jury created successfully', data: result });
-        } else {
-            res.status(400).json({ success: false, message: 'Failed to create jury' });
+        if (lastInsertedId) {
+            const { lastInsertedId: promotion_juryId } = await SectionModel.createPromotionJury({
+                id_promotion: payload.id_promotion,
+                id_annee: payload.id_annee,
+                id_jury: lastInsertedId
+            });
+
+            console.log('Promotion Jury ID:', promotion_juryId);
+            if (!promotion_juryId) {
+                return res.status(400).json({ success: false, message: 'Failed to link jury to promotion' });
+            }
+
+            return res.json({
+                success: true,
+                message: 'Jury created successfully',
+                data: {
+                    id: lastInsertedId,
+                    promotion_juryId,
+                }
+            });
         }
+        res.status(400).json({ success: false, message: 'Failed to create jury' });
     } catch (error) {
         console.error('Error creating jury:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
@@ -600,4 +617,49 @@ router.delete('/matiere/:id_matiere', async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
+
+router.put('/jury/:id_jury', async (req, res) => {
+    try {
+        const { id_jury } = req.params;
+        const payload = {
+            col: req.body['col'],
+            value: req.body['value']
+        }
+
+        console.log('Payload for Update Jury:', payload);
+        const result = await SectionModel.updateJury(payload.col, payload.value, id_jury);
+
+        if (result) {
+            res.json({ success: true, message: 'Jury updated successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to update jury' });
+        }
+    } catch (error) {
+        console.error('Error updating jury:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.delete('/jury/:id_jury', async (req, res) => {
+    try {
+        const { id_jury } = req.params;
+
+        if (!id_jury) {
+            return res.status(400).json({ success: false, message: 'Jury ID is required' });
+        }
+
+        const result = await SectionModel.deleteJury(id_jury);
+
+        if (result) {
+            res.json({ success: true, message: 'Jury deleted successfully' });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to delete jury' });
+        }
+    } catch (error) {
+        console.error('Error deleting jury:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+
 module.exports = router;
