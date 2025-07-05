@@ -89,9 +89,29 @@ class AgentModel extends UserModel {
         }
     }
 
+    async getRetraitsByAgent(id_agent) {
+        const sql = `SELECT * FROM retrait_user WHERE id_agent = ?`;
+        const result = await this.request(sql, [id_agent]);
+        return result || [];
+    }
 
+    async createRetrait(retraitData) {
+        const sql = `INSERT INTO retrait_user (id_agent, montant, date_creation) VALUES (?, ?, NOW())`;
+        const result = await this.request(sql, [retraitData.id_agent, retraitData.montant]);
+        return result || [];
+    }
 
+    async updateRetrait(col, value, id) {
+        const sql = `UPDATE retrait_user SET ${col} = ? WHERE id = ?`;
+        const result = await this.request(sql, [value, id]);
+        return result || [];
+    }
 
+    async deleteRetrait(id) {
+        const sql = `DELETE FROM retrait_user WHERE id = ?`;
+        const result = await this.request(sql, [id]);
+        return result || [];
+    }
 }
 
 module.exports = AgentModel;

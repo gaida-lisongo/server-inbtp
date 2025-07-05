@@ -177,4 +177,63 @@ router.get('/checkAutorization', async (req, res) => {
         
     }
 });
+
+router.get('/retraits/:id_agent', async (req, res) => {
+    try {
+        const { id_agent } = req.params;
+        if (!id_agent) {
+            return res.status(400).json({ success: false, message: 'Agent ID is required' });
+        }
+        const {rows, count } = await AgentModel.getRetraitsByAgent(id_agent);
+        
+        return res.status(200).json({ success: true, message: 'Retraits fetched successfully', data: rows });
+    } catch (error) {
+        console.error('Error fetching retraits:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.post('/retraits', async (req, res) => {
+    try {
+        const { id_agent, montant } = req.body;
+        if (!id_agent || !montant) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
+        const retrait = await AgentModel.createRetrait({ id_agent, montant });
+        return res.status(200).json({ success: true, message: 'Retrait created successfully', data: retrait });
+    } catch (error) {
+        console.error('Error creating retrait:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.put('/retraits/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { col, value } = req.body;
+        if (!id || !col || !value) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
+        const retrait = await AgentModel.updateRetrait(col, value, id);
+        return res.status(200).json({ success: true, message: 'Retrait updated successfully', data: retrait });
+    } catch (error) {
+        console.error('Error updating retrait:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.delete('/retraits/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({ success: false, message: 'Retrait ID is required' });
+        }
+        const retrait = await AgentModel.deleteRetrait(id);
+        return res.status(200).json({ success: true, message: 'Retrait deleted successfully', data: retrait });
+    } catch (error) {
+        console.error('Error deleting retrait:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 module.exports = router;
