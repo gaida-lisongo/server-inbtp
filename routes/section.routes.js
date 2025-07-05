@@ -203,7 +203,7 @@ router.get('/jury/:id_promotion/:id_annee', async (req, res) => {
     }
 });
 
-router.get('/inscriptions/:id_promotion/:id_annee', async (req, res) => {
+router.get('/deliberations/:id_promotion/:id_annee', async (req, res) => {
     try {
         const { id_promotion, id_annee } = req.params;
         if (!id_promotion) {
@@ -215,14 +215,14 @@ router.get('/inscriptions/:id_promotion/:id_annee', async (req, res) => {
 
         const { rows, count } = await SectionModel.getInsertionByPromotion({id_promotion, id_annee});
 
-        console.log('Inscriptions Data:', rows);
+        console.log('Délibération Data:', rows);
         if (!count || count === 0) {
-            return res.status(404).json({ success: false, message: 'No inscriptions found for this promotion' });
+            return res.status(404).json({ success: false, message: 'No délibérations found for this promotion' });
         }
 
-        res.json({ success: true, message: 'Inscriptions retrieved successfully', data: rows });
+        res.json({ success: true, message: 'Délibérations retrieved successfully', data: rows });
     } catch (error) {
-        console.error('Error retrieving inscriptions:', error);
+        console.error('Error retrieving délibérations:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
