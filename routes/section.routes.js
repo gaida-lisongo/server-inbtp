@@ -227,6 +227,34 @@ router.get('/inscriptions/:id_promotion/:id_annee', async (req, res) => {
     }
 });
 
+router.post('/create-jury', async (req, res) => {
+    try {
+        const payload = {
+            id_promotion: req.body['id_promotion'],
+            id_annee: req.body['id_annee'],
+            id_section: req.body['id_section'],
+            designation: req.body['designation'],
+            code: req.body['code'],
+            id_president: req.body['id_president'],
+            id_secretaire: req.body['id_secretaire'],
+            id_membre: req.body['id_membre'] || null, // Optional field
+            autorisation: req.body['autorisation'] || false // Optional field, default to false
+        }
+
+        console.log('Payload for Jury:', payload);
+        const result = await SectionModel.createJury(payload);
+
+        if (result) {
+            res.json({ success: true, message: 'Jury created successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to create jury' });
+        }
+    } catch (error) {
+        console.error('Error creating jury:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.post('/find-titulaire', async (req, res) => {
     try {
         const searchTerm = req.body.search || '';
