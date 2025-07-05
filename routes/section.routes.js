@@ -193,6 +193,7 @@ router.get('/jury/:id_promotion/:id_annee', async (req, res) => {
         }
         const { rows, count } = await SectionModel.getJuryByPromotion({id_promotion, id_annee});
         console.log('Jury Data:', rows);
+
         if (!count || count === 0) {
             return res.status(404).json({ success: false, message: 'No jury found for this promotion' });
         }
@@ -280,11 +281,7 @@ router.post('/find-titulaire', async (req, res) => {
         if(!id_annee){
             return res.status(400).json({ success: false, message: 'Academic year ID is required' });
         }
-
-        if (!searchTerm) {
-            return res.status(400).json({ success: false, message: 'Search term is required' });
-        }
-
+        
         const { rows, count } = await SectionModel.findTitulaireByRechearch(searchTerm, id_annee);
 
         if (!count || count === 0) {
