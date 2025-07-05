@@ -148,7 +148,7 @@ class SectionModel extends AgentModel {
     }
 
     async getJuryByPromotion(payload){
-        const sql = `SELECT *
+        const sql = `SELECT j.*, pj.id AS promotion_juryId
             FROM jury j
             INNER JOIN promotion_jury pj ON pj.id_jury = j.id
             WHERE pj.id_annee = ? AND pj.id_promotion = ?`;
