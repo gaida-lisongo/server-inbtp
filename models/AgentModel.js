@@ -96,8 +96,8 @@ class AgentModel extends UserModel {
     }
 
     async createRetrait(retraitData) {
-        const sql = `INSERT INTO retrait_user (id_agent, montant, date_creation) VALUES (?, ?, NOW())`;
-        const result = await this.request(sql, [retraitData.id_agent, retraitData.montant]);
+        const sql = `INSERT INTO retrait_user (id_agent, montant, telephone, observation, date_creation) VALUES (?, ?, ?, ?, NOW())`;
+        const result = await this.request(sql, [retraitData.id_agent, retraitData.telephone, retraitData.observation, retraitData.montant]);
         return result || [];
     }
 

@@ -195,12 +195,12 @@ router.get('/retraits/:id_agent', async (req, res) => {
 
 router.post('/retraits', async (req, res) => {
     try {
-        const { id_agent, montant } = req.body;
+        const { id_agent, montant, phone, observation } = req.body;
         if (!id_agent || !montant) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
-        const retrait = await AgentModel.createRetrait({ id_agent, montant });
-        return res.status(200).json({ success: true, message: 'Retrait created successfully', data: retrait });
+        const retrait = await AgentModel.createRetrait({ id_agent, montant, phone, observation });
+        return res.status(200).json({ success: true, message: 'Retrait created successfully', data: retrait.lastInsertedId });
     } catch (error) {
         console.error('Error creating retrait:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
