@@ -236,7 +236,7 @@ router.delete('/retraits/:id', async (req, res) => {
     }
 });
 
-router.put('/agent', async (req, res) => {
+router.put('/profile', async (req, res) => {
     try {
         const { id, col, val } = req.body;
         if (!id || !col || !val) {
