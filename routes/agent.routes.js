@@ -238,12 +238,12 @@ router.delete('/retraits/:id', async (req, res) => {
 
 router.put('/agent', async (req, res) => {
     try {
-        const { id, col, value } = req.body;
-        if (!id || !col || !value) {
+        const { id, col, val } = req.body;
+        if (!id || !col || !val) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        const agent = await AgentModel.updateAgent(col, value, id);
+        const agent = await AgentModel.updateAgent(col, val, id);
         if (agent) {
             return res.status(200).json({ success: true, message: 'Agent updated successfully', data: agent });
         }
