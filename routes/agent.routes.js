@@ -135,9 +135,9 @@ router.put('/resetPassword', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Agent not found' });
         }
         const mdp = await hashPassword(val);
-        console.log('Updating agent:', agent, 'with column:', col, 'and value:', val);
+        
         const result = await AgentModel.updateAgent(col, mdp, agent.id);
-        console.log('Update result:', result);
+        
         if (result) {
             const token = AgentModel.generateToken(agent);
 
@@ -243,8 +243,14 @@ router.put('/profile', async (req, res) => {
         if (!id || !col || !val) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
+        if(col == 'mdp') {
+            const mdp = await hashPassword(val);
 
-        const agent = await AgentModel.updateAgent(col, val, id);
+            const agent = await AgentModel.updateAgent('mdp', mdp, id);
+        } else {
+            
+            const agent = await AgentModel.updateAgent(col, val, id);
+        }
         if (agent) {
             return res.status(200).json({ success: true, message: 'Agent updated successfully', data: agent });
         }
