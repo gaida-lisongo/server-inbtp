@@ -247,15 +247,19 @@ router.put('/profile', async (req, res) => {
             const mdp = await hashPassword(val);
 
             const agent = await AgentModel.updateAgent('mdp', mdp, id);
-        } else {
-            
-            const agent = await AgentModel.updateAgent(col, val, id);
-        }
-        if (agent) {
-            return res.status(200).json({ success: true, message: 'Agent updated successfully', data: agent });
-        }
+            if (agent) {
+                return res.status(200).json({ success: true, message: 'Agent updated successfully', data: agent });
+            }
 
-        return res.status(404).json({ success: false, message: 'Agent not found' });
+            return res.status(404).json({ success: false, message: 'Agent not found' });
+        } else {            
+            const agent = await AgentModel.updateAgent(col, val, id);
+            if (agent) {
+                return res.status(200).json({ success: true, message: 'Agent updated successfully', data: agent });
+            }
+
+            return res.status(404).json({ success: false, message: 'Agent not found' });
+        }
     } catch (error) {
         console.error('Error updating agent:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
