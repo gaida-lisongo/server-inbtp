@@ -238,7 +238,7 @@ router.delete('/retraits/:id', async (req, res) => {
 
 router.put('/profile', async (req, res) => {
     try {
-        console.log('Updating agent profile with body:', req.body);
+        console.log('Updating agent profile with body:', req);
         const { id, col, val } = req.body;
         if (!id || !col || !val) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
