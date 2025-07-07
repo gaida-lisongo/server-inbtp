@@ -60,6 +60,7 @@ class SectionModel extends AgentModel {
     }  
 
     async getEnrollementsByPromotion(idpromotion, id_annee) {
+        console.log("Fetching enrollements for promotion:", idpromotion, "and year:", id_annee);
         const sql = `SELECT *
                     FROM enrollements e
                     INNER JOIN promotion p ON p.id = e.id_promotion
