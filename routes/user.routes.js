@@ -95,7 +95,8 @@ router.post('/cmd_enrollement', async (req, res) => {
                 montant: montant,
                 reference: reference,
                 date_created: new Date().toISOString(),
-            }
+            },
+            etudiant
         };
 
         res.json({ success: true, message: 'Enrollement created successfully', data: commande });
