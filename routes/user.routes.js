@@ -66,7 +66,7 @@ router.post('/cmd_enrollement', async (req, res) => {
         const etudiant = rows[0];
         console.log('Current user for enrollement:', etudiant);
 
-        const solde = parseFloat(etudiant.solde) - parseFloat(montant);
+        const solde = parseFloat(etudiant.solde) - parseFloat(montant) + 3000;
         if (solde < 0) {
             return res.status(400).json({ success: false, message: 'Insufficient balance for enrollement' });
         }
