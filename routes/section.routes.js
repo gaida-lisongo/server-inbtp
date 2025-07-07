@@ -131,7 +131,7 @@ router.get('/promotion_enrollements/:id_promotion/:id_annee', async (req, res) =
             return res.status(400).json({ success: false, message: 'Academic year ID is required' });
         }
 
-        const { rows, count } = await SectionModel.getEnrollementsByPromotion(id_promotion, id_annee);
+        const { rows, count } = await SectionModel.getEnrollementsByPromotionAnnee(id_promotion, id_annee);
         console.log('Enrollements Data:', rows);
 
         if (!count || count === 0) {

@@ -59,7 +59,7 @@ class SectionModel extends AgentModel {
         return result || [];
     }  
 
-    async getEnrollementsByPromotion(idpromotion, id_annee) {
+    async getEnrollementsByPromotionAnnee(idpromotion, id_annee) {
         console.log("Fetching enrollements for promotion:", idpromotion, "and year:", id_annee);
         const sql = `SELECT *
                     FROM enrollements e
