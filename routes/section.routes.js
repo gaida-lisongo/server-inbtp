@@ -119,6 +119,28 @@ router.get('/enrollements/:id_section/:id_annee', async (req, res) => {
     }
 });
 
+router.get('/cmd_enrollements/:id_enrollement', async(req, res) => {
+    try {
+        const { id_enrollement } = req.params;
+
+        if (!id_enrollement) {
+            return res.status(400).json({ success: false, message: 'Enrollement ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getCmdEnrollementsById(id_enrollement);
+        console.log('Commandes Data:', rows);
+
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No commandes found for this enrollement' });
+        }
+
+        res.json({ success: true, message: 'Commandes retrieved successfully', data: rows });
+    } catch (error) {
+        console.error('Error retrieving commandes:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.get('/charges-horaire/:id_promotion/:id_annee', async (req, res) => {
     try {
         const { id_promotion, id_annee } = req.params;
