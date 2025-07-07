@@ -58,6 +58,17 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, [idSection, id_annee]);    
         return result || [];
     }  
+
+    async getEnrollementsByPromotion(idpromotion, id_annee) {
+        const sql = `SELECT *
+                    FROM enrollements e
+                    INNER JOIN promotion p ON p.id = e.id_promotion
+                    WHERE p.id = ? AND e.id_annee = ?
+                    ORDER BY e.date_fin DESC`;
+        const result = await this.request(sql, [idpromotion, id_annee]);
+        return result || [];
+    }  
+    
     
     async getCmdEnrollementsById(idEnrollement){
         const sql =`SELECT c.*, enr.date_fin, enr.designation AS 'enr_title', enr.date_fin, enr.date_creation, enr.type, enr.q_section, enr.q_coge, enr.q_jury, enr.q_app, enr.id_annee, enr.tranche, CONCAT(e.nom, ' ', e.post_nom) AS 'etudiant_nom', e.prenom, e.telephone, e.e_mail, e.avatar, e.matricule

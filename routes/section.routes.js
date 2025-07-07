@@ -119,6 +119,32 @@ router.get('/enrollements/:id_section/:id_annee', async (req, res) => {
     }
 });
 
+router.get('/promotion_enrollements/:id_promotion/:id_annee', async (req, res) => {
+    try {
+        const { id_promotion, id_annee } = req.params;
+
+        if (!id_promotion) {
+            return res.status(400).json({ success: false, message: 'Promotion ID is required' });
+        }
+
+        if (!id_annee) {
+            return res.status(400).json({ success: false, message: 'Academic year ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getEnrollementsByPromotion(id_promotion, id_annee);
+        console.log('Enrollements Data:', rows);
+
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No enrollements found for this promotion' });
+        }
+
+        res.json({ success: true, message: 'Enrollements retrieved successfully', data: rows });
+    } catch (error) {
+        console.error('Error retrieving enrollements:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}); 
+
 router.get('/cmd_enrollement/:id_enrollement', async(req, res) => {
     try {
         const { id_enrollement } = req.params;
