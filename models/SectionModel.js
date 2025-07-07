@@ -4,7 +4,6 @@ class SectionModel extends AgentModel {
     constructor() {
         super();
     }
-    
     async getEnrollementsByPromotion(idProgramme) {
         const sql = `SELECT er.*, CONCAT(n.intitule, ' ', s.sigle) AS 'classe', p.orientation, p.description AS 'promo_des', n.systeme
             FROM enrollements er

@@ -108,6 +108,17 @@ class UserModel extends AppModel {
             throw error; // Propagation de l'erreur pour gestion ultérieure
         }
     }
+
+    async getExamensSession(id_session) {
+        const sql = `SELECT e.id, m.designation AS epreuve, m.credit, m.semestre, e.id_matiere, e.date_epreuve
+                    FROM examen_matiere e
+                    INNER JOIN matiere m ON m.id = e.id_matiere
+                    WHERE e.id_session = ?
+                    ORDER BY e.date_epreuve`;
+        const result = await this.request(sql, [id_session]);
+        return result || [];
+    }
+    
     
     async updateCommande(col, val, id_commande) {
         try {
@@ -212,6 +223,22 @@ class UserModel extends AppModel {
                 VALUES (?, NOW(), ?, ?, ?)
             `;
             const result = await this.request(query, [id_etudiant, type, reference, id_produit]);
+
+            return result || false;
+        } catch (error) {
+            console.error('Error creating commande:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
+    async createCommandeEnrollement(data) {
+        try {
+            const { id_enrollement, id_etudiant, reference, montant } = data;
+            const query = `
+                INSERT INTO commande_enrollement (id_enrollement, id_etudiant, date_created, reference, montant)
+                VALUES (?, ?, NOW(), ?, ?)
+            `;
+            const result = await this.request(query, [id_enrollement, id_etudiant, reference, montant]);
 
             return result || false;
         } catch (error) {

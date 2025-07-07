@@ -13,15 +13,13 @@ router.get('/current/:id_section', async (req, res) => {
         }
         
         const { rows: sectionData, count } = await SectionModel.getProgrammeById(id_section);
-        console.log('Section Data:', sectionData);
 
         if (!count || count === 0) {
             return res.status(404).json({ success: false, message: 'Section not found' });
         }
 
         const { rows: enrollementData, count: enrollementCount } = await SectionModel.getEnrollementsByPromotion(id_section);
-        console.log('Enrollement Data:', enrollementData);
-
+      
         res.json({ 
             success: true, 
             message: 'Section retrieved successfully', 
@@ -657,6 +655,7 @@ router.delete('/jury/:id_jury', async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
+
 
 
 module.exports = router;

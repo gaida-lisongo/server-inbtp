@@ -45,6 +45,66 @@ async function convertBufferToBase64(buffer) {
     return buffer.toString('base64');
 }
 
+router.post('/cmd_enrollement', async (req, res) => {
+    try {
+        const {
+            id_enrollement,
+            matricule,
+            montant,
+            reference = ''
+        } =  req.body;
+
+        if (!id_enrollement || !matricule || !montant) {
+            return res.status(400).json({ success: false, message: 'id_enrollement, matricule and montant are required' });
+        }
+
+        const { rows, count } = await UserModel.getUserByMatricule(matricule);
+        if (count === 0) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const etudiant = rows[0];
+        console.log('Current user for enrollement:', etudiant);
+
+        const solde = parseFloat(etudiant.solde) - parseFloat(montant);
+        if (solde < 0) {
+            return res.status(400).json({ success: false, message: 'Insufficient balance for enrollement' });
+        }
+
+        const { rows: examens, count: examCount } = await UserModel.getExamensSession(id_enrollement);
+
+        const { lastInsertedId } = await UserModel.createCommandeEnrollement({
+            id_etudiant: etudiant.id,
+            id_enrollement,
+            montant,
+            reference
+        });
+        console.log('Enrollement created successfully:', lastInsertedId);
+
+        const { rows: updatedUser, count: updateCount } = await UserModel.updateUser('solde', solde, etudiant.id);
+        if (updateCount === 0) {
+            return res.status(404).json({ success: false, message: 'User not found for balance update' });
+        }
+        console.log('User balance updated successfully:', updatedUser);
+        
+        const commande = {
+            examens: examens,
+            solde: solde,
+            enrollement: {
+                id: lastInsertedId,
+                montant: montant,
+                reference: reference,
+                date_created: new Date().toISOString(),
+            }
+        };
+
+        res.json({ success: true, message: 'Enrollement created successfully', data: commande });
+    } catch (error) {
+        console.error('Error retrieving enrollement:', error);
+        res.status(500).json({ success: false, message: 'Internal server error in cmd_enrollement' });
+    }
+});
+
 router.post('/login', async (req, res) => {
     try {
         const { matricule, mdp } = req.body;
