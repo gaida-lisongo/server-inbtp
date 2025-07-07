@@ -119,7 +119,7 @@ router.get('/enrollements/:id_section/:id_annee', async (req, res) => {
     }
 });
 
-router.get('/cmd_enrollements/:id_enrollement', async(req, res) => {
+router.get('/cmd_enrollement/:id_enrollement', async(req, res) => {
     try {
         const { id_enrollement } = req.params;
 
