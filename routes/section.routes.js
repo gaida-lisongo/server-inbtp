@@ -450,7 +450,7 @@ router.get('/agents', async (req, res) => {
                 titulaire: authTitulaire > 0 ? true : false
             }
 
-            const { rows: logs } = await AgentModel.getLogsAgent(agent.id);
+            const logs = await AgentModel.getLogsAgent(agent.id);
             console.log(`Logs for agent ${agent.id}:`, logs);
             currentAgent.logs = {connexions: logs ? logs : [], count: logs?.length || 0};
 
