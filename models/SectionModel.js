@@ -40,8 +40,8 @@ class SectionModel extends AgentModel {
                 INNER JOIN etudiant e ON e.id = cmd.id_etudiant
                 WHERE u.id_promotion = ? AND c.id_annee = ?
             `;
-        const result = await this.request(sql, []);
-        return result || [idPromotion, idAnnee];
+        const result = await this.request(sql, [idPromotion, idAnnee]);
+        return result || [];
     }
 
     async getEtudiantBypromotion(idPromotion, idAnnee){
