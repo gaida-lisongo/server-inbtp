@@ -21,6 +21,13 @@ function generateOTP(userId) {
     return otp;
 }
 
+async function generateLogOfConnection(agentId, req) {
+    // Enregistre un log de connexion pour l'agent
+    const ipAdresse = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    console.log(`Logging connection for agent ${agentId} from IP: ${ipAdresse}`);
+    return AgentModel.createLog(agentId, ipAdresse);
+}
+
 async function hashPassword(password) {
     // crypte le mot de passe avec SHA-256
     return crypto.createHash('sha256').update(password).digest('hex');
@@ -50,6 +57,7 @@ router.post('/login', async (req, res) => {
 
         if (result) {
             const { agent, token } = result;
+            await generateLogOfConnection(agent.id, req);
             return res.status(200).json({ success: true, message: 'Agent authenticated successfully', data: { agent, token } });
         } else {
             return res.status(401).json({ success: false, message: 'Invalid matricule or password' });

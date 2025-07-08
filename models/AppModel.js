@@ -338,8 +338,9 @@ class AppModel extends Model {
     }
 
     async getAgents() {
-        const sql = `SELECT *
+        const sql = `SELECT agent.*, grade.designation AS 'titre_acad'
             FROM agent
+            INNER JOIN grade ON agent.id_grade = grade.id
             ORDER BY nom, post_nom, prenom
         `;
         const result = await this.request(sql);

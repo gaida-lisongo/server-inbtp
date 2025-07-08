@@ -49,10 +49,31 @@ class AgentModel extends UserModel {
         }
     }
 
-    async checkUserSession(userId, session) {
+    async getLogsAgent(idAgent) {
         try {
             const query = `
                 SELECT * 
+                FROM logs_titulaire
+                WHERE id_agent = ?
+                ORDER BY date_login DESC
+            `;  
+            const {rows, count} = await this.request(query, [idAgent]);
+
+            if (rows && rows.length > 0) {
+                return rows;
+            }
+
+            return [];
+        } catch (error) {
+            console.error('Error fetching agent logs:', error);
+            throw error; // Propagation de l'erreur pour gestion ultérieure
+        }
+    }
+
+    async checkUserSession(userId, session) {
+        try {
+            const query = `
+                SELECT affectation.*, poste.designation 
                 FROM affectation
                 INNER JOIN poste ON affectation.id_poste = poste.id
                 WHERE affectation.id_agent = ? AND poste.designation = ?
@@ -98,6 +119,13 @@ class AgentModel extends UserModel {
     async createRetrait(retraitData) {
         const sql = `INSERT INTO retrait_user (id_agent, montant, telephone, observation, date_creation) VALUES (?, ?, ?, ?, NOW())`;
         const result = await this.request(sql, [retraitData.id_agent, retraitData.montant, retraitData.telephone, retraitData.observation]);
+        return result || [];
+    }
+
+    async createLog(idAgent, ipAdresse){
+        //logs_titulaire`(`id`, `id_agent`, `id_section`, `date_login`, `ip_adresse`)
+        const sql = `INSERT INTO logs_titulaire (id_agent, date_login, ip_adresse) VALUES (?, NOW(), ?)`;
+        const result = await this.request(sql, [idAgent, ipAdresse]);
         return result || [];
     }
 

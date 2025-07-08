@@ -1,6 +1,6 @@
 const express = require('express');
 const { route } = require('./home.routes');
-const { SectionModel } = require('../models');
+const { SectionModel, AppModel, AgentModel } = require('../models');
 
 const router = express.Router();
 
@@ -419,6 +419,48 @@ router.get('/deliberations/:id_promotion/:id_annee', async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
+
+router.post('/agents', async (req, res) => {
+    try {
+        const { rows, count } = await AppModel.getAgents();
+        if (count === 0) {
+            return res.status(404).json({ success: false, message: 'No agents found' });            
+        }
+
+        const agents = await Promise.all(rows.map(async agent => {
+            let currentAgent = {
+                id: agent.id,
+                identite :{
+                    nom: agent.nom,
+                    post_nom: agent.post_nom,
+                    prenom: agent.prenom,
+                    sexe: agent.sexe,
+                    matricule: agent.matricule,
+                    avatar: agent.avatar,
+                    titre_acad: agent.titre_acad
+                }
+            }
+            const { rows: authJury } = await AgentModel.checkUserSession(agent.id, 'JURY');
+            const { rows: authTitulaire } = await AgentModel.checkUserSession(agent.id, 'TITULAIRE');
+            
+            currentAgent.autorisation = {
+                jury: authJury.length > 0 ? true : false,
+                titulaire: authTitulaire.length > 0 ? true : false
+            }
+
+            const { rows: logs } = await AgentModel.getLogsAgent(agent.id);
+            currentAgent.logs = logs;
+
+            return currentAgent;
+        }));
+
+        res.json({ success: true, message: 'Agents retrieved successfully', data: agents });
+    } catch (error) {
+        console.error('Error retrieving agents:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+        
+    }
+})
 
 router.post('/create-jury', async (req, res) => {
     try {
