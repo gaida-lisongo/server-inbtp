@@ -446,8 +446,8 @@ router.get('/agents', async (req, res) => {
             console.log(`Auth Titulaire for agent ${agent.id}:`, authTitulaire);
 
             currentAgent.autorisation = {
-                jury: authJury.length > 0 ? true : false,
-                titulaire: authTitulaire.length > 0 ? true : false
+                jury: authJury ? true : false,
+                titulaire: authTitulaire > 0 ? true : false
             }
 
             const { rows: logs } = await AgentModel.getLogsAgent(agent.id);
