@@ -472,7 +472,7 @@ router.post('/authorization', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Agent ID and type are required' });
         }
 
-        const response = await AgentModel.createAuthorization({ id_agent, type });
+        const response = await SectionModel.createAuthorization({ id_agent, type });
         console.log('Authorization created with ID:', response);
 
         if (response) {
@@ -493,7 +493,7 @@ router.delete('/authorization/', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Agent ID and type are required' });
         }
 
-        const result = await AgentModel.deleteAuthorization({ id_agent, type });
+        const result = await SectionModel.deleteAuthorization({ id_agent, type });
         console.log('Authorization deleted:', result);
 
         if (result) {
