@@ -529,13 +529,31 @@ class SectionModel extends AgentModel {
         return result;
     }
 
-
-
     async deleteMatiere(id) {
         const sql = `DELETE FROM matiere WHERE id = ?`;
         const params = [id];
         const result = await this.request(sql, params);
         return result;
+    }
+
+    async createAuthorization({id_agent, type}) {
+        const sql = `INSERT INTO affectation (id_agent, id_poste)
+            VALUES (
+                ${id_agent},
+                (SELECT id FROM poste WHERE designation = ?)
+            );`;
+        const params = [type];
+        const result = await this.request(sql, params);
+        return result || [];
+    }
+
+    async deleteAuthorization(id_agent, type) {
+        const sql = `DELETE FROM affectation 
+            WHERE id_agent = ? 
+            AND id_poste = (SELECT id FROM poste WHERE designation = ?)`;
+        const params = [id_agent, type];
+        const result = await this.request(sql, params);
+        return result || [];
     }
 }
 

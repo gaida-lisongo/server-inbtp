@@ -463,7 +463,49 @@ router.get('/agents', async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
         
     }
-})
+});
+
+router.post('/authorization', async (req, res) => {
+    try {
+        const { id_agent, type } = req.body
+        if(!id_agent || !type) {
+            return res.status(400).json({ success: false, message: 'Agent ID and type are required' });
+        }
+
+        const { lastInsertedId } = await AgentModel.createAuthorization({ id_agent, type });
+        console.log('Authorization created with ID:', lastInsertedId);
+
+        if (lastInsertedId) {
+            return res.json({ success: true, message: 'Authorization created successfully', data: { id: lastInsertedId } });
+        }
+
+        return res.status(400).json({ success: false, message: 'Failed to create authorization', data: lastInsertedId });
+    } catch (error) {
+        console.error('Error creating authorization:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.delete('/authorization/', async (req, res) => {
+    try {
+        const { id_agent, type } = req.body;
+        if (!id_agent || !type) {
+            return res.status(400).json({ success: false, message: 'Agent ID and type are required' });
+        }
+
+        const result = await AgentModel.deleteAuthorization({ id_agent, type });
+        console.log('Authorization deleted:', result);
+
+        if (result) {
+            return res.json({ success: true, message: 'Authorization deleted successfully', data: result});
+        }
+        return res.status(400).json({ success: false, message: 'Failed to delete authorization' });
+
+    } catch (error) {
+        console.error('Error deleting authorization:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
 
 router.post('/create-jury', async (req, res) => {
     try {
