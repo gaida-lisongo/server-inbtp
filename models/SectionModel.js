@@ -547,7 +547,7 @@ class SectionModel extends AgentModel {
         return result || [];
     }
 
-    async deleteAuthorization(id_agent, type) {
+    async deleteAuthorization({id_agent, type}) {
         const sql = `DELETE FROM affectation 
             WHERE id_agent = ? 
             AND id_poste = (SELECT id FROM poste WHERE designation = ?)`;
