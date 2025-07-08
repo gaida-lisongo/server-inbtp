@@ -4,7 +4,7 @@ const { SectionModel } = require('../models');
 
 const router = express.Router();
 
-async function categorieEtudiant(data, categore){
+function categorieEtudiant(data, categore){
     try {
         let critere = 0;
 
@@ -53,8 +53,29 @@ router.get('/liste_declarative/:id_promotion/:id_annee', async (req, res) => {
         }
 
         const {rows, count} = await SectionModel.getEtudiantBypromotion(id_promotion, id_annee);
-        console.log('Students Data:', rows);
-        res.json({ success: true, message: 'Students retrieved successfully', data: rows });
+        if(!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No students found for this promotion' });
+        }
+
+        let etudiants = [
+            {
+                'critere': 'Mineur',
+                'data': categorieEtudiant(rows, 'mineur')
+            },
+            {
+                'critere': 'Adolescent',
+                'data': categorieEtudiant(rows, 'adolescent')
+            },
+            {
+                'critere': 'Adulte',
+                'data': categorieEtudiant(rows, 'adulte')
+            },
+            {
+                'critere': 'Senior',
+                'data': categorieEtudiant(rows, 'senior')
+            }
+        ]
+        res.json({ success: true, message: 'Students retrieved successfully', data: etudiants });
     } catch (error) {
         console.error('Error retrieving students:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
