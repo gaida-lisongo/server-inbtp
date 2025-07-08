@@ -451,7 +451,8 @@ router.get('/agents', async (req, res) => {
             }
 
             const { rows: logs } = await AgentModel.getLogsAgent(agent.id);
-            currentAgent.logs = {connexions: logs ? [...logs] : [], count: logs?.length || 0};
+            console.log(`Logs for agent ${agent.id}:`, logs);
+            currentAgent.logs = {connexions: logs ? logs : [], count: logs?.length || 0};
 
             return currentAgent;
         }));

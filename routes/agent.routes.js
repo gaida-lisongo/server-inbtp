@@ -25,6 +25,8 @@ async function generateLogOfConnection(agentId, req) {
    try {
      // Enregistre un log de connexion pour l'agent
      const ipAdresse = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+     // Données de Localisation, latitude et longitude
+     
      console.log(`Logging connection for agent ${agentId} from IP: ${ipAdresse}`);
      const { lastInsertedId  } = await AgentModel.createLog(agentId, ipAdresse);
      console.log(`Connection log created with ID: ${lastInsertedId}`);
