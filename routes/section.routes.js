@@ -480,6 +480,7 @@ router.post('/enrollement', async (req, res) => {
             q_section: req.body['q_section'],
             q_coge: req.body['q_coge'],
             q_jury: req.body['q_jury'],
+            q_app: req.body['q_app'], // Optional field
             date_fin: req.body['date_fin']
         }
 
