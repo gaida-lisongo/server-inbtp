@@ -362,24 +362,6 @@ class SectionModel extends AgentModel {
         return result;
 
     }
-    
-    async createCommunication(communicationData) {
-        const sql = `INSERT INTO communique (
-            id_auteur, 
-            titre, 
-            contenu, 
-            date_created, 
-            service
-            ) VALUES (?, ?, ?, NOW(), ?)`;
-        const params = [
-            communicationData.id_section,
-            communicationData.titre,
-            communicationData.contenu,
-            communicationData.service
-        ];
-        const result = await this.request(sql, params);
-        return result;
-    }
 
     async createChargeHoraire(chargeData) {
 
@@ -554,6 +536,48 @@ class SectionModel extends AgentModel {
         const params = [id_agent, type];
         const result = await this.request(sql, params);
         return result || [];
+    }
+    
+    async createCommunication(communicationData) {
+        const sql = `INSERT INTO communique (
+            id_auteur, 
+            titre, 
+            contenu, 
+            date_created, 
+            service
+            ) VALUES (?, ?, ?, NOW(), ?)`;
+        const params = [
+            communicationData.id_section,
+            communicationData.titre,
+            communicationData.contenu,
+            communicationData.service
+        ];
+        const result = await this.request(sql, params);
+        return result;
+    }
+
+    async getCommuniquesBySection(id_section) {
+        const sql = `SELECT cmq.*, CONCAT(agt.grade, ' ', agt.nom, ' ', agt.post_nom) AS 'auteur'
+                FROM communique cmq
+                INNER JOIN agent agt ON agt.id = cmq.id_auteur
+                WHERE cmq.id_section = ?`;
+        const params = [id_section];
+        const result = await this.request(sql, params);
+        return result || [];
+    }
+
+    async deleteCommunique(id) {
+        const sql = `DELETE FROM communique WHERE id = ?`;
+        const params = [id];
+        const result = await this.request(sql, params);
+        return result || [];
+    }
+
+    async updateCommunique(id, col, val) {
+        const sql = `UPDATE communique SET ${col} = ? WHERE id = ?`;
+        const params = [val, id];
+        const result = await this.request(sql, params);
+        return result;
     }
 }
 

@@ -776,6 +776,71 @@ router.post('/communique', async (req, res) => {
     }
 });
 
+router.get('/communiques/:id_section', async (req, res) => {
+    try {
+        const { id_section } = req.params;
+
+        if (!id_section) {
+            return res.status(400).json({ success: false, message: 'Section ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getCommuniquesBySection(id_section);
+        console.log('Communications Data:', rows);
+
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No communications found for this section' });
+        }
+
+        res.json({ success: true, message: 'Communications retrieved successfully', data: rows });
+    } catch (error) {
+        console.error('Error retrieving communications:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.put('/communique/:id_communique', async (req, res) => {
+    try {
+        const { id_communique } = req.params;
+        const payload = {
+            col: req.body['col'],
+            value: req.body['value']
+        }
+
+        console.log('Payload for Update Communication:', payload);
+        const result = await SectionModel.updateCommunique(payload.col, id_communique, payload.value);
+
+        if (result) {
+            res.json({ success: true, message: 'Communication updated successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to update communication' });
+        }
+    } catch (error) {
+        console.error('Error updating communication:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.delete('/communique/:id_communique', async (req, res) => {
+    try {
+        const { id_communique } = req.params;
+
+        if (!id_communique) {
+            return res.status(400).json({ success: false, message: 'Communication ID is required' });
+        }
+
+        const result = await SectionModel.deleteCommunique(id_communique);
+
+        if (result) {
+            res.json({ success: true, message: 'Communication deleted successfully' });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to delete communication' });
+        }
+    } catch (error) {
+        console.error('Error deleting communication:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.put('/chargeHoraire/:id_charge', async (req, res) => {
     try {
         const { id_charge } = req.params;
