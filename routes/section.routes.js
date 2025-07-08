@@ -19,7 +19,7 @@ function categorieEtudiant(data, categore){
                 critere = 40;
                 break;
             default:
-                critere = 65;
+                critere = 40;
                 break;
         }
 
@@ -56,8 +56,13 @@ function categorieEtudiant(data, categore){
                 console.error('Current year is not a valid number');
             }
             const age = currentYear - parseInt(year, 10);
-
-            if (age <= critere) {
+            if (categore === 'mineur' && age < critere && age >= 0) {
+                etudiants.push(etudiant);
+            } else if (categore === 'adolescent' && age >= 18 && age < critere) {
+                etudiants.push(etudiant);
+            } else if (categore === 'adulte' && age >= 25 && age < critere) {
+                etudiants.push(etudiant);
+            } else if (categore === 'senior' && age >= critere) {
                 etudiants.push(etudiant);
             }
         });
