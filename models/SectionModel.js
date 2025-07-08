@@ -4,6 +4,46 @@ class SectionModel extends AgentModel {
     constructor() {
         super();
     }
+
+    async getCommandesNotesByPromotion(idPromotion, idAnnee) {
+        const sql = `SELECT 6000 AS 'montant', CONCAT(e.nom, ' ', e.post_nom) AS 'etudiant_nom', e.prenom, e.sexe, e.matricule AS 'etudiant_matricule',  cmd.*, CONCAT(m.designation, ' (', m.credit, ')') AS cours, CONCAT(t.nom, ' ', t.post_nom) AS 'tit_nom', t.prenom, t.matricule, t.statut, t.telephone, c.id_matiere, c.id_titulaire
+            FROM (
+                SELECT *
+                FROM commande
+                WHERE commande.type = 'note'
+            ) cmd
+            INNER JOIN charge_horaire c ON c.id = cmd.id_produit
+            INNER JOIN matiere m ON m.id = c.id_matiere
+            INNER JOIN unite u ON u.id = m.id_unite
+            INNER JOIN agent t ON t.id = c.id_titulaire
+            INNER JOIN etudiant e ON e.id = cmd.id_etudiant
+            WHERE u.id_promotion = ? AND c.id_annee = ?
+        `;
+        
+        const result = await this.request(sql, [idPromotion, idAnnee]);
+        return result || [];
+    }
+
+    async getCommandesTravauxByPromotion(idPromotion, idAnnee){
+        const sql = `
+                SELECT CONCAT(e.nom, ' ', e.post_nom) AS 'etudiant_nom', e.prenom, e.sexe, e.matricule AS 'etudiant_matricule',  cmd.*, CONCAT(m.designation, ' (', m.credit, ')') AS cours, CONCAT(t.nom, ' ', t.post_nom) AS 'tit_nom', t.prenom, t.matricule, t.statut, t.telephone, c.id_matiere, c.id_titulaire
+                FROM (
+                    SELECT commande.*, travail.id_charge, travail.montant
+                    FROM commande
+                    INNER JOIN travail ON travail.id = commande.id_produit
+                    WHERE commande.type = 'travail'
+                ) cmd
+                INNER JOIN charge_horaire c ON c.id = cmd.id_charge
+                INNER JOIN matiere m ON m.id = c.id_matiere
+                INNER JOIN unite u ON u.id = m.id_unite
+                INNER JOIN agent t ON t.id = c.id_titulaire
+                INNER JOIN etudiant e ON e.id = cmd.id_etudiant
+                WHERE u.id_promotion = 1 AND c.id_annee = 3
+            `;
+        const result = await this.request(sql, []);
+        return result || [idPromotion, idAnnee];
+    }
+
     async getEtudiantBypromotion(idPromotion, idAnnee){
         const sql = `SELECT e.*, pe.id_promotion, pe.date_inscription, pe.id_annee_acad, ade.section, ade.option, ade.annee, ade.pourcentage_exetat, ade.inscription
             FROM promotion_etudiant pe

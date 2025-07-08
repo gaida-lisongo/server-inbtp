@@ -77,6 +77,41 @@ function categorieEtudiant(data, categore){
     }
 }
 
+router.get('/cmd_enseignants/:id_promotion/:id_annee', async (req, res) => {
+    try {
+        const { id_promotion, id_annee } = req.params;
+
+        if (!id_promotion || !id_annee) {
+            return res.status(400).json({ success: false, message: 'Promotion ID and Year ID are required' });
+        }
+        const { rows: NotesData} = await SectionModel.getCommandesNotesByPromotion(id_promotion, id_annee);
+        console.log('Commandes Notes Data:', NotesData);
+
+        const { rows: TravauxData } = await SectionModel.getCommandesTravauxByPromotion(id_promotion, id_annee);
+        console.log('Commandes Travaux Data:', TravauxData);
+
+        const data = [
+            {
+                product: 'Notes',
+                commandes: NotesData ? NotesData : []
+            },
+            {
+                product: 'Travaux',
+                commandes: TravauxData ? TravauxData : []
+            }
+        ];
+
+        res.status(200).json({
+            success: true,
+            message: 'Commandes retrieved successfully',
+            data: data
+        })
+    } catch (error) {
+        console.error('Error retrieving commandes:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.get('/liste_declarative/:id_promotion/:id_annee', async (req, res) => {
     try {
         const { id_promotion, id_annee } = req.params;
