@@ -26,9 +26,34 @@ function categorieEtudiant(data, categore){
 
         data.forEach(etudiant => {
             //etudiant.date_naiss est un varchar de la forme YYYY-MM-DD
-            const dateNaissance = new Date(etudiant.date_naiss);
-            const age = new Date().getFullYear() - dateNaissance.getFullYear();
+            //recupérer l'année de l'étudiant avec split etudiant.date_naiss
+            if (!etudiant.date_naiss) {
+                console.warn(`Skipping student with missing date_naiss: ${JSON.stringify(etudiant)}`);
+                return; // Skip this student if date_naiss is missing
+            }
+            if (typeof etudiant.date_naiss !== 'string') {
+                console.warn(`Invalid date_naiss format for student: ${JSON.stringify(etudiant)}`);
+                return; // Skip this student if date_naiss is not a string
+            }
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(etudiant.date_naiss)) {
+                console.warn(`Invalid date_naiss format for student: ${JSON.stringify(etudiant)}`);
+                return; // Skip this student if date_naiss is not in the correct format
+            }
 
+            const [year] = etudiant.date_naiss.split('-');
+            if (!year || isNaN(year)) {
+                console.warn(`Invalid year extracted from date_naiss for student: ${JSON.stringify(etudiant)}`);
+                return; // Skip this student if year is invalid
+            }
+            
+            //Récupérer l'année courante
+            const currentYear = new Date().getFullYear();
+            //Calculer l'âge de l'étudiant
+            if (isNaN(currentYear)) {
+                console.error('Current year is not a valid number');
+            }
+            const age = currentYear - parseInt(year, 10);
+            
             if (age <= critere) {
                 etudiants.push(etudiant);
             }
