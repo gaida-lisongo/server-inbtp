@@ -472,14 +472,14 @@ router.post('/authorization', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Agent ID and type are required' });
         }
 
-        const { lastInsertedId } = await AgentModel.createAuthorization({ id_agent, type });
-        console.log('Authorization created with ID:', lastInsertedId);
+        const response = await AgentModel.createAuthorization({ id_agent, type });
+        console.log('Authorization created with ID:', response);
 
-        if (lastInsertedId) {
-            return res.json({ success: true, message: 'Authorization created successfully', data: { id: lastInsertedId } });
+        if (response) {
+            return res.json({ success: true, message: 'Authorization created successfully', data: { id: response } });
         }
 
-        return res.status(400).json({ success: false, message: 'Failed to create authorization', data: lastInsertedId });
+        return res.status(400).json({ success: false, message: 'Failed to create authorization', data: response });
     } catch (error) {
         console.error('Error creating authorization:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
