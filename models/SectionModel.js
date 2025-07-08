@@ -38,7 +38,7 @@ class SectionModel extends AgentModel {
                 INNER JOIN unite u ON u.id = m.id_unite
                 INNER JOIN agent t ON t.id = c.id_titulaire
                 INNER JOIN etudiant e ON e.id = cmd.id_etudiant
-                WHERE u.id_promotion = 1 AND c.id_annee = 3
+                WHERE u.id_promotion = ? AND c.id_annee = ?
             `;
         const result = await this.request(sql, []);
         return result || [idPromotion, idAnnee];
