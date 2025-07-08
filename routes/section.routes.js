@@ -420,7 +420,7 @@ router.get('/deliberations/:id_promotion/:id_annee', async (req, res) => {
     }
 });
 
-router.post('/agents', async (req, res) => {
+router.get('/agents', async (req, res) => {
     try {
         const { rows, count } = await AppModel.getAgents();
         if (count === 0) {
