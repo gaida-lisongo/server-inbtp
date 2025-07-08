@@ -52,8 +52,9 @@ function categorieEtudiant(data, categore){
             if (isNaN(currentYear)) {
                 console.error('Current year is not a valid number');
             }
+            console.log(`Current Year: ${currentYear}, Student Year: ${year}`);
             const age = currentYear - parseInt(year, 10);
-            
+
             if (age <= critere) {
                 etudiants.push(etudiant);
             }
