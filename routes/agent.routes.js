@@ -22,10 +22,18 @@ function generateOTP(userId) {
 }
 
 async function generateLogOfConnection(agentId, req) {
-    // Enregistre un log de connexion pour l'agent
-    const ipAdresse = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    console.log(`Logging connection for agent ${agentId} from IP: ${ipAdresse}`);
-    return AgentModel.createLog(agentId, ipAdresse);
+   try {
+     // Enregistre un log de connexion pour l'agent
+     const ipAdresse = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+     console.log(`Logging connection for agent ${agentId} from IP: ${ipAdresse}`);
+     const { lastInsertedId  } = await AgentModel.createLog(agentId, ipAdresse);
+     console.log(`Connection log created with ID: ${lastInsertedId}`);
+ 
+     return lastInsertedId;
+   } catch (error) {
+        console.error('Error generating log of connection:', error);
+        throw new Error('Failed to generate log of connection');    
+   }
 }
 
 async function hashPassword(password) {
