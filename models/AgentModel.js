@@ -125,6 +125,7 @@ class AgentModel extends UserModel {
     }
 
     async createLog(idAgent, ipAdresse){
+        console.log('Params : ', idAgent, ' - ', ipAdresse);
         //logs_titulaire`(`id`, `id_agent`, `id_section`, `date_login`, `ip_adresse`)
         const sql = `INSERT INTO logs_titulaire (id_agent, date_login, ip_adresse) VALUES (?, NOW(), ?)`;
         const result = await this.request(sql, [idAgent, ipAdresse]);
