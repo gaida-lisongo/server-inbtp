@@ -280,8 +280,8 @@ class SectionModel extends AgentModel {
     }
 
     async createEnrollement(enrollementData) {
-        const sql = `INSERT INTO enrollements (id_promotion, id_annee, date_fin, q_jury, q_section, q_coge, tranche, montant, type, designation)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO enrollements (id_promotion, id_annee, date_fin, q_jury, q_section, q_coge, q_app, tranche, montant, type, designation)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const params = [
             enrollementData.id_promotion,
             enrollementData.id_annee,
@@ -289,6 +289,7 @@ class SectionModel extends AgentModel {
             enrollementData.q_jury,
             enrollementData.q_section,
             enrollementData.q_coge,
+            enrollementData.q_app,
             enrollementData.tranche,
             enrollementData.montant,
             enrollementData.type,
