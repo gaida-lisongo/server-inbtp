@@ -1,7 +1,6 @@
 const express = require('express');
 const { route } = require('./home.routes');
 const { SectionModel } = require('../models');
-const excelJs = require('exceljs');
 
 const router = express.Router();
 
