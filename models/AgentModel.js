@@ -79,6 +79,8 @@ class AgentModel extends UserModel {
                 WHERE affectation.id_agent = ? AND poste.designation = ?
             `;
             const {rows, count} = await this.request(query, [userId, session]);
+            console.log(`Checking user session for userId: ${userId}, session: ${session}`);
+            console.log('Rows returned:', rows);
 
             if (rows && rows.length > 0) {
                 return rows[0];
