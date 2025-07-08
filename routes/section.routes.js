@@ -440,11 +440,11 @@ router.get('/agents', async (req, res) => {
                     titre_acad: agent.titre_acad
                 }
             }
-            const { rows: authJury } = await AgentModel.checkUserSession(agent.id, 'JURY');
-            const { rows: authTitulaire } = await AgentModel.checkUserSession(agent.id, 'TITULAIRE');
+            const authJury = await AgentModel.checkUserSession(agent.id, 'JURY');
+            const authTitulaire = await AgentModel.checkUserSession(agent.id, 'TITULAIRE');
             console.log(`Auth Jury for agent ${agent.id}:`, authJury);
             console.log(`Auth Titulaire for agent ${agent.id}:`, authTitulaire);
-            
+
             currentAgent.autorisation = {
                 jury: authJury.length > 0 ? true : false,
                 titulaire: authTitulaire.length > 0 ? true : false
