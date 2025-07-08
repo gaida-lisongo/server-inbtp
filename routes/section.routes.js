@@ -54,7 +54,7 @@ router.get('/liste_declarative/:id_promotion/:id_annee', async (req, res) => {
 
         const {rows, count} = await SectionModel.getEtudiantBypromotion(id_promotion, id_annee);
         console.log('Students Data:', rows);
-        res.json({ success: true, message: 'Students retrieved successfully', data: etudiants });
+        res.json({ success: true, message: 'Students retrieved successfully', data: rows });
     } catch (error) {
         console.error('Error retrieving students:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
