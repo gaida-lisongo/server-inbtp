@@ -57,6 +57,7 @@ router.post('/login', async (req, res) => {
 
         if (result) {
             const { agent, token } = result;
+            console.log('Agent authenticated successfully:', agent);
             await generateLogOfConnection(agent.id, req);
             return res.status(200).json({ success: true, message: 'Agent authenticated successfully', data: { agent, token } });
         } else {
