@@ -10,7 +10,8 @@ function categorieEtudiant(data, categore){
 
         switch (categore) {
             case 'mineur':
-                critere = 18
+                critere = 18;
+                break;
             case 'adolescent':
                 critere = 25;
                 break;
