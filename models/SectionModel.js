@@ -4,6 +4,17 @@ class SectionModel extends AgentModel {
     constructor() {
         super();
     }
+    async getEtudiantBypromotion(idPromotion, idAnnee){
+        const sql = `SELECT e.*, pe.id_promotion, pe.date_inscription, pe.id_annee_acad, ade.section, ade.option, ade.annee, ade.pourcentage_exetat, ade.inscription
+            FROM promotion_etudiant pe
+            INNER JOIN administratif_etudiant ade ON ade.id = pe.id_adminEtudiant
+            INNER JOIN etudiant e ON e.id = ade.id_etudiant
+            WHERE pe.id_promotion = ? AND pe.id_annee_acad = ?`
+        
+        const result = await this.request(sql, [idPromotion, idAnnee]);
+        return result || [];
+    }
+    
     async getEnrollementsByPromotion(idProgramme) {
         const sql = `SELECT er.*, CONCAT(n.intitule, ' ', s.sigle) AS 'classe', p.orientation, p.description AS 'promo_des', n.systeme
             FROM enrollements er

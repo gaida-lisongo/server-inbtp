@@ -1,8 +1,66 @@
 const express = require('express');
 const { route } = require('./home.routes');
 const { SectionModel } = require('../models');
+const excelJs = require('exceljs');
 
 const router = express.Router();
+
+async function categorieEtudiant(data, categore){
+    try {
+        let critere = 0;
+
+        switch (categore) {
+            case 'mineur':
+                critere = 18
+            case 'adolescent':
+                critere = 25;
+                break;
+            case 'adulte':
+                critere = 40;
+                break;
+            default:
+                critere = 65;
+                break;
+        }
+
+        const etudiants = [];
+
+        data.forEach(etudiant => {
+            //etudiant.date_naiss est un varchar de la forme YYYY-MM-DD
+            const dateNaissance = new Date(etudiant.date_naiss);
+            const age = new Date().getFullYear() - dateNaissance.getFullYear();
+
+            if (age <= critere) {
+                etudiants.push(etudiant);
+            }
+        });
+        
+        //Tri des étudiants par date de naissance
+        etudiants.sort((a, b) => new Date(a.date_naiss) - new Date(b.date_naiss));
+        return etudiants;
+
+    } catch (error) {
+        console.error('Error categorizing students:', error);
+        throw new Error('Failed to categorize students');
+    }
+}
+
+router.get('/liste_declarative/:id_promotion/:id_annee', async (req, res) => {
+    try {
+        const { id_promotion, id_annee } = req.params;
+
+        if (!id_promotion || !id_annee) {
+            return res.status(400).json({ success: false, message: 'Promotion ID and Year ID are required' });
+        }
+
+        const {rows, count} = await SectionModel.getEtudiantBypromotion(id_promotion, id_annee);
+        console.log('Students Data:', rows);
+        res.json({ success: true, message: 'Students retrieved successfully', data: etudiants });
+    } catch (error) {
+        console.error('Error retrieving students:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
 
 router.get('/current/:id_section', async (req, res) => {
     try {
