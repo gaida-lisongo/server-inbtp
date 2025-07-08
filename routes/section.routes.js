@@ -22,6 +22,8 @@ function categorieEtudiant(data, categore){
                 break;
         }
 
+        console.log(`Critère pour la catégorie ${categore}: ${critere}`);
+
         const etudiants = [];
 
         data.forEach(etudiant => {
@@ -52,7 +54,6 @@ function categorieEtudiant(data, categore){
             if (isNaN(currentYear)) {
                 console.error('Current year is not a valid number');
             }
-            console.log(`Current Year: ${currentYear}, Student Year: ${year}`);
             const age = currentYear - parseInt(year, 10);
 
             if (age <= critere) {
