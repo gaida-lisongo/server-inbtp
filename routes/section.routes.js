@@ -871,7 +871,7 @@ router.put('/messages/:id_message', async (req, res) => {
             status: 'TRUE'
         }
         console.log('Payload for Update Message:', payload);
-        const result = await SectionModel.updateContactStatus(payload);
+        const result = await SectionModel.updateContactStatus(payload.id, payload.status);
         if (result) {
             res.json({ success: true, message: 'Message updated successfully', data: result });
         } else {
