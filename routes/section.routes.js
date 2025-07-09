@@ -807,7 +807,7 @@ router.put('/communique/:id_communique', async (req, res) => {
         }
 
         console.log('Payload for Update Communication:', payload);
-        const result = await SectionModel.updateCommunique(payload.col, id_communique, payload.value);
+        const result = await SectionModel.updateCommunique(id_communique, payload.col, payload.value);
 
         if (result) {
             res.json({ success: true, message: 'Communication updated successfully', data: result });
