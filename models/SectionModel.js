@@ -557,9 +557,10 @@ class SectionModel extends AgentModel {
     }
 
     async getCommuniquesBySection(id_section) {
-        const sql = `SELECT cmq.*, CONCAT(agt.grade, ' ', agt.nom, ' ', agt.post_nom) AS 'auteur'
+        const sql = `SELECT cmq.*, CONCAT(grade.designation, ' ', agt.nom, ' ', agt.post_nom) AS 'auteur'
                 FROM communique cmq
                 INNER JOIN agent agt ON agt.id = cmq.id_auteur
+                INNER JOIN grade ON grade.id = agt.id_grade
                 WHERE cmq.id_auteur = ?`;
         const params = [id_section];
         const result = await this.request(sql, params);
