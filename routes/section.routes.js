@@ -841,6 +841,69 @@ router.delete('/communique/:id_communique', async (req, res) => {
     }
 });
 
+router.get('/messages/:id_section', async (req, res) => {
+    try {
+        const { id_section } = req.params;
+
+        if (!id_section) {
+            return res.status(400).json({ success: false, message: 'Section ID is required' });
+        }
+
+        const { rows, count } = await SectionModel.getContactSectionById(id_section);
+        console.log('Messages Data:', rows);
+
+        if (!count || count === 0) {
+            return res.status(404).json({ success: false, message: 'No messages found for this section' });
+        }
+
+        res.json({ success: true, message: 'Messages retrieved successfully', data: rows });
+    } catch (error) {
+        console.error('Error retrieving messages:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.put('/messages/:id_message', async (req, res) => {
+    try {
+        const { id_message } = req.params;
+        const payload = {
+            id: id_message,
+            status: true
+        }
+        console.log('Payload for Update Message:', payload);
+        const result = await SectionModel.updateContactStatus(payload);
+        if (result) {
+            res.json({ success: true, message: 'Message updated successfully', data: result });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to update message' });
+        }
+    } catch (error) {
+        console.error('Error updating message:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.delete('/messages/:id_message', async (req, res) => {
+    try {
+        const { id_message } = req.params;
+
+        if (!id_message) {
+            return res.status(400).json({ success: false, message: 'Message ID is required' });
+        }
+
+        const result = await SectionModel.deleteContactSection(id_message);
+
+        if (result) {
+            res.json({ success: true, message: 'Message deleted successfully' });
+        } else {
+            res.status(400).json({ success: false, message: 'Failed to delete message' });
+        }
+    } catch (error) {
+        console.error('Error deleting message:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 router.put('/chargeHoraire/:id_charge', async (req, res) => {
     try {
         const { id_charge } = req.params;

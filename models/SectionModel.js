@@ -580,6 +580,28 @@ class SectionModel extends AgentModel {
         const result = await this.request(sql, params);
         return result;
     }
+
+    // Get a specific contact message by ID
+    async getContactSectionById(id) {
+        const sql = `SELECT * FROM contacts_sections WHERE id_section = ?`;
+        const result = await this.request(sql, [id]);
+        return result[0] || null;
+    }
+
+    // Update contact message status
+    async updateContactStatus(id, status) {
+        const sql = `UPDATE contacts_sections SET statut = ? WHERE id = ?`;
+        const result = await this.request(sql, [status, id]);
+        return result;
+    }
+
+    // Delete a contact message
+    async deleteContactSection(id) {
+        const sql = `DELETE FROM contacts_sections WHERE id = ?`;
+        const result = await this.request(sql, [id]);
+        return result;
+    }
+
 }
 
 module.exports = SectionModel;
