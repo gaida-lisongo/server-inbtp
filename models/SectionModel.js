@@ -223,8 +223,14 @@ class SectionModel extends AgentModel {
     }
 
     async getJuryByPromotion(payload){
-        const sql = `SELECT j.*, pj.id AS promotion_juryId
+        const sql = `SELECT j.*, pj.id AS promotion_juryId, CONCAT(g_president.designation, '. ', president.nom, ' ', president.post_nom) AS 'j_president', CONCAT(g_secretaire.designation, '. ', secretaire.nom, ' ', secretaire.post_nom) AS 'j_secretaire', CONCAT(g_membre.designation, '. ', membre.nom, ' ', membre.post_nom) AS 'j_membre'
             FROM jury j
+            INNER JOIN agent president ON president.id = j.id_president
+            INNER JOIN grade g_president ON g_president.id = president.id_grade
+            INNER JOIN agent secretaire ON secretaire.id = j.id_secretaire
+            INNER JOIN grade g_secretaire ON g_secretaire.id = secretaire.id_grade
+            INNER JOIN agent membre ON membre.id = j.id_membre
+            INNER JOIN grade g_membre ON g_membre.id = membre.id_grade
             INNER JOIN promotion_jury pj ON pj.id_jury = j.id
             WHERE pj.id_annee = ? AND pj.id_promotion = ?`;
 
